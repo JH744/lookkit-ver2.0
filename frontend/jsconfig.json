@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "lib": ["es6", "dom"] // ES6 및 DOM 라이브러리 지원 추가
   },
   "exclude": ["node_modules", "dist"]
 }
