@@ -10,21 +10,21 @@
           <div class="carousel-inner">
             <div class="carousel-item active" data-bs-interval="2000">
               <img
-                src="@/assets/category/bag1.png"
+                src="@/assets/banner/main_sumnail1.png"
                 class="d-block w-100"
                 alt="..."
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
               <img
-                src="@/assets/category/bag1.png"
+                src="@/assets/banner/main_sumnail2.png"
                 class="d-block w-100"
                 alt="..."
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
               <img
-                src="@/assets/category/bag1.png"
+                src="@/assets/banner/main_sumnail3.png"
                 class="d-block w-100"
                 alt="..."
               />
@@ -133,18 +133,9 @@
       <div class="new-container">
         <p>NEW-IN</p>
         <div class="new-product-block">
-          <!-- <img
-            class="new-product-img"
-            src="./images/products/038/38_thumbnail.webp"
-          />
-          <img
-            class="new-product-img"
-            src="./images/products/039/39_thumbnail.webp"
-          />
-          <img
-            class="new-product-img"
-            src="./images/products/040/40_thumbnail.webp"
-          /> -->
+          <img class="new-product-img" src="@/assets/38_thumbnail.webp" />
+          <img class="new-product-img" src="@/assets/39_thumbnail.webp" />
+          <img class="new-product-img" src="@/assets/40_thumbnail.webp" />
         </div>
       </div>
     </div>
