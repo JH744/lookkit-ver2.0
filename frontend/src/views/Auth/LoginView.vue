@@ -3,9 +3,9 @@
     <div class="loginContainer">
       <div class="loginBox">
         <div class="loginHeading">로그인</div>
-        <div th:if="${param.error}" class="loginFailMessage">
+        <!-- <div th:if="${param.error}" class="loginFailMessage">
           <span>아이디 또는 비밀번호를 재확인해주세요</span>
-        </div>
+        </div> -->
         <div class="formContainer">
           <form class="formBox" action="/auth/login" method="post">
             <div class="formLabel formLabelId"><label>아이디</label></div>
@@ -27,18 +27,10 @@
               class="inputField inputFieldPassword"
             />
             <div id="showPwdButton" class="showPwdButton show">
-              <img
-                th:src="@{/images/icon/eyesShow.svg}"
-                width="27"
-                height="27"
-              />
+              <img src="@/assets/icons/eyesShow.svg" width="27" height="27" />
             </div>
             <div id="NoShowPwdButton" class="NoShowPwdButton show">
-              <img
-                th:src="@{/images/icon/eyesNoShow.svg}"
-                width="31"
-                height="31"
-              />
+              <img src="@/assets/icons/eyesNoShow.svg" width="31" height="31" />
             </div>
             <div class="rememberIdContainer">
               <input type="checkbox" class="checkbox" id="rememberId" />
@@ -51,14 +43,19 @@
               회원가입
             </button>
             <div class="findIdPasswordContainer">
-              <div class="findIdLink" id="findIdLink">아이디 찾기</div>
+              <div class="findIdLink">
+                <router-link to="/auth/findId">아이디 찾기</router-link>
+              </div>
               <div class="verticalDivider"></div>
-              <div class="findPasswordLink" id="findPasswordLink">
-                비밀번호 찾기
+              <div class="findPasswordLink">
+                <router-link to="/auth/findPwd">비밀번호 찾기</router-link>
               </div>
             </div>
           </form>
-          <button>카카오</button>
+          <!-- 소셜로그인컴포넌트 
+           <button>구글</button>  
+           <button>카카오</button> 
+          <button>네이버</button> -->
         </div>
       </div>
     </div>
@@ -75,7 +72,7 @@ export default {};
   box-sizing: border-box;
 }
 .loginContainer {
-  height: 100vh;
+  height: 85vh;
   position: relative;
   display: flex;
   justify-content: center;

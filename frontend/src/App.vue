@@ -9,4 +9,4 @@
   </header>
 </template>
 
-<style scoped></style>
+<style></style>
