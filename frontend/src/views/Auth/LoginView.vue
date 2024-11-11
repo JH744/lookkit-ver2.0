@@ -7,10 +7,11 @@
           <span>아이디 또는 비밀번호를 재확인해주세요</span>
         </div> -->
         <div class="formContainer">
-          <form class="formBox" action="/auth/login" method="post">
+          <form class="formBox" @submit.prevent="handleLogin">
             <div class="formLabel formLabelId"><label>아이디</label></div>
             <input
               name="username"
+              v-model="username"
               type="text"
               placeholder="아이디를 입력하세요"
               id="idInputBox"
@@ -22,6 +23,7 @@
             <input
               type="password"
               name="password"
+              v-model="password"
               placeholder="비밀번호 영문/특수문자/숫자 8~16자"
               id="pwdInputBox"
               class="inputField inputFieldPassword"
@@ -62,8 +64,31 @@
   </div>
 </template>
 
-<script>
-export default {};
+<script setup>
+import { ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+const router = useRouter();
+
+const username = ref("");
+const password = ref("");
+
+const handleLogin = async () => {
+  try {
+    const response = await axios.post("/api/auth/login", {
+      username: username.value,
+      password: password.value,
+    });
+
+    // JWT를 로컬 스토리지에 저장합니다.
+    localStorage.setItem("token", response.data.token);
+
+    // 성공적으로 로그인한 후 페이지 이동 등을 처리합니다.
+    router.push("/home");
+  } catch (error) {
+    alert("로그인에 실패하였습니다.");
+  }
+};
 </script>
 
 <style scoped>
