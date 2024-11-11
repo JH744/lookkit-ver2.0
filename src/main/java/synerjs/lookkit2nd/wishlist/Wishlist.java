@@ -2,6 +2,8 @@ package synerjs.lookkit2nd.wishlist;
 
 import jakarta.persistence.*;
 import lombok.*;
+import synerjs.lookkit2nd.coordiset.Coordiset;
+import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
 @Getter
@@ -19,14 +21,12 @@ public class Wishlist {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Long productId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-    private Long codiId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "codi_id")
+    private Coordiset codi;
 
-    @Builder
-    public Wishlist(User user, Long productId, Long codiId) {
-        this.user = user;
-        this.productId = productId;
-        this.codiId = codiId;
-    }
 }
