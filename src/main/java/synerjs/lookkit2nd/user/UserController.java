@@ -9,6 +9,7 @@ public class UserController {
     private final UserService userService;
 
     public UserController(UserService userService) {
+        System.out.println("테스트");
         this.userService = userService;
     }
 
