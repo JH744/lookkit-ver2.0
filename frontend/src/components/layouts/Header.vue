@@ -6,7 +6,7 @@
         <ul class="navMenu">
           <li>
             <router-link to="/main/category?type=outer" class="menu"
-              >Home</router-link
+              >OUTER</router-link
             >
           </li>
           <li>
@@ -47,7 +47,7 @@
         <div class="navIcon">
           <!-- 비로그인시 로그인버튼 노출-->
           <div id="LoginBtn" class="iconBtn">
-            <router-link to="/login" class="btn-a">
+            <router-link to="/auth/login" class="btn-a">
               <img
                 src="@/assets/icons/login.png"
                 class="simptip-position-top simptip-success"
