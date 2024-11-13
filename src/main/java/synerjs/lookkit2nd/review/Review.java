@@ -2,12 +2,14 @@ package synerjs.lookkit2nd.review;
 
 import jakarta.persistence.*;
 import lombok.*;
-import synerjs.lookkit2nd.coordiset.Coordiset;
+import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,11 +24,13 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codi_id")
-    private Coordiset coordiset;
+    @JsonIgnore
+    private Codi codi;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -39,9 +43,9 @@ public class Review {
     private Timestamp createdAt;
 
     @Builder
-    public Review(Product product, Coordiset coordiset, User user, Integer rating, String reviewText, Timestamp createdAt) {
+    public Review(Product product, Codi codi, User user, Integer rating, String reviewText, Timestamp createdAt) {
         this.product = product;
-        this.coordiset = coordiset;
+        this.codi = codi;
         this.user = user;
         this.rating = rating;
         this.reviewText = reviewText;

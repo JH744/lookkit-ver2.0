@@ -1,29 +1,17 @@
 package synerjs.lookkit2nd.product;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+@Data
+@Builder
+public class ProductDTO {
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-@ToString
-@Table(name = "products")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
+    private Long categoryId;
     private String productName;
     private String brandName;
     private String productDescription;
@@ -34,10 +22,9 @@ public class Product {
     private Timestamp productCreatedAt;
     private Timestamp productUpdatedAt;
 
-    @Builder
-    public Product(Category category, String productName, String brandName, String productDescription, Integer productPrice,
-                   Integer productStock, String genderTarget, String productThumbnail, Timestamp productCreatedAt, Timestamp productUpdatedAt) {
-        this.category = category;
+    public ProductDTO(Long productId, Long categoryId, String productName, String brandName, String productDescription, Integer productPrice, Integer productStock, String genderTarget, String productThumbnail, Timestamp productCreatedAt, Timestamp productUpdatedAt) {
+        this.productId = productId;
+        this.categoryId = categoryId;
         this.productName = productName;
         this.brandName = brandName;
         this.productDescription = productDescription;

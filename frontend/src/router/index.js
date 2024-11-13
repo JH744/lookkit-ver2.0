@@ -43,6 +43,32 @@ const routes = [
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
+  {
+    path: "/codi/:codiId",
+    component: () => import("@/views/Codi/CodiView.vue"),
+  },
+  {
+    path: "/product/:productId",
+    component: () => import("@/views/Product/ProductView.vue"),
+  },
+  {
+    path: "/order",
+    component: () => import("@/views/Order/OrderView.vue"),
+    children: [
+      {
+        path: "addaddress",
+        component: () => import("@/views/Order/AddAddressView.vue"),
+      },
+      {
+        path: "complete",
+        component: () => import("@/views/Order/OrderCompleteView.vue"),
+      },
+    ],
+  },
+  {
+    path: "/cart",
+    component: () => import("@/views/Cart/CartView.vue"),
+  },
 ];
 
 const router = createRouter({

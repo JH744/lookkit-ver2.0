@@ -19,14 +19,16 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-
+    @Column(name = "USER_UUID")
     private String userUid;
     private String password;
     private String userName;
     private String gender;
+    @Column(name = "BIRTHDATE")
     private LocalDate birthDate;
     private String email;
     private String phone;
+    @Column(name = "CREATED_AT")
     private Timestamp userCreatedAt;
     private Timestamp lastUpdate;
     private String role;

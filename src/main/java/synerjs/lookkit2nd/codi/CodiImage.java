@@ -1,4 +1,4 @@
-package synerjs.lookkit2nd.coordiset;
+package synerjs.lookkit2nd.codi;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "codi_images")
 @ToString
-public class CoordisetImage {
+public class CodiImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +16,12 @@ public class CoordisetImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codi_id")
-    private Coordiset coordiset;
+    private Codi coordiset;
 
     private String imgPath;
 
     @Builder
-    public CoordisetImage(Coordiset coordiset, String imgPath) {
+    public CodiImage(Codi coordiset, String imgPath) {
         this.coordiset = coordiset;
         this.imgPath = imgPath;
     }

@@ -23,17 +23,11 @@ public class Order {
     private User user;
 
     private BigDecimal totalAmount;
-
     private String orderStatus;
-
     private String orderComment;
-
     private Timestamp orderDate;
-
     private String orderAddressee;
-
     private String orderAddress;
-
     private String orderPhone;
 
     @Builder
