@@ -1,17 +1,15 @@
 package synerjs.lookkit2nd.user;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        System.out.println("테스트");
-        this.userService = userService;
-    }
 
 //    @GetMapping("/{id}")
 //    public UserDTO getUser(@PathVariable Long id) {

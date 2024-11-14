@@ -42,7 +42,7 @@
             </div>
             <button type="submit" class="loginButton">로그인</button>
             <button type="button" class="signupLink" id="signupLink">
-              회원가입
+              <router-link to="/auth/signup">회원가입</router-link>
             </button>
             <div class="findIdPasswordContainer">
               <div class="findIdLink">
@@ -75,16 +75,15 @@ const password = ref("");
 
 const handleLogin = async () => {
   try {
-    const response = await axios.post("/api/auth/login", {
-      username: username.value,
-      password: password.value,
-    });
-
-    // JWT를 로컬 스토리지에 저장합니다.
-    localStorage.setItem("token", response.data.token);
-
-    // 성공적으로 로그인한 후 페이지 이동 등을 처리합니다.
-    router.push("/home");
+    const response = await axios
+      .post("/api/auth/login", {
+        username: username.value,
+        password: password.value,
+      })
+      .then((jwt) => {
+        console.log("jwt", jwt);
+      });
+    router.push("/main");
   } catch (error) {
     alert("로그인에 실패하였습니다.");
   }
