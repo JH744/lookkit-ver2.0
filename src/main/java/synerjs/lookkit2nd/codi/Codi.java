@@ -1,4 +1,4 @@
-package synerjs.lookkit2nd.coordiset;
+package synerjs.lookkit2nd.codi;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,9 +10,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@ToString
 @Table(name = "codi")
-public class Coordiset {
+public class Codi {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +25,11 @@ public class Coordiset {
 
     private Integer codiPrice;
 
-    @OneToMany(mappedBy = "coordiset", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
-    public Coordiset(String codiName, String codiDescription, String codiThumbnail, Integer codiPrice) {
+    public Codi(String codiName, String codiDescription, String codiThumbnail, Integer codiPrice) {
         this.codiName = codiName;
         this.codiDescription = codiDescription;
         this.codiThumbnail = codiThumbnail;

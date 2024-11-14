@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import Mypage from "@/views/mypage/Mypage.vue";
 
 const routes = [
   {
@@ -42,6 +43,28 @@ const routes = [
   {
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
+  },
+  {
+    path: "/mypage",
+    component: Mypage,
+    children: [
+      {
+        path: "manage",
+        component: () => import("@/views/mypage/OrderManagement.vue"),
+      },
+      {
+        path: "inquiry",
+        component: () => import("@/views/mypage/inquiry/UserInquiryList.vue"),
+      },
+      {
+        path: "inquiry/create",
+        component: () => import("@/views/mypage/inquiry/InquiryForm.vue"),
+      },
+      {
+        path: "wishlist",
+        component: () => import("@/views/mypage/WishList.vue"),
+      },
+    ],
   },
 ];
 

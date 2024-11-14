@@ -6,6 +6,7 @@ import Header from "./components/layouts/Header.vue";
 
 const app = createApp(App);
 
-app.component("Header", Header); //공용 컴포넌트 등록
+//공용 컴포넌트 등록
+app.component("Header", Header);
 
 app.use(router).mount("#app");

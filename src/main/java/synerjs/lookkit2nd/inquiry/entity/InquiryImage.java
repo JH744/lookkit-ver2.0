@@ -1,12 +1,14 @@
-package synerjs.lookkit2nd.inquiry;
+package synerjs.lookkit2nd.inquiry.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 @ToString
+@Builder
 @Table(name = "inquiries_images")
 public class InquiryImage {
 
@@ -14,15 +16,7 @@ public class InquiryImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long inquiryImageId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inquiry_id")
-    private Inquiry inquiry;
+    private Long inquiryId;
 
     private String imagePath;
-
-    @Builder
-    public InquiryImage(Inquiry inquiry, String imagePath) {
-        this.inquiry = inquiry;
-        this.imagePath = imagePath;
-    }
 }

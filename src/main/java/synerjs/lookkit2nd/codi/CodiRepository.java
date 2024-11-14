@@ -1,8 +1,8 @@
-package synerjs.lookkit2nd.coordiset;
+package synerjs.lookkit2nd.codi;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CoordisetRepository extends JpaRepository<Coordiset,Long> {
+public interface CodiRepository extends JpaRepository<Codi,Long> {
 }

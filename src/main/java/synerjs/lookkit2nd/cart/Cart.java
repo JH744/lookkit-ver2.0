@@ -1,7 +1,12 @@
 package synerjs.lookkit2nd.cart;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import synerjs.lookkit2nd.codi.Codi;
+import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
 @Getter
@@ -16,15 +21,16 @@ public class Cart {
     private Long cartId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     private User user;
-    private Long productId;
-    private Long codiId;
 
-    @Builder
-    public Cart(User user, Long productId, Long codiId) {
-        this.user = user;
-        this.productId = productId;
-        this.codiId = codiId;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID")
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CODI_ID")
+    private Codi codi;
+
+    private int quantity;
 }

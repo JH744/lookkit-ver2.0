@@ -1,15 +1,16 @@
-package synerjs.lookkit2nd.wishlist;
+package synerjs.lookkit2nd.wishlist.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import synerjs.lookkit2nd.coordiset.Coordiset;
+import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
-@Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@ToString
+@Getter
+@Builder
 @Table(name = "wishlist")
 public class Wishlist {
 
@@ -27,6 +28,6 @@ public class Wishlist {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codi_id")
-    private Coordiset codi;
+    private Codi codi;
 
 }

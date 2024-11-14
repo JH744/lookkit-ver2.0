@@ -35,18 +35,18 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
-    @Builder
-    public User(String userUid, String password, String userName, String gender, LocalDate birthDate,
-                String email, String phone, Timestamp userCreatedAt, String role, String address) {
-        this.userUid = userUid;
-        this.password = password;
-        this.userName = userName;
-        this.gender = gender;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.phone = phone;
-        this.userCreatedAt = userCreatedAt;
-        this.role = role;
-        this.address = address;
-    }
+//    @Builder
+//    public User(String userUid, String password, String userName, String gender, LocalDate birthDate,
+//                String email, String phone, Timestamp userCreatedAt, String role, String address) {
+//        this.userUid = userUid;
+//        this.password = password;
+//        this.userName = userName;
+//        this.gender = gender;
+//        this.birthDate = birthDate;
+//        this.email = email;
+//        this.phone = phone;
+//        this.userCreatedAt = userCreatedAt;
+//        this.role = role;
+//        this.address = address;
+//    }
 }
