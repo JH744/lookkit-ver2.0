@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
 public class UserDTO {
     private Long userId;
     private String userUuid;
@@ -26,5 +27,21 @@ public class UserDTO {
     private Timestamp lastUpdate;
     private String role;
     private String address;
+
+
+    public User toEntity(UserDTO dto) {
+        User user = User.builder()
+                .userUuid(dto.getUserUuid())
+                .userName(dto.getUserName())
+                .gender(dto.getGender())
+                .password(dto.getPassword())
+                .email(dto.getEmail())
+                .phone(dto.getPhone())
+                .address(dto.getAddress())
+                .birthDate(dto.getBirthDate())
+                .build();
+        return user;
+
+    }
 
 }

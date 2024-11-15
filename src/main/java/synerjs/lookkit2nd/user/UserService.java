@@ -32,7 +32,7 @@ public class UserService {
         boolean result = true;
         try {
             userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));// 암호화
-             User user  = userMapper.toEntity(userDto);  // dto -> 엔티티 변환
+             User user  = userDto.toEntity(userDto);  // dto -> 엔티티 변환
             userRepository.save(user);
         }catch (Exception e){
             System.out.println("에러발생: "+e.getMessage());

@@ -3,9 +3,9 @@
     <div class="loginContainer">
       <div class="loginBox">
         <div class="loginHeading">로그인</div>
-        <!-- <div th:if="${param.error}" class="loginFailMessage">
+        <div v-if="loginError" class="loginFailMessage">
           <span>아이디 또는 비밀번호를 재확인해주세요</span>
-        </div> -->
+        </div>
         <div class="formContainer">
           <form class="formBox" @submit.prevent="handleLogin">
             <div class="formLabel formLabelId"><label>아이디</label></div>
@@ -21,21 +21,36 @@
               <label>비밀번호</label>
             </div>
             <input
-              type="password"
+              :type="inputPwdType"
               name="password"
               v-model="password"
               placeholder="비밀번호 영문/특수문자/숫자 8~16자"
               id="pwdInputBox"
               class="inputField inputFieldPassword"
             />
-            <div id="showPwdButton" class="showPwdButton show">
+            <div
+              id="showPwdButton"
+              class="showPwdButton"
+              @click="isPasswordVisible = !isPasswordVisible"
+              :class="{ hidden: !isPasswordVisible }"
+            >
               <img src="@/assets/icons/eyesShow.svg" width="27" height="27" />
             </div>
-            <div id="NoShowPwdButton" class="NoShowPwdButton show">
+            <div
+              id="NoShowPwdButton"
+              class="NoShowPwdButton"
+              @click="isPasswordVisible = !isPasswordVisible"
+              :class="{ hidden: isPasswordVisible }"
+            >
               <img src="@/assets/icons/eyesNoShow.svg" width="31" height="31" />
             </div>
             <div class="rememberIdContainer">
-              <input type="checkbox" class="checkbox" id="rememberId" />
+              <input
+                type="checkbox"
+                class="checkbox"
+                id="rememberId"
+                v-model="isRememberId"
+              />
               <label class="rememberIdLabel" for="rememberId"
                 >아이디 저장</label
               >
@@ -65,13 +80,31 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch, onMounted, reactive } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 const router = useRouter();
-
 const username = ref("");
 const password = ref("");
+const isPasswordVisible = ref(false);
+const inputPwdType = ref("password");
+const loginError = ref(false);
+const isRememberId = ref(false);
+
+onMounted(() => {
+  const savedId = localStorage.getItem("savedId");
+  if (savedId) {
+    isRememberId.value = true; // 아이디저장 체크박스 체크활성화
+    username.value = savedId;
+  }
+});
+
+watch(
+  () => isPasswordVisible.value,
+  (value) => {
+    inputPwdType.value = value ? "text" : "password";
+  }
+);
 
 const handleLogin = async () => {
   try {
@@ -81,11 +114,19 @@ const handleLogin = async () => {
         password: password.value,
       })
       .then((jwt) => {
-        console.log("jwt", jwt);
+        // console.log("jwt", jwt);
+
+        // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
+        if (isRememberId.value) {
+          localStorage.setItem("savedId", username.value);
+        } else {
+          // 미체크시 기존저장된 아이디를 삭제
+          localStorage.removeItem("savedId");
+        }
       });
     router.push("/main");
   } catch (error) {
-    alert("로그인에 실패하였습니다.");
+    loginError.value = true; // 에러 메시지 출력
   }
 };
 </script>
@@ -282,7 +323,7 @@ const handleLogin = async () => {
   position: absolute;
   top: 148px;
   right: 12px;
-  display: none;
+
   cursor: pointer;
 }
 .showPwdButton {
@@ -290,5 +331,9 @@ const handleLogin = async () => {
   top: 150px;
   right: 14px;
   cursor: pointer;
+}
+
+.hidden {
+  display: none;
 }
 </style>
