@@ -23,7 +23,7 @@
               name="userUuid"
               v-model="userUuid"
               class="inputField"
-              placeholder="아이디를 입력하세요"
+              placeholder="아이디를 입력하세요."
             />
             <button
               type="button"
@@ -50,6 +50,18 @@
 
             <label id="pwCheckLabel" class="pwCheckLabel"> 비밀번호 체크</label>
           </div>
+          <div class="passwordCheckContainer">
+            <div class="passwordLabel">비밀번호 확인</div>
+
+            <input
+              type="password"
+              v-model="repeatPassword"
+              class="passwordInput"
+              placeholder="비밀번호를 재입력해주세요."
+            />
+
+            <label id="pwCheckLabel" class="pwCheckLabel"> 비밀번호 체크</label>
+          </div>
           <div class="nameContainer">
             <div class="nameLabel">이름</div>
             <input
@@ -58,7 +70,7 @@
               v-model="userName"
               name="userName"
               class="nameInput"
-              placeholder="이름을 입력하세요"
+              placeholder="이름을 입력하세요."
             />
           </div>
           <div class="phoneContainer">
@@ -69,7 +81,7 @@
               v-model="phone"
               name="phone"
               class="nameInput"
-              placeholder="-없이 휴대폰 번호를 입력하세요"
+              placeholder="-없이 휴대폰 번호를 입력하세요."
             />
           </div>
           <div class="emailLabel">이메일 주소</div>
@@ -123,7 +135,7 @@
             v-model="birthDate"
             class="birthdateInput"
             name="birthDate"
-            placeholder="생년월일 6자리를 입력하세요"
+            placeholder="생년월일 6자리를 입력하세요."
           />
           <div class="genderMaleContainer">
             <input
@@ -180,6 +192,7 @@ const router = useRouter();
 
 const userUuid = ref("");
 const password = ref("");
+const repeatPassword = ref("");
 const userName = ref("");
 const phone = ref("");
 const email = ref("");
@@ -346,7 +359,7 @@ const chooseGenderMan = () => {
   height: 100px;
   position: absolute;
   left: 0px;
-  top: 1033px;
+  top: 1130px;
 }
 .signupButton {
   background: #0d1134;
@@ -492,6 +505,15 @@ const chooseGenderMan = () => {
   left: 0px;
   top: 126px;
 }
+
+.passwordCheckContainer {
+  width: 499px;
+  height: 86px;
+  position: absolute;
+  left: 0px;
+  top: 251px;
+}
+
 .passwordLabel {
   color: #000000;
   text-align: left;
@@ -537,7 +559,7 @@ const chooseGenderMan = () => {
   height: 87px;
   position: absolute;
   left: 0px;
-  top: 251px;
+  top: 377px;
 }
 .nameLabel {
   color: #000000;
@@ -583,7 +605,7 @@ const chooseGenderMan = () => {
   height: 87px;
   position: absolute;
   left: 0px;
-  top: 377px;
+  top: 755px;
 }
 .phoneLabel {
   color: #000000;
@@ -652,7 +674,7 @@ const chooseGenderMan = () => {
   font-weight: 400;
   position: absolute;
   left: 0px;
-  top: 755px;
+  top: 880px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -672,7 +694,7 @@ const chooseGenderMan = () => {
   height: 57px;
   position: absolute;
   right: 1px;
-  top: 731px;
+  top: 855px;
   cursor: pointer;
   text-align: center;
   align-content: center;
@@ -696,7 +718,7 @@ const chooseGenderMan = () => {
   height: 57px;
   position: absolute;
   left: 0px;
-  top: 731px;
+  top: 855px;
 }
 .detailedAddressInput {
   background: #ffffff;
@@ -707,7 +729,7 @@ const chooseGenderMan = () => {
   height: 57px;
   position: absolute;
   left: 0px;
-  top: 867px;
+  top: 980px;
 }
 .postcodeSearchText {
   color: #555553;
