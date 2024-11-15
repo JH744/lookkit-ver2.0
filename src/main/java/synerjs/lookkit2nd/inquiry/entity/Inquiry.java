@@ -2,6 +2,7 @@ package synerjs.lookkit2nd.inquiry.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +23,10 @@ public class Inquiry {
 
     private String inquiryContents;
 
+    @CreationTimestamp
     private LocalDateTime inquiryCreatedAt;
 
-    private char answerState; // Enum 대신 char 사용
+    @Column(length = 1)
+    @Builder.Default
+    private String answerState = "N"; // Enum 대신 String
 }

@@ -21,7 +21,9 @@
           <tbody>
             <tr v-for="inquiry in inquiries" :key="inquiry.inquiryId">
               <td class="right-padding">
-                <a :href="`/mypage/inquiry/view/${inquiry.inquiryId}`">{{ inquiry.inquiryTitle }}</a>
+                <router-link :to="`/mypage/inquiry/${inquiry.inquiryId}`">
+                  {{ inquiry.inquiryTitle }}
+                </router-link>
               </td>
               <td>{{ formatDate(inquiry.inquiryCreatedAt) }}</td>
               <td class="answer-text">{{ inquiry.answerState === 'Y' ? 'YES' : 'NO' }}</td>
@@ -42,18 +44,21 @@ const inquiries = ref([]);
 // 데이터 로드 함수
 const loadInquiries = async () => {
   try {
-    const response = await axios.get('http://localhost:8081/api/inquiry/5');
+    const response = await axios.get('http://localhost:8081/api/mypage/inquiry/user/5');
     inquiries.value = response.data.data;
-    console.log(inquiries.value);
   } catch (error) {
     console.error('Error loading inquiries:', error);
   }
 };
 
 // 날짜 형식 변환 함수
-const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-  return new Date(dateString).toLocaleDateString('ko-KR', options);
+const formatDate = (dateTime) => {
+  const date = new Date(dateTime);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}.${month}.${day}`
 };
 
 // 문의 삭제 함수
@@ -118,10 +123,12 @@ th {
 
 
 td button {
-    padding: 5px 10px;
+    padding: 6px 10px;
     background-color: #ffffff;
     border: 1px solid #ccc;
     cursor: pointer;
+    font-size: 13px;
+    border-radius: 5px;
 }
 
 td button:hover {

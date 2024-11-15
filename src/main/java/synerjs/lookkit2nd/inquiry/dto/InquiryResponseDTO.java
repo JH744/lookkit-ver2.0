@@ -18,7 +18,7 @@ public class InquiryResponseDTO {
     private String inquiryTitle;
     private String inquiryContents;
     private LocalDateTime inquiryCreatedAt;
-    private char answerState;
+    private String answerState;
     private List<InquiryImageDTO> inquiryImages = new ArrayList<>();
 
     public static InquiryResponseDTO fromEntity(Inquiry inquiry, List<InquiryImageDTO> inquiryImages) {
@@ -31,7 +31,5 @@ public class InquiryResponseDTO {
                 .answerState(inquiry.getAnswerState())
                 .inquiryImages(inquiryImages)
                 .build();
-
     }
-
 }

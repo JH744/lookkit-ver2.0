@@ -30,7 +30,7 @@ public class InquiryService {
     // 사용자의 문의 리스트
     @Transactional(readOnly = true)
     public List<InquiryResponseDTO> getUserInquiries(Long userId) {
-        return inqRepository.findByUserId(userId)
+        return inqRepository.findByUserIdOrderByInquiryCreatedAtDesc(userId)
                 .stream()
                 .map(inquiry -> InquiryResponseDTO.fromEntity(inquiry, Collections.emptyList())) // 이미지 없이 DTO 생성
                 .collect(Collectors.toList());
@@ -56,6 +56,7 @@ public class InquiryService {
         Inquiry inquiry = request.toEntity();
         inqRepository.save(inquiry);
 
+
         List<InquiryImageDTO> imagesToSave = new ArrayList<>();
 
         // 이미지가 있는 경우, 이미지 저장 및 정보 DB 저장
@@ -67,6 +68,7 @@ public class InquiryService {
 
                     // 이미지 정보 DB 저장
                     InquiryImage saveImg = InquiryImage.builder()
+                            .inquiryId(inquiry.getInquiryId())
                             .imagePath(imagePath)
                             .build();
                     imgRepository.save(saveImg);

@@ -61,6 +61,12 @@ const routes = [
         component: () => import("@/views/mypage/inquiry/InquiryForm.vue"),
       },
       {
+        path: "inquiry/:inquiryId",
+        name: "InquiryDetail",
+        component: () => import("@/views/mypage/inquiry/InquiryDetail.vue"),
+        props: true, // URL의 파라미터를 컴포넌트의 props로 전달할 수 있게 함
+      },
+      {
         path: "wishlist",
         component: () => import("@/views/mypage/WishList.vue"),
       },

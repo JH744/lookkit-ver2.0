@@ -2,6 +2,7 @@ package synerjs.lookkit2nd.inquiry.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import synerjs.lookkit2nd.common.response.BaseResponse;
@@ -15,25 +16,25 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/inquiry")
+@RequestMapping("/api/mypage/inquiry")
 public class InquiryController {
     private final InquiryService inquiryService;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public BaseResponse<List<InquiryResponseDTO>> getUserInquiries(@PathVariable Long userId) {
         List<InquiryResponseDTO> response = inquiryService.getUserInquiries(userId);
         return new BaseResponse<>(response);
     }
 
-    @GetMapping("/{userId}/{inquiryId}")
-    public BaseResponse<InquiryResponseDTO> getInquiryDetail(@PathVariable Long userId, @PathVariable Long inquiryId) {
-        InquiryResponseDTO response = inquiryService.getInquiryDetail(userId);
+    @GetMapping("/{inquiryId}")
+    public BaseResponse<InquiryResponseDTO> getInquiryDetail(@PathVariable Long inquiryId) {
+        InquiryResponseDTO response = inquiryService.getInquiryDetail(inquiryId);
         return new BaseResponse<>(response);
     }
 
-    @PostMapping
-    public BaseResponse<InquiryResponseDTO> createInquiry(@RequestBody InquiryRequestDTO request,
-                                                          @RequestParam(value = "files", required = false) List<MultipartFile> files) throws IOException {
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public BaseResponse<InquiryResponseDTO> createInquiry(@RequestPart("request") InquiryRequestDTO request,
+                                                          @RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
         InquiryResponseDTO response = inquiryService.createInquiry(request, files);
         return new BaseResponse<>(response);
     }
