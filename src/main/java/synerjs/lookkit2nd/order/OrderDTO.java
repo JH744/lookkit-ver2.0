@@ -21,14 +21,16 @@ public class OrderDTO {
     private String orderAddress;
     private String orderPhone;
     
-    private Long itemId;           
-    private String itemName;       
-    private Integer quantity;       
-    private LocalDate startDate;    
-    private LocalDate endDate;      
+    private Long itemId;
+    private String itemName;
+    private String brandName;
+    private Integer quantity;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Integer price;  
+    private Integer totalPrice;
 
-    public OrderDTO(Long orderId, Long userId, BigDecimal totalAmount, String orderStatus, String orderComment, Timestamp orderDate, String orderAddressee, String orderAddress, String orderPhone, Long itemId, String itemName, Integer quantity, LocalDate startDate, LocalDate endDate, Integer price) {
+    public OrderDTO(Long orderId, Long userId, BigDecimal totalAmount, String orderStatus, String orderComment, Timestamp orderDate, String orderAddressee, String orderAddress, String orderPhone, Long itemId, String itemName, String brandName, Integer quantity, LocalDate startDate, LocalDate endDate, Integer price, Integer totalPrice) {
         this.orderId = orderId;
         this.userId = userId;
         this.totalAmount = totalAmount;
@@ -40,9 +42,11 @@ public class OrderDTO {
         this.orderPhone = orderPhone;
         this.itemId = itemId;
         this.itemName = itemName;
+        this.brandName = brandName;
         this.quantity = quantity;
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
+        this.totalPrice = totalPrice;
     }
 }

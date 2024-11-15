@@ -3,68 +3,38 @@ package synerjs.lookkit2nd.order;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/api/order")
 public class OrderController {
 
+    private final OrderService orderService;
 
-//     @PostMapping("/order")
-//     public ResponseEntity<String> createOrder(@RequestBody OrderDTO orderDTO) {
-//     Order order = Order.builder()
-//             .userId(orderDTO.getUserId())
-//             .totalAmount(orderDTO.getTotalAmount())
-//             .orderStatus(orderDTO.getOrderStatus())
-//             .orderComment(orderDTO.getOrderComment())
-//             .orderDate(orderDTO.getOrderDate())
-//             .orderAddressee(orderDTO.getOrderAddressee())
-//             .orderAddress(orderDTO.getOrderAddress())
-//             .orderPhone(orderDTO.getOrderPhone())
-//             .build();
+    @Autowired
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
-//     orderService.saveOrder(order);
-//     return ResponseEntity.ok("Order created successfully");
-// }
- 
-    @PostMapping("/buy-now/product")
-public OrderDTO buyNowProduct(
-        @RequestParam Long productId,
-        @RequestParam String productName,
-        @RequestParam Integer quantity,
-        @RequestParam Integer price) {
-
-    OrderDTO orderDTO = OrderDTO.builder()
-            .itemId(productId)
-            .itemName(productName)
-            .quantity(quantity)
-            .price(price * quantity)
-            .build();
-
-    return orderDTO;
+    // // 주문을 DB에 저장하는 API
+    // @PostMapping("/complete")
+    // public ResponseEntity<String> completeOrder(@RequestBody OrderDTO orderDTO) {
+    //     try {
+    //         orderService.saveOrder(orderDTO);
+    //         return ResponseEntity.ok("Order completed and saved successfully");
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    //                              .body("Failed to complete order: " + e.getMessage());
+    //     }
+    // }
 }
 
-@PostMapping("/rent-now/codi")
-public OrderDTO rentNowCodi(
-        @RequestParam Long codiId,
-        @RequestParam String codiName,
-        @RequestParam LocalDate startDate,
-        @RequestParam LocalDate endDate,
-        @RequestParam Integer rentalPrice) {
-
-    OrderDTO orderDTO = OrderDTO.builder()
-            .itemId(codiId)
-            .itemName(codiName)
-            .startDate(startDate)
-            .endDate(endDate)
-            .price(rentalPrice)
-            .build();
-
-    return orderDTO;
-}
-
-
-}
 
 

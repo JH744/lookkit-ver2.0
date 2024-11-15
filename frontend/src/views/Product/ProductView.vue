@@ -19,7 +19,7 @@
           </div>
           <div v-if="quantity > 0" class="selected-summary-info">
             <div class="selected-summary">
-              <p>선택한 수량: {{ quantity }}개</p>
+              <p>선택한 수량 {{ quantity }}개</p>
               <p><strong style="font-size: 1.5em;">총 구매 금액: {{ formattedTotalPrice }}</strong></p>
             </div>
             <button @click="resetQuantity" class="btn btn-reset">X</button>
@@ -149,46 +149,60 @@
   
   const addToCart = async () => {
     try {
-      await axios.post('/product/add', {
-        productId: product.value.productId,
-        quantity: quantity.value
-      });
+    const userId = 1;
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
+    const response = await axios.post(
+      `${API_BASE_URL}/add/product/${product.value.productId}?quantity=${quantity.value}&userId=${userId}`
+    );
+     
       alert('장바구니에 추가되었습니다.');
       window.location.href = '/cart';
     } catch (error) {
-      if (error.response && error.response.status === 409) {
-        updateCartQuantity(quantity.value);
-      } else {
+      console.error("옷장에 추가 실패:", error);
         alert('장바구니에 추가하는 데 실패했습니다.');
-      }
     }
   };
   
-  const updateCartQuantity = async (additionalQuantity) => {
-    try {
-      await axios.put('/cart/update', {
-        productId: product.value.productId,
-        additionalQuantity: additionalQuantity
-      });
-      alert('장바구니 수량이 업데이트되었습니다.');
-      window.location.href = '/cart';
-    } catch (error) {
-      alert('장바구니 수량 업데이트에 실패했습니다.');
-    }
-  };
+  // const updateCartQuantity = async (additionalQuantity) => {
+  //   try {
+  //     await axios.put('/cart/update', {
+  //       productId: product.value.productId,
+  //       additionalQuantity: additionalQuantity
+  //     });
+  //     alert('장바구니 수량이 업데이트되었습니다.');
+  //     window.location.href = '/cart';
+  //   } catch (error) {
+  //     alert('장바구니 수량 업데이트에 실패했습니다.');
+  //   }
+  // };
   
-  const buyNow = async () => {
-    try {
-      await axios.post(`${API_BASE_URL}/buy`, {
-        productId: product.value.productId,
-        quantity: quantity.value
-      });
-      alert('주문 페이지로 이동합니다.');
-      window.location.href = '/order';
+  const buyNow = async () => { 
+  try {
+    const API_BASE_URL = 'http://localhost:8081/api/products';
+    // 주문 정보 API 호출
+    const response = await axios.post(`${API_BASE_URL}/buy?productId=${product.value.productId}&quantity=${quantity.value}`);
+
+    // API 호출 결과로부터 OrderDTO 객체를 반환받음
+    const orderDTO = response.data;
+
+    // 주문 페이지로 이동 시 주문 정보를 URL 파라미터에 추가하여 전달
+    const orderParams = new URLSearchParams({
+      itemId: orderDTO.itemId,
+      itemName: orderDTO.itemName,
+      brandName: orderDTO.brandName,
+      quantity: orderDTO.quantity,
+      price: orderDTO.price,
+      totalPrice: orderDTO.totalPrice,
+      itemType: 'product'  // 상품인지 코디인지 구분을 위한 파라미터
+    });
+
+    alert('주문 페이지로 이동합니다.');
+    window.location.href = `/order?${orderParams.toString()}`;
   } catch (error) {
     alert('구매 페이지로 이동하는 데 실패했습니다.');
     console.error("주문 오류:", error);
   }
 };
+
 </script>
   

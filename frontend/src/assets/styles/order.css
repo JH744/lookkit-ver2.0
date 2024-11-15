@@ -109,20 +109,44 @@
 }
 .item-description {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 5px;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #e6e6e6;
+  border-radius: 5px;
 }
-.brand-name2 {
+
+.brand-name {
   color: #212529;
   font-size: 11px;
 }
+
 .product-name {
   font-size: 14px;
   color: #767676;
 }
+
+
+.product-variant {
+  font-size: 13px;
+  color: #7b7b7b;
+  display: flex;
+  flex-direction: row;
+}
+.product-variant2 {
+  font-size: 13px;
+  color: #7b7b7b;
+  display: flex;
+  flex-direction: row;
+}
+
 .item-price {
-  font-weight: 700;
-  font-size: 18px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #101010;
 }
 .payment-frame {
   width: 100%;

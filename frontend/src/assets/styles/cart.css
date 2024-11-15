@@ -47,7 +47,6 @@
     display: flex;
     border-top: 1px solid #101010;
     padding: 20px;
-    gap: 760px;
     flex-direction: row;
     justify-content: space-between;
   }
@@ -66,17 +65,27 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
+    gap: 10%;
+    
+  }
+
+  .cart-item-list2 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10%;
+    margin-bottom: 40px;
   }
   
   .cart-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #e6e6e6;
     border-radius: 5px;
-    width: 100%;
   }
   
   .item-checkbox {
@@ -95,10 +104,9 @@
     flex-direction: column;
     gap: 5px;
     flex: 1;
-    margin-left: 20px;
   }
   
-  .brand-name2 {
+  .brand {
     color: #212529;
     font-size: 11px;
   }
@@ -107,10 +115,13 @@
     font-size: 14px;
     color: #767676;
   }
+
   
   .product-variant {
     font-size: 13px;
     color: #7b7b7b;
+    display: flex;
+    flex-direction: row;
   }
   
   .item-price {
@@ -120,24 +131,37 @@
   }
   
   .item-price-box {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    flex: 1;
-    margin-right: 15px;
+    gap: 5px;  
   }
   
   .quantity-input {
     background: none;
     border: 1px solid #6a6a6a;
     border-radius: 24px;
-    padding: 5px 15px;
+    padding: 5px 5px;
     display: flex;
     align-items: center;
     gap: 5px;
+    width: 50px;
     cursor: pointer;
   }
   
+  .selected-items-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+  }
+  .delete-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #6a6a6a;
+    cursor: pointer;
+    background: none;
+    border: none;
+ }
   .cart-summary {
     width: 100%;
     margin-top: 40px;

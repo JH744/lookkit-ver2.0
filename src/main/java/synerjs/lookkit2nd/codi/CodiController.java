@@ -32,24 +32,28 @@ public class CodiController {
 
     @PostMapping("/rent")
     public OrderDTO rentCodi(
-    @RequestParam(name = "codiId") Long codiId, 
-    @RequestParam(name = "startDate") String startDate, 
-    @RequestParam(name = "endDate") String endDate) {
-        Codi codi = codiService.getCodiById(codiId);
-        LocalDate rentalStart = LocalDate.parse(startDate);
-        LocalDate rentalEnd = LocalDate.parse(endDate);
-        int days = (int) ChronoUnit.DAYS.between(rentalStart, rentalEnd);
-        BigDecimal basePrice = new BigDecimal("40000");
-        BigDecimal additionalDayPrice = new BigDecimal("10000");
-        BigDecimal totalPrice = days > 3 ? basePrice.add(additionalDayPrice.multiply(new BigDecimal(days - 3))) : basePrice;
+        @RequestParam(name = "codiId") Long codiId, 
+        @RequestParam(name = "startDate") String startDate, 
+        @RequestParam(name = "endDate") String endDate) {
 
+    Codi codi = codiService.getCodiById(codiId);
+    LocalDate rentalStart = LocalDate.parse(startDate);
+    LocalDate rentalEnd = LocalDate.parse(endDate);
+    int days = (int) ChronoUnit.DAYS.between(rentalStart, rentalEnd);
+    
+    Integer basePrice = codi.getCodiPrice();  // basePrice는 Integer 타입
+    Integer additionalDayPrice = 10000;  // 추가 비용도 Integer로 정의
+    Integer totalPrice = (days > 3) 
+        ? basePrice + (additionalDayPrice * (days - 3))
+        : basePrice;
 
-        return OrderDTO.builder()
-                .itemId(codi.getCodiId())
-                .itemName(codi.getCodiName())
-                .startDate(rentalStart)
-                .endDate(rentalEnd)
-                .price(codi.getCodiPrice())
-                .build();
-    }
+    return OrderDTO.builder()
+            .itemId(codi.getCodiId())
+            .itemName(codi.getCodiName())
+            .startDate(rentalStart)
+            .endDate(rentalEnd)
+            .price(basePrice)
+            .totalPrice(totalPrice)
+            .build();
+}
 }

@@ -6,6 +6,7 @@ import synerjs.lookkit2nd.user.User;
 
 import java.time.LocalDate;
 
+@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

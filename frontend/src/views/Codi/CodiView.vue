@@ -8,7 +8,8 @@
         <div class="brand">{{ codi.codiName }}</div>
         <div class="product-title">{{ codi.codiDescription }}</div>
         <div class="price-section">
-          <span class="price">{{ codi.codiPrice.toLocaleString() }}</span>
+          <span class="price" v-if="codi.codiPrice !== undefined">{{ codi.codiPrice.toLocaleString() }}원</span>
+          <span v-else>가격 정보 없음</span>
         </div>
         <div class="rental-terms-section">
           <h4 class="rental-terms-title">대여 조건</h4>
@@ -167,29 +168,46 @@ const resetRentalDates = () => {
 
 const addToCart = async () => {
   try {
-    await axios.post('/cart/add', {
-      codiId: codi.value.codiId,
-      rentalStartDate: rentalStartDate.value,
-      rentalEndDate: rentalEndDate.value
-    });
+    const userId = 1;
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
+    const response = await axios.post(
+      `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${rentalStartDate.value}&rentalEndDate=${rentalEndDate.value}&userId=${userId}`
+    );
     alert('옷장에 추가되었습니다.');
     window.location.href = '/cart';
   } catch (error) {
+    console.error("옷장에 추가 실패:", error);
     alert('옷장에 추가하는 데 실패했습니다.');
   }
 };
 
 const rentNow = async () => {
   try {
-    await axios.post('/api/codi/rent', {
-      codiId: codi.value.codiId,
-      startDate: rentalStartDate.value,
-      endDate: rentalEndDate.value
+    const API_BASE_URL = 'http://localhost:8081/api/codi';
+    // 대여 정보 API 호출
+    const response = await axios.post(`${API_BASE_URL}/rent?codiId=${codi.value.codiId}&startDate=${rentalStartDate.value}&endDate=${rentalEndDate.value}`);
+
+    // API 호출 결과로부터 OrderDTO 객체를 반환받음
+    const orderDTO = response.data;
+
+    // 주문 페이지로 이동 시 대여 정보를 URL 파라미터에 추가하여 전달
+    const orderParams = new URLSearchParams({
+      itemId: orderDTO.itemId,
+      itemName: orderDTO.itemName,
+      startDate: orderDTO.startDate,
+      endDate: orderDTO.endDate,
+      price: orderDTO.price,
+      totalPrice: orderDTO.totalPrice,
+      itemType: 'codi'  // 상품인지 코디인지 구분을 위한 파라미터
     });
+
     alert('대여가 완료되었습니다.');
+    window.location.href = `/order?${orderParams.toString()}`;
   } catch (error) {
     alert('대여 페이지로 이동하는 데 실패했습니다.');
+    console.error("대여 오류:", error);
   }
 };
+
 </script>
 

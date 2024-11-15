@@ -1,9 +1,12 @@
 package synerjs.lookkit2nd.cart;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.user.User;
 import synerjs.lookkit2nd.user.UserService;
@@ -22,43 +25,74 @@ public class CartController {
     }
 
      // 장바구니에 있는 모든 상품 조회
-     @GetMapping("/items")
-     public List<CartDTO> getCartItems(@RequestParam(name = "userId") Long userId) {
-         User user = userService.getUserById(userId);
-         return cartService.getCartItemsByUser(user).stream()
-                 .map(cart -> CartDTO.builder()
-                         .cartId(cart.getCartId())
-                         .userId(cart.getUser().getUserId())
-                         .productId(cart.getProductId())
-                         .codiId(cart.getCodiId())
-                         .rentalStartDate(cart.getRentalStartDate())
-                         .rentalEndDate(cart.getRentalEndDate())
-                         .quantity(cart.getQuantity())
-                         .build())
-                 .collect(Collectors.toList());
-     }
+    @GetMapping("/items")
+    public List<CartDTO> getCartItems(@RequestParam("userId") Long userId) {
+        User user = userService.getUserById(userId);
+        return cartService.getCartItemsByUser(user).stream()
+                .map(cart -> CartDTO.builder()
+                        .cartId(cart.getCartId())
+                        .userId(cart.getUserId())
+                        .productId(cart.getProductId())
+                        .codiId(cart.getCodiId())
+                        .rentalStartDate(cart.getRentalStartDate())
+                        .rentalEndDate(cart.getRentalEndDate())
+                        .quantity(cart.getQuantity())
+                        .productName(cart.getProductName())
+                        .codiName(cart.getCodiName())
+                        .brandName(cart.getBrandName())
+                        .productPrice(cart.getProductPrice())
+                        .codiPrice(cart.getCodiPrice())
+                        .build())
+                .collect(Collectors.toList());
+    }
     
     @PostMapping("/add/product/{productId}")
-    public String addProductToCart(
+    public ResponseEntity<String> addProductToCart(
         @PathVariable("productId") Long productId, 
-        @RequestParam(name = "quantity") int quantity, 
-        @RequestParam(name = "userId") Long userId) {
-        User user = userService.getUserById(userId);
-        cartService.addProductToCart(user, productId, quantity);
-        return "Product added to cart";
+        @RequestParam("quantity") int quantity, 
+        @RequestParam("userId") Long userId) {
+
+        try {
+            User user = userService.getUserById(userId);
+            cartService.addProductToCart(user, productId, quantity);
+            return ResponseEntity.ok("Product added to cart");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to add product to cart: " + e.getMessage());
+        }                         
     }
 
     
-    @PostMapping("/add/coordiset/{codiId}")
-    public String addCoordisetToCart(
-        @PathVariable("codiId") Long codiId,  // 명확한 이름 지정
+    @PostMapping("/add/codi/{codiId}")
+    public ResponseEntity<String> addCodiToCart(
+        @PathVariable("codiId") Long codiId, 
         @RequestParam("rentalStartDate") String rentalStartDate,
         @RequestParam("rentalEndDate") String rentalEndDate,
         @RequestParam("userId") Long userId) {
     
-        User user = userService.getUserById(userId);
-        cartService.addCoordisetToCart(user, codiId, rentalStartDate, rentalEndDate);
-        return "Coordiset added to cart";
+        try {
+            User user = userService.getUserById(userId);
+            cartService.addCodiToCart(user, codiId, rentalStartDate, rentalEndDate);
+            return ResponseEntity.ok("Codi added to cart");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to add codi to cart: " + e.getMessage());
+        }                         
     }
+
+    @PostMapping("/update")
+    public ResponseEntity<String> updateCartItem(
+    @RequestParam("userId") Long userId,
+    @RequestBody Map<String, Object> updateRequest) {
+    try {
+        User user = userService.getUserById(userId);
+        cartService.updateCartItem(updateRequest);
+        return ResponseEntity.ok("Cart item updated successfully");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Failed to update cart item: " + e.getMessage());
+    }
+}
+
 
 }

@@ -32,15 +32,20 @@ public class ProductController {
 
     @PostMapping("/buy")
     public OrderDTO buyProduct(
-    @RequestParam(name = "productId") Long productId,
-    @RequestParam(name = "quantity") Integer quantity) {
+        @RequestParam(name = "productId") Long productId,
+        @RequestParam(name = "quantity") Integer quantity) {
+    
     Product product = productService.getProductById(productId);
+    Integer productPrice = product.getProductPrice();
+    Integer totalPrice = productPrice * quantity;  // 총 금액 계산
+
     return OrderDTO.builder()
-            .itemId(product.getProductId())       // getProductId()로 수정
-            .itemName(product.getProductName()) 
-            .itemName(product.getBrandName())   // getProductName()으로 수정
+            .itemId(product.getProductId())
+            .itemName(product.getProductName())
+            .brandName(product.getBrandName())
             .quantity(quantity)
-            .price(product.getProductPrice())      // getProductPrice()로 수정
+            .price(productPrice)
+            .totalPrice(totalPrice)
             .build();
 }
 }
