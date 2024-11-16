@@ -38,6 +38,7 @@ public class User {
 
     @Column(name = "GENDER") // 컬럼명 명시 (필요 시)
     private String gender;
+    
 
     @DateTimeFormat(pattern = "yyMMdd")
     @Column(name = "BIRTHDATE") // 컬럼명 명시
@@ -48,6 +49,7 @@ public class User {
 
     @Column(name = "PHONE") // 컬럼명 명시 (필요 시)
     private String phone;
+    // @Column(name = "CREATED_AT")
 
     @CreatedDate
     @Column(name = "USER_CREATED_AT", updatable = false) // 컬럼명 명시
@@ -81,6 +83,7 @@ public class User {
         this.role = role != null ? role : "USER"; //빌더 사용시 기본값은 일반유저
         this.address = address;
     }
+
     @PrePersist // 엔티티가 저장되기 전에 role 값이 null이라면 'USER'를 기본값 설정
     private void setDefaultRole() {
         if (this.role == null) {

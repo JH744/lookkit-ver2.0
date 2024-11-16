@@ -3,9 +3,9 @@ package synerjs.lookkit2nd.codi;
 import jakarta.persistence.*;
 import lombok.*;
 import synerjs.lookkit2nd.review.Review;
-
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,14 +18,12 @@ public class Codi {
     private Long codiId;
 
     private String codiName;
-
     private String codiDescription;
-
     private String codiThumbnail;
-
     private Integer codiPrice;
 
     @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
@@ -36,3 +34,4 @@ public class Codi {
         this.codiPrice = codiPrice;
     }
 }
+

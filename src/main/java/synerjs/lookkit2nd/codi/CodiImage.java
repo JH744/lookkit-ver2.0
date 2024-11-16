@@ -16,13 +16,18 @@ public class CodiImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codi_id")
+
+    private Codi coordiset;
+
     private Codi codi;
+
 
     private String imgPath;
 
     @Builder
     public CodiImage(Codi codi, String imgPath) {
         this.codi = codi;
+
         this.imgPath = imgPath;
     }
 }

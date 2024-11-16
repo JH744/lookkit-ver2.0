@@ -45,6 +45,36 @@ const routes = [
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
   {
+<<<<<<< HEAD
+
+    path: "/codi/:codiId",
+    component: () => import("@/views/Codi/CodiView.vue"),
+  },
+  {
+    path: "/product/:productId",
+    component: () => import("@/views/Product/ProductView.vue"),
+  },
+  {
+    path: "/order",
+    component: () => import("@/views/Order/OrderView.vue"),
+    children: [
+      {
+        path: "addaddress",
+        component: () => import("@/views/Order/AddAddressView.vue"),
+      },
+      {
+        path: "complete",
+        component: () => import("@/views/Order/OrderCompleteView.vue"),
+      },
+    ],
+  },
+  {
+    path: "/cart",
+    component: () => import("@/views/Cart/CartView.vue"),
+
+    // path: "/updateInfo",
+    // component: () => import("@/views/Mypage/UserInfoView.vue"),
+=======
     path: "/mypage",
     component: Mypage,
     children: [
@@ -73,10 +103,15 @@ const routes = [
     ],
     path: "/userInfo",
     component: () => import("@/views/mypage/UserInfoView.vue"),
+>>>>>>> 2215db5de9dd88465a06d018876349fc0d275b21
   },
   {
     path: "/vali",
     component: () => import("@/views/Admin/Vali.vue"),
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2215db5de9dd88465a06d018876349fc0d275b21
   },
 ];
 
