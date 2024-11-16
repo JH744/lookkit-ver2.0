@@ -23,17 +23,19 @@
               name="userUuid"
               v-model="userUuid"
               class="inputField"
+              :class="{ 'error-input': userUuidError }"
               placeholder="아이디를 입력하세요."
             />
             <button
               type="button"
               id="duplicateCheckButton"
               class="duplicateCheckButton"
+              @click="checkDuplicateID"
             >
               중복확인
             </button>
             <label id="idCheckLabel" class="idCheckLabel">
-              ✓ 사용가능한 아이디</label
+              {{ errors.userUuid }}</label
             >
           </div>
           <div class="passwordContainer">
@@ -45,10 +47,13 @@
               name="password"
               v-model="password"
               class="passwordInput"
+              :class="{ 'error-input': passwordError }"
               placeholder="비밀번호 영문/특수문자/숫자 8~16자"
             />
 
-            <label id="pwCheckLabel" class="pwCheckLabel"> 비밀번호 체크</label>
+            <label id="pwCheckLabel" class="pwCheckLabel">
+              {{ errors.password }}</label
+            >
           </div>
           <div class="passwordCheckContainer">
             <div class="passwordLabel">비밀번호 확인</div>
@@ -57,10 +62,13 @@
               type="password"
               v-model="repeatPassword"
               class="passwordInput"
+              :class="{ 'error-input': repeatPasswordError }"
               placeholder="비밀번호를 재입력해주세요."
             />
 
-            <label id="pwCheckLabel" class="pwCheckLabel"> 비밀번호 체크</label>
+            <label id="pwCheckLabel2" class="pwCheckLabel">
+              {{ repeatPasswordError }}</label
+            >
           </div>
           <div class="nameContainer">
             <div class="nameLabel">이름</div>
@@ -70,8 +78,12 @@
               v-model="userName"
               name="userName"
               class="nameInput"
+              :class="{ 'error-input': userNameError }"
               placeholder="이름을 입력하세요."
             />
+            <label id="userNameCheckLabel" class="userNameCheckLabel">
+              {{ userNameError }}</label
+            >
           </div>
           <div class="phoneContainer">
             <div class="phoneLabel">휴대폰 번호</div>
@@ -81,32 +93,42 @@
               v-model="phone"
               name="phone"
               class="nameInput"
+              :class="{ 'error-input': phoneError }"
               placeholder="-없이 휴대폰 번호를 입력하세요."
             />
+            <label class="phoneCheckLabel"> {{ phoneError }}</label>
           </div>
           <div class="emailLabel">이메일 주소</div>
           <div class="emailContainer">
             <input
               type="email"
               id="email"
-              v-model="email"
               name="email"
               class="emailInput"
+              :class="{ 'error-input': emailError }"
               placeholder="이메일주소"
+              v-model="email"
             />
             <label id="emailCheckLabel" class="emailCheckLabel">
-              이메일 체크</label
+              {{ errors.email }}</label
             >
           </div>
           <div class="addressLabel">주소 정보</div>
           <div class="addressContainer">
             <div class="addrBox">
-              <div id="addressSearch" class="postcodeInputBtn">주소검색</div>
+              <div
+                id="addressSearch"
+                class="postcodeInputBtn"
+                @click="openPostcodePopup"
+              >
+                주소검색
+              </div>
               <input
                 type="text"
                 class="addressInput"
                 id="user_address"
                 v-model="user_address"
+                :class="{ 'error-input': addressError }"
                 name="user_address"
                 placeholder="주소"
                 readonly
@@ -115,7 +137,7 @@
             <input
               type="text"
               id="user_detail_address"
-              name="user_detail_address"
+              ref="user_detail_address_input"
               v-model="user_detail_address"
               class="detailedAddressInput"
               placeholder="상세주소"
@@ -127,6 +149,7 @@
               v-model="address"
               style="display: none"
             />
+            <label class="addressCheckLabel"> {{ addressError }}</label>
           </div>
           <div class="birthdateLabel">생년월일</div>
           <input
@@ -184,25 +207,121 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { useForm, useField } from "vee-validate";
+import * as yup from "yup";
 
 const router = useRouter();
 
-const userUuid = ref("");
-const password = ref("");
-const repeatPassword = ref("");
-const userName = ref("");
-const phone = ref("");
-const email = ref("");
 const gender = ref("M");
-const address = ref("경기도");
+const user_detail_address = ref("");
 const birthDate = ref("");
 const isChecked = ref(false);
+const user_detail_address_input = ref(null);
 
-// 회원가입 api 요청 핸들러
+const total_address = computed(() => {
+  return `${user_address.value} ${user_detail_address.value}`;
+});
+
+// 유효성 검사 스키마 설정
+const schema = yup.object({
+  userName: yup
+    .string()
+    .matches(
+      /^[가-힣a-zA-Z]{2,15}$/,
+      "* 이름은 한글 또는 영문 2~15자여야 합니다."
+    )
+    .required("* 이름은 필수 항목입니다."),
+  email: yup
+    .string()
+    .matches(
+      /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/,
+      "* 올바른 이메일 주소를 입력해주세요."
+    )
+    .required("* 이메일을 입력해주세요"),
+  phone: yup
+    .string()
+    .matches(/^(010|011|016|070)\d{7,8}$/, "* 유효한 전화번호 형식이 아닙니다.")
+    .required("* 전화번호는 필수 항목입니다."),
+  userUuid: yup
+    .string()
+    .matches(
+      /^[a-zA-Z0-9]{6,12}$/,
+      "* 6~12자 영문 대소문자, 숫자만 입력하세요."
+    )
+    .required("* 아이디는 필수 입력 항목입니다."),
+  password: yup
+    .string()
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/,
+      "* 8-16자 이내 영문자, 숫자, 특수문자를 모두 포함해야 합니다."
+    )
+    .required("* 비밀번호는 필수 항목입니다."),
+  repeatPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "* 비밀번호가 일치하지 않습니다.") // 비밀번호 일치 검사
+    .required("* 비밀번호 확인은 필수 항목입니다."),
+  user_address: yup.string().required("* 주소는 필수 입력 항목입니다."), // 주소 필드 추가
+});
+
+const { validate, errors } = useForm({
+  validationSchema: schema,
+});
+
+const { value: userName, errorMessage: userNameError } = useField("userName");
+const { value: email, errorMessage: emailError } = useField("email");
+const { value: phone, errorMessage: phoneError } = useField("phone");
+const { value: user_address, errorMessage: addressError } =
+  useField("user_address");
+const { value: userUuid, errorMessage: userUuidError } = useField("userUuid");
+const { value: password, errorMessage: passwordError } = useField("password");
+const { value: repeatPassword, errorMessage: repeatPasswordError } =
+  useField("repeatPassword");
+
+// 유효성 검사 후 중복 체크
+const checkDuplicateID = () => {
+  console.log("userUuidError", userUuidError.value);
+  if (!userUuidError.value && userUuid.value != null) {
+    fetchDuplicateCheckId(userUuid.value);
+  } else {
+    alert("아이디를 올바르게 입력해주세요");
+  }
+};
+
+/**아이디 중복 확인 */
+const fetchDuplicateCheckId = async (Id) => {
+  try {
+    const response = await axios
+      // .get(`/api/users/check-id?userUuid=${Id}`)
+      .get(`http://localhost:8081/api/users/check-id?userUuid=${Id}`)
+      .then((res) => {
+        console.log(res);
+        alert("사용가능한 아이디입니다.");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("중복되는 아이디입니다.");
+      });
+  } catch {
+    console.error();
+    alert("중복확인 에러");
+  }
+};
+
+/**  회원가입 api 요청 핸들러*/
 const handleSignUp = async () => {
+  // 전체 유효성 검사 실행
+  const isValid = await validate();
+
+  if (!isValid) {
+    console.log("유효성 검사 실패");
+    return;
+  }
+
+  console.log(" total_address", total_address.value);
+
   try {
     const response = await axios
       // .post("/api/auth/signup", {
@@ -213,16 +332,15 @@ const handleSignUp = async () => {
         phone: phone.value,
         email: email.value,
         gender: gender.value,
-        address: address.value,
+        address: total_address.value,
         birthDate: birthDate.value,
       })
       .then((res) => {
         console.log("res", res);
       });
     router.push("/auth/login");
-  } catch (error) {
+  } catch {
     console.error();
-    console.log(error);
     alert("회원가입에 실패하였습니다.");
   }
 };
@@ -237,66 +355,48 @@ const chooseGenderMan = () => {
   console.log(gender.value);
 };
 
-// onMounted(() => {
-//   const handlerDaum = () => {
-//     let idDuplicateChecked = false;
-//     //      -- [주소지 찾기] --
-//     $("#addressSearch").click(function () {
-//       new daum.Postcode({
-//         oncomplete: function (data) {
-//           // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
-//           // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-//           // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-//           var addr = ""; // 주소 변수
-//           var extraAddr = ""; // 참고항목 변수
+/** 주소 api 불러오기*/
+const loadDaumPostcode = () => {
+  return new Promise((resolve, reject) => {
+    if (document.getElementById("daum-postcode-script")) {
+      resolve(); // 이미 스크립트가 로드된 경우
+      return;
+    }
 
-//           //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-//           if (data.userSelectedType === "R") {
-//             // 사용자가 도로명 주소를 선택했을 경우
-//             addr = data.roadAddress;
-//           } else {
-//             // 사용자가 지번 주소를 선택했을 경우(J)
-//             addr = data.jibunAddress;
-//           }
+    const script = document.createElement("script");
+    script.src =
+      "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.id = "daum-postcode-script";
+    script.async = true;
 
-//           // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-//           if (data.userSelectedType === "R") {
-//             // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-//             // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-//             if (data.bname !== "" && /[동|로|가]$/g.test(data.bname)) {
-//               extraAddr += data.bname;
-//             }
-//             // 건물명이 있고, 공동주택일 경우 추가한다.
-//             if (data.buildingName !== "" && data.apartment === "Y") {
-//               extraAddr +=
-//                 extraAddr !== "" ? ", " + data.buildingName : data.buildingName;
-//             }
-//             // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-//             if (extraAddr !== "") {
-//               extraAddr = " (" + extraAddr + ")";
-//             }
-//             // 조합된 참고항목을 해당 필드에 넣는다.
-//           } else {
-//           }
+    script.onload = () => {
+      console.log("Daum Postcode script loaded");
+      resolve();
+    };
 
-//           // 우편번호와 주소 정보를 해당 필드에 넣는다.
+    script.onerror = () =>
+      reject(new Error("Failed to load Daum Postcode script"));
 
-//           document.getElementById("user_address").value = addr;
+    document.body.appendChild(script);
+  });
+};
 
-//           //주소 검색이 완료된 후 변하는 css 목록
-//           $(".field_address input").css("display", "block");
-//           $("#addressNo").text("재검색");
-
-//           // 커서를 상세주소 필드로 이동한다.
-//           document.getElementById("user_detail_address").focus();
-//           // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
-//           // 예제를 참고하여 다양한 활용법을 확인해 보세요.
-//           // http://postcode.map.daum.net/guide  api주소
-//         },
-//       }).open();
-//     });
-//   };
-// });
+/**  다음 주소 팝업창 열기 */
+const openPostcodePopup = () => {
+  loadDaumPostcode()
+    .then(() => {
+      new window.daum.Postcode({
+        oncomplete: (data) => {
+          console.log("user_address:", data.address);
+          user_address.value = data.address;
+          user_detail_address_input.value.focus();
+        },
+      }).open();
+    })
+    .catch((error) => {
+      console.error(error.message);
+    });
+};
 </script>
 
 <style scoped>
@@ -476,14 +576,11 @@ const chooseGenderMan = () => {
   top: 29px;
 }
 .idCheckLabel {
-  font-size: 14px;
-  color: #ff294f;
   width: 293px;
   height: 57px;
   position: absolute;
   left: 5px;
   top: 93px;
-  display: none;
 }
 .inputPlaceholder {
   color: #797979;
@@ -843,15 +940,29 @@ const chooseGenderMan = () => {
   position: absolute;
   top: 92px;
   left: 3px;
-  display: none;
 }
 .emailCheckLabel {
   position: absolute;
   top: 723px;
   left: 3px;
-  display: none;
 }
 
+.userNameCheckLabel {
+  position: absolute;
+  top: 94px;
+  left: 3px;
+}
+
+.phoneCheckLabel {
+  position: absolute;
+  top: 94px;
+  left: 3px;
+}
+.addressCheckLabel {
+  position: absolute;
+  top: 1043px;
+  left: 3px;
+}
 .passwordLabel,
 .label,
 .nameLabel,
@@ -861,7 +972,26 @@ const chooseGenderMan = () => {
 .addressLabel {
   min-width: 120px;
 }
+.addressCheckLabel,
+.idCheckLabel,
+.pwCheckLabel,
+.emailCheckLabel,
+.userNameCheckLabel,
+.phoneCheckLabel {
+  color: #ff294f;
+  font-size: 14px;
+}
+
 .hidden-input {
   display: none;
+}
+
+.error-input {
+  color: #ff294f !important;
+  border: 1.5px solid #ff294f !important;
+}
+
+input:focus::placeholder {
+  opacity: 0; /* 포커스 시 사라지도록 설정 */
 }
 </style>

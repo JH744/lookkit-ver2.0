@@ -1,8 +1,8 @@
 package synerjs.lookkit2nd.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -11,13 +11,16 @@ public class UserController {
     private final UserService userService;
 
 
-//    @GetMapping("/{id}")
-//    public UserDTO getUser(@PathVariable Long id) {
-//        return userService.getUserById(id);
-//    }
-//
-//    @PostMapping
-//    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-//        return userService.createUser(userDTO);
-//    }
+    @GetMapping("/check-id")
+    public ResponseEntity checkIdDuplication(@RequestParam  String userUuid){
+       User result =  userService.findByUserUuid(userUuid);
+        if (result == null){
+            return    ResponseEntity.status(200).body("사용 가능한 아이디");
+        }else {
+            return ResponseEntity.status(500).body("중복 아이디");
+        }
+    }
+
+
+
 }
