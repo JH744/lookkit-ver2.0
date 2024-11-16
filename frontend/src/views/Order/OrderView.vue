@@ -11,7 +11,7 @@
         <div class="info-row">
           <span class="label-title">배송지 정보</span>
           <button class="link-text" @click="navigateToAddAddress">
-            <span>+배송지를 등록하세요</span>
+            <span>배송지를 등록하세요</span>
           </button>            
         </div>
         <div class="info-row">
@@ -47,7 +47,37 @@
       <header class="section-header">
         <h2 class="section-title">상품 정보</h2>
       </header>
-      <div v-if="orderItem">
+
+      <!-- Cart에서 저장된 selectedItems 출력 -->
+      <div v-if="orderStore.selectedItems.length > 0">
+        <div v-for="item in orderStore.selectedItems" :key="item.itemId" class="item-description">
+          <!-- 썸네일 이미지 -->
+          <img class="item-thumbnail" :src="`/images/product/0${item.itemId}/${item.itemId}_thumbnail.webp`" alt="썸네일" />
+
+          <!-- 상품 정보 -->
+          <div class="item-description2">  
+            <div v-if="item.type === 'product' && item.brandName" class="brand-name">
+              {{ item.brandName }}
+            </div>
+            <div class="product-name"> {{ item.itemName }} </div>
+          </div>
+
+          <!-- 수량 또는 대여일 -->
+          <div v-if="item.type === 'product'" class="product-variant">
+            {{ item.quantity }}개
+          </div>
+          <div v-else-if="item.type === 'codi'" class="product-variant">
+            대여일 {{ item.startDate }} ~ 반납일 {{ item.endDate }}
+          </div>
+
+          <!-- 가격 -->
+          <div class="item-price">{{ formatPrice(item.totalPrice) }}원</div>
+        </div>
+      </div>
+
+
+      <!-- 단일 상품 정보 출력 -->
+      <div v-else-if="orderItem">
       <div v-if="orderItem.quantity">
       <!-- Product 정보 -->
         <div class="item-description">    
@@ -88,7 +118,7 @@
       </header>
       <div class="summary-row">
         <span class="summary-title">최종 결제금액</span>
-        <span class="summary-value">{{ totalPrice }}원</span>
+        <span class="summary-value">{{ formatPrice(totalPrice) }}원</span>
       </div>
     </section>
     <section class="total-payment-section">
@@ -106,9 +136,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import "@/assets/styles/order.css";
+import { useOrderStore } from '@/store/orderStore';
 
 const buyerAddressName = ref('');
 const buyerRecipientName = ref('');
@@ -130,6 +161,27 @@ const agreements = ref([
   { text: '개인정보 제 3자 제공 동의(필수)', checked: false },
   { text: '위 주문 내용을 확인하였으며, 결제에 모두 동의합니다', checked: false }
 ]);
+
+const orderStore = useOrderStore();
+
+onMounted(async () => {
+  await nextTick();
+  console.log("Selected items in orderStore after mount:", orderStore.selectedItems);
+});
+
+// 주문 완료 후 데이터 초기화
+const completeOrder = () => {
+  alert('주문이 완료되었습니다.');
+  orderStore.clearSelectedItems();
+  localStorage.removeItem('orderStore'); // 로컬 스토리지에서도 데이터 삭제
+  window.location.href = '/order/complete';
+};
+
+// 사용자가 페이지를 떠날 때 selectedItems 초기화
+onBeforeUnmount(() => {
+  orderStore.clearSelectedItems();
+  localStorage.removeItem('orderStore'); // 로컬 스토리지에서도 데이터 삭제
+});
 
 const orderItem = ref(null);
 const route = useRoute();
@@ -174,10 +226,31 @@ return 0;
 });
 
 
-const formatPrice = (price) => {
-  return price ? price.toLocaleString() : '0';
-};
+// 총 가격 계산
+const totalPrice = computed(() => {
+  if (orderItem.value) {
+    if (orderItem.value.quantity) {
+      // Product의 경우 수량에 따라 총 가격 계산
+      return orderItem.value.quantity * orderItem.value.price;
+    } else {
+      // Codi의 경우 대여 가격 사용
+      return orderItem.value.price;
+    }
+  }
+  return 0;
+});
 
+// 총 수량 계산
+const totalQuantity = computed(() => {
+  if (orderItem.value && orderItem.value.quantity) {
+    return orderItem.value.quantity;
+  }
+  return 1; // Codi의 경우 수량은 1개로 간주
+});
+
+  const formatPrice = (price) => {
+    return price ? price.toLocaleString() : '0';
+  };
 
 
 const processPayment = () => {
@@ -195,6 +268,7 @@ const processPayment = () => {
 const navigateToAddAddress = () => {
   router.push({ path: '/add-address' });
 };
+
 </script>
 
 

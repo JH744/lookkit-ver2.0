@@ -97,7 +97,7 @@ public class CartService {
     }
 
     @Transactional
-public void updateCartItem(Map<String, Object> updateRequest) {
+    public void updateCartItem(Map<String, Object> updateRequest) {
     Long cartId = Long.valueOf(updateRequest.get("cartId").toString());
     Optional<Cart> cartOptional = cartRepository.findById(cartId);
 
@@ -128,5 +128,17 @@ public void updateCartItem(Map<String, Object> updateRequest) {
         throw new RuntimeException("Cart item not found");
     }
 }
+
+
+    @Transactional
+    public void deleteCartItemById(Long cartId) {
+    cartRepository.deleteById(cartId);
+}
+
+    @Transactional
+    public void deleteMultipleCartItemsByIds(List<Long> cartIds) {
+    cartRepository.deleteAllById(cartIds);
+}
+
 
 }

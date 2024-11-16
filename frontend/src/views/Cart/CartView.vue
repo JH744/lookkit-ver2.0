@@ -47,7 +47,7 @@
               <strong>{{ formatPrice(getCodiTotalPrice(item)) }}원</strong>
             </div>
           </div>
-          <button class="delete-button"><span>삭제</span></button>
+          <button class="delete-button" @click="deleteItem(item)"><span>삭제</span></button>
         </div>
       </div>
       </div>
@@ -82,7 +82,7 @@
               <strong>{{ formatPrice(getProductTotalPrice(item)) }}원</strong>
             </div>
           </div>
-          <button class="delete-button"><span>삭제</span></button>
+          <button class="delete-button" @click="deleteItem(item)"><span>삭제</span></button>
         </div>
       </div>
       </div>
@@ -147,10 +147,15 @@
   import axios from 'axios';
   import "@/assets/styles/cart.css";
   import iconDelete from '@/assets/icons/icon-delete.svg';
+  import { useOrderStore } from '@/store/orderStore';
+  import { useRouter } from 'vue-router';
+  
+
   
   const activeTab = ref('coordinate');
   const coordinateItems = ref([]);
   const singleItems = ref([]);
+  const orderStore = useOrderStore();
   
   // 장바구니 데이터 불러오기
 const fetchCartItems = async () => {
@@ -196,10 +201,48 @@ const fetchCartItems = async () => {
     return item.codiPrice;
   };
   
+  // 선택된 아이템 삭제
+  const deleteSelectedItems = async () => {
+  const itemsToDelete = selectedItems.value;
+  if (itemsToDelete.length === 0) {
+    alert('선택된 항목이 없습니다.');
+    return;
+  }
+
+  try {
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
+    await axios.post(`${API_BASE_URL}/delete/bulk`, { cartIds: itemsToDelete.map(item => item.cartId) });
+    coordinateItems.value = coordinateItems.value.filter(i => !i.selected);
+    singleItems.value = singleItems.value.filter(i => !i.selected);
+  } catch (error) {
+    alert('선택된 상품을 삭제하는 데 실패했습니다.');
+    console.error('Error deleting selected items:', error);
+  }
+  };
+
+  // 개별 아이템 삭제
+  const deleteItem = async (item) => {
+  try {
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
+    await axios.post(`${API_BASE_URL}/delete`, { cartId: item.cartId });
+    if (item.type === 'coordinate') {
+      coordinateItems.value = coordinateItems.value.filter(i => i.cartId !== item.cartId);
+    } else {
+      singleItems.value = singleItems.value.filter(i => i.cartId !== item.cartId);
+    }
+  } catch (error) {
+    alert('아이템을 삭제하는 데 실패했습니다.');
+    console.error('Error deleting item:', error);
+  }
+  };
+
   // 선택된 아이템 계산
   const selectedItems = computed(() => {
-    return [...coordinateItems.value, ...singleItems.value].filter(item => item.selected);
+  const selected = [...coordinateItems.value, ...singleItems.value].filter(item => item.selected);
+  console.log("Selected items in cart.vue:", selected);
+  return selected;
   });
+
   
   // 총 수량 계산
   const totalQuantity = computed(() => {
@@ -217,25 +260,7 @@ const fetchCartItems = async () => {
   }, 0);
   });
   
-  // 선택된 아이템 삭제
-  const deleteSelectedItems = () => {
-    const itemsToDelete = selectedItems.value;
-    if (itemsToDelete.length === 0) {
-      alert('선택된 항목이 없습니다.');
-      return;
-    }
-    
-    itemsToDelete.forEach(async item => {
-      try {
-        await axios.post('/api/cart/delete', { cartId: item.cartId });
-        // 아이템 삭제 후 필터링
-        coordinateItems.value = coordinateItems.value.filter(i => i.cartId !== item.cartId);
-        singleItems.value = singleItems.value.filter(i => i.cartId !== item.cartId);
-      } catch (error) {
-        alert('선택된 상품을 삭제하는 데 실패했습니다.');
-      }
-    });
-  };
+
   
   // 수량 업데이트
   const updateItemQuantity = async (item) => {
@@ -271,11 +296,37 @@ const fetchCartItems = async () => {
   }
   };
 
+  const router = useRouter();
 
+
+  const checkout = async () => {
+  if (selectedItems.value.length === 0) {
+    alert('선택된 상품이 없습니다.');
+    return;
+  }
+
+  // 구매하기 버튼을 클릭한 경우에만 데이터 저장
+  orderStore.$patch({
+    selectedItems: selectedItems.value.map(item => ({
+      itemId: item.productId || item.codiId,
+      itemName: item.productName || item.codiName,
+      brandName: item.brandName || '',
+      type: item.type,
+      quantity: item.quantity || 1,
+      startDate: item.rentalStartDate || null,
+      endDate: item.rentalEndDate || null,
+      totalPrice: item.productPrice || item.codiPrice,
+    }))
+  });
+
+  // 데이터를 로컬 스토리지에 저장
+  localStorage.setItem('orderStore', JSON.stringify(orderStore.selectedItems));
+
+  // 로그 출력
+  console.log("Order Store before navigating to order page:", orderStore.selectedItems);
 
   // 결제 페이지로 이동
-  const checkout = () => {
-    window.location.href = '/order/checkout';
-  };
+  router.push('/order');
+};
   </script>
   

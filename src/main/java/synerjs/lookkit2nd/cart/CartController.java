@@ -84,13 +84,38 @@ public class CartController {
     public ResponseEntity<String> updateCartItem(
     @RequestParam("userId") Long userId,
     @RequestBody Map<String, Object> updateRequest) {
-    try {
+        try {
         User user = userService.getUserById(userId);
         cartService.updateCartItem(updateRequest);
         return ResponseEntity.ok("Cart item updated successfully");
-    } catch (Exception e) {
+        } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .body("Failed to update cart item: " + e.getMessage());
+    }
+    }
+
+
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteCartItem(@RequestBody Map<String, Long> request) {
+    try {
+        Long cartId = request.get("cartId");
+        cartService.deleteCartItemById(cartId);
+        return ResponseEntity.ok("Cart item deleted successfully");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Failed to delete cart item: " + e.getMessage());
+    }
+}
+
+    @PostMapping("/delete/bulk")
+    public ResponseEntity<String> deleteMultipleCartItems(@RequestBody Map<String, List<Long>> request) {
+    try {
+        List<Long> cartIds = request.get("cartIds");
+        cartService.deleteMultipleCartItemsByIds(cartIds);
+        return ResponseEntity.ok("Selected cart items deleted successfully");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("Failed to delete selected cart items: " + e.getMessage());
     }
 }
 
