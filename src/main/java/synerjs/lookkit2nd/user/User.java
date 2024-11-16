@@ -50,8 +50,8 @@ public class User {
     private String phone;
 
     @CreatedDate
-    @Column(name = "USER_CREATED_AT", updatable = false) // 컬럼명 명시
-    private Timestamp userCreatedAt;
+    @Column(name = "CREATED_AT", updatable = false) // 컬럼명 명시
+    private Timestamp createdAt;
 
     @Column(name = "LAST_UPDATE") // 컬럼명 명시 (필요 시)
     @LastModifiedDate
@@ -68,7 +68,7 @@ public class User {
 
     @Builder
     public User(String userUuid, String password, String userName, String gender, LocalDate birthDate,
-                String email, String phone, Timestamp userCreatedAt,Timestamp lastUpdate, String role, String address) {
+                String email, String phone, Timestamp createdAt,Timestamp lastUpdate, String role, String address) {
         this.userUuid = userUuid;
         this.password = password;
         this.userName = userName;
@@ -76,7 +76,7 @@ public class User {
         this.birthDate = birthDate;
         this.email = email;
         this.phone = phone;
-        this.userCreatedAt = userCreatedAt;
+        this.createdAt = createdAt;
         this.lastUpdate=lastUpdate;
         this.role = role != null ? role : "USER"; //빌더 사용시 기본값은 일반유저
         this.address = address;
