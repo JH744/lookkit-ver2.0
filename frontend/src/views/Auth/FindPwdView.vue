@@ -24,51 +24,18 @@
         />
         <div id="authenticationBtn" class="buttonContainer">인증받기</div>
       </div>
-      <div class="formContainer2">
-        <input class="formInput" placeholder="인증번호 입력" name="veriCode" />
-        <div style="margin: 15px">
-          <span class="verificationNotice"
-            >*3분 이내로 인증번호 6자리를 입력해주세요.</span
-          >
-          <!-- 인증번호를 재입력해주세요. -->
-        </div>
-        <div id="authenticationOKBtn" class="buttonContainer">확인</div>
-      </div>
 
-      <form action="/auth/updatePwd" method="post" class="formContainer3">
-        <span class="">새비밀번호입력</span>
-        <input
-          type="password"
-          class="formInput"
-          placeholder="새비밀번호를 입력해 주세요"
-          name="newPassword"
-          id="newPwd"
-        />
-        <span class="">새비밀번호 재입력</span>
-        <input
-          type="password"
-          class="formInput"
-          placeholder="새비밀번호를 재입력해 주세요"
-          id="newPwd2"
-        />
-        <div id="ModifyBtn" class="buttonContainer">확인</div>
-      </form>
-      <div class="formContainer4">
-        <div>
-          <p>비밀번호를 성공적으로 변경하였습니다.</p>
-        </div>
-        <div id="goToLoginBtn" class="buttonContainer">로그인하러가기</div>
-      </div>
+      <AuthenticationEmail />
+      <UpdatePassword />
+      <CompleteModal />
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  setup() {
-    return {};
-  },
-};
+<script setup>
+import AuthenticationEmail from "./components/AuthenticationEmail.vue";
+import CompleteModal from "./components/CompleteModal.vue";
+import UpdatePassword from "./components/UpdatePassword.vue";
 </script>
 
 <style scoped>
@@ -163,27 +130,6 @@ body {
   position: relative;
 }
 
-.formContainer3 {
-  padding: calc(31.5px * 1.2) 10px 14px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  align-self: stretch;
-  flex-shrink: 0;
-  position: relative;
-  gap: 16px;
-
-  height: 400px;
-  span {
-    font-size: 18px;
-  }
-  input {
-    width: 100%;
-  }
-  display: none;
-}
-
 .formContainer2 {
   padding: calc(31.5px * 1.2) 20px 24px 20px;
   display: flex;
@@ -194,20 +140,13 @@ body {
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
-  display: none;
+  /* display: none; */
 
   input {
     width: 100%;
   }
 }
-.formContainer4 {
-  display: none;
-  height: 450px;
-  p {
-    font-size: 20px;
-    padding: 40px 20px;
-  }
-}
+
 .formLabel {
   color: var(--wwwkurlycom-mine-shaft, #333333);
   text-align: left;
