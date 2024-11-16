@@ -43,6 +43,10 @@ const routes = [
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
+  {
+    path: "/updateInfo",
+    component: () => import("@/views/Mypage/UserInfoView.vue"),
+  },
 ];
 
 const router = createRouter({
