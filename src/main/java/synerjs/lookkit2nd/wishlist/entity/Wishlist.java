@@ -1,28 +1,24 @@
-package synerjs.lookkit2nd.cart;
+package synerjs.lookkit2nd.wishlist.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
-@Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@ToString
-@Table(name = "cart")
-public class Cart {
+@Getter
+@Builder
+@Table(name = "wishlist")
+public class Wishlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartId;
+    private Long wishlistId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
-    private User user;
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUCT_ID")
@@ -32,5 +28,4 @@ public class Cart {
     @JoinColumn(name = "CODI_ID")
     private Codi codi;
 
-    private int quantity;
 }

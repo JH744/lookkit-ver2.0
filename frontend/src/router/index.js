@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import Mypage from "@/views/mypage/Mypage.vue";
 
 const routes = [
   {
@@ -44,17 +45,38 @@ const routes = [
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
   {
-<<<<<<< HEAD
-    path: "/updateInfo",
-    component: () => import("@/views/Mypage/UserInfoView.vue"),
-=======
+    path: "/mypage",
+    component: Mypage,
+    children: [
+      {
+        path: "manage",
+        component: () => import("@/views/mypage/OrderManagement.vue"),
+      },
+      {
+        path: "inquiry",
+        component: () => import("@/views/mypage/inquiry/UserInquiryList.vue"),
+      },
+      {
+        path: "inquiry/create",
+        component: () => import("@/views/mypage/inquiry/InquiryForm.vue"),
+      },
+      {
+        path: "inquiry/:inquiryId",
+        name: "InquiryDetail",
+        component: () => import("@/views/mypage/inquiry/InquiryDetail.vue"),
+        props: true, // URL의 파라미터를 컴포넌트의 props로 전달할 수 있게 함
+      },
+      {
+        path: "wishlist",
+        component: () => import("@/views/mypage/WishList.vue"),
+      },
+    ],
     path: "/userInfo",
     component: () => import("@/views/mypage/UserInfoView.vue"),
   },
   {
     path: "/vali",
     component: () => import("@/views/Admin/Vali.vue"),
->>>>>>> 650cad9da8f4d0be70d37ae49ebec7799a12af01
   },
 ];
 

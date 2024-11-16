@@ -2,9 +2,11 @@ package synerjs.lookkit2nd.product;
 
 import jakarta.persistence.*;
 import lombok.*;
+import synerjs.lookkit2nd.codi.Codi;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,14 +20,20 @@ public class Product {
     private Long productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "CATEGORY_ID")
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CODI_ID")
+    private Codi codi;
 
     private String productName;
 
     private String productDescription;
 
-    private BigDecimal productPrice;
+    private int productPrice;
+
+    private String brandName;
 
     private Integer productStock;
 
@@ -33,21 +41,8 @@ public class Product {
 
     private String productThumbnail;
 
-    private Timestamp productCreatedAt;
+    private LocalDateTime productCreatedAt;
 
-    private Timestamp productUpdatedAt;
+    private LocalDateTime productUpdatedAt;
 
-    @Builder
-    public Product(Category category, String productName, String productDescription, BigDecimal productPrice,
-                   Integer productStock, String genderTarget, String productThumbnail, Timestamp productCreatedAt, Timestamp productUpdatedAt) {
-        this.category = category;
-        this.productName = productName;
-        this.productDescription = productDescription;
-        this.productPrice = productPrice;
-        this.productStock = productStock;
-        this.genderTarget = genderTarget;
-        this.productThumbnail = productThumbnail;
-        this.productCreatedAt = productCreatedAt;
-        this.productUpdatedAt = productUpdatedAt;
-    }
 }

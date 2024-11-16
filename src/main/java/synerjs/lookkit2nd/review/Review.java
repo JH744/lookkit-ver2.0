@@ -2,17 +2,15 @@ package synerjs.lookkit2nd.review;
 
 import jakarta.persistence.*;
 import lombok.*;
-import synerjs.lookkit2nd.coordiset.Coordiset;
+import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@ToString
 @Table(name = "reviews")
 public class Review {
 
@@ -21,30 +19,30 @@ public class Review {
     private Long reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "codi_id")
-    private Coordiset coordiset;
+    @JoinColumn(name = "CODI_ID")
+    private Codi codi;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     private User user;
 
-    private Integer rating; // 1~5점
+    private Integer rating;
 
     private String reviewText;
 
     private Timestamp createdAt;
 
-    @Builder
-    public Review(Product product, Coordiset coordiset, User user, Integer rating, String reviewText, Timestamp createdAt) {
-        this.product = product;
-        this.coordiset = coordiset;
-        this.user = user;
-        this.rating = rating;
-        this.reviewText = reviewText;
-        this.createdAt = createdAt;
-    }
+//    @Builder
+//    public Review(Product product, Codi codi, User user, Integer rating, String reviewText, Timestamp createdAt) {
+//        this.product = product;
+//        this.codi = codi;
+//        this.user = user;
+//        this.rating = rating;
+//        this.reviewText = reviewText;
+//        this.createdAt = createdAt;
+//    }
 }
