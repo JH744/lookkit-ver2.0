@@ -152,14 +152,42 @@
       </div>
 
       <div class="modal-footer">
-        <button id="updatePwBtn">비밀번호 변경하기</button>
+        <button id="updatePwBtn" @click="updateUserInfo">
+          비밀번호 변경하기
+        </button>
         <button id="cancleBtn">취소</button>
       </div>
     </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import axios from "axios";
+import { ref, onMounted } from "vue";
+const el = ref();
+
+function updateUserInfo() {
+  axios
+    .post("/api/v1/user/updateinfo")
+    .then((response) => {
+      console.log("받아온 응답: ", response);
+    })
+    .catch(() => {});
+}
+
+// axios.get("/user?ID=12345")
+//   .then(function (response) {
+//     // 성공 핸들링
+//     console.log(response);
+//   })
+//   .catch(function (error) {
+//     // 에러 핸들링
+//     console.log(error);
+//   })
+//   .finally(function () {
+//     // 항상 실행되는 영역
+//   });
+</script>
 
 <style scoped>
 @charset "UTF-8";
