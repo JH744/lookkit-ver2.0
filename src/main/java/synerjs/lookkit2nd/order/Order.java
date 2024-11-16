@@ -16,18 +16,37 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ORDER_ID")
     private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID") // 외래 키 컬럼명 명시
     private User user;
 
+    @Column(name = "TOTAL_AMOUNT")
     private BigDecimal totalAmount;
     private String orderStatus;
     private String orderComment;
     private Timestamp orderDate;
     private String orderAddressee;
     private String orderAddress;
+
+    // @Column(name = "ORDER_STATUS")
+    // private String orderStatus;
+
+    // @Column(name = "ORDER_COMMENT")
+    // private String orderComment;
+
+    // @Column(name = "ORDER_DATE")
+    // private Timestamp orderDate;
+
+    // @Column(name = "ORDER_ADDRESSEE")
+    // private String orderAddressee;
+
+    // @Column(name = "ORDER_ADDRESS")
+    // private String orderAddress;
+
+    @Column(name = "ORDER_PHONE")
     private String orderPhone;
 
     @Builder

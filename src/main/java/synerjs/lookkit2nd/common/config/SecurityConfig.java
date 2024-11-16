@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -15,6 +17,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf((csrf) -> csrf.disable());
+
+        // 세션 관리 정책 설정
+        http.sessionManagement((session) -> session
+                // 세션 생성 및 상태 유지 OFF, Stateless 방식 설정
+                // JWT 기반 인증 ->  서버가 클라이언트 세션 유지않도록 설정
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+    http.addFilterBefore(new JwtFilter(), ExceptionTranslationFilter.class);
+
         http.authorizeHttpRequests((authorize) ->
             authorize.requestMatchers("/**").permitAll() // 모든 페이지 허용
 //              authorize.requestMatchers( "/auth/**","/kakao-login","/fail","/product/**","/common/**","/main/**","/error/**","/fail/**","/mailsender").permitAll() // 모두에게 허용되도록 설정
