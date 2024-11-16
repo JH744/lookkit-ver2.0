@@ -25,21 +25,26 @@ public class Order {
 
     @Column(name = "TOTAL_AMOUNT")
     private BigDecimal totalAmount;
-
-    @Column(name = "ORDER_STATUS")
     private String orderStatus;
-
-    @Column(name = "ORDER_COMMENT")
     private String orderComment;
-
-    @Column(name = "ORDER_DATE")
     private Timestamp orderDate;
-
-    @Column(name = "ORDER_ADDRESSEE")
     private String orderAddressee;
-
-    @Column(name = "ORDER_ADDRESS")
     private String orderAddress;
+
+    // @Column(name = "ORDER_STATUS")
+    // private String orderStatus;
+
+    // @Column(name = "ORDER_COMMENT")
+    // private String orderComment;
+
+    // @Column(name = "ORDER_DATE")
+    // private Timestamp orderDate;
+
+    // @Column(name = "ORDER_ADDRESSEE")
+    // private String orderAddressee;
+
+    // @Column(name = "ORDER_ADDRESS")
+    // private String orderAddress;
 
     @Column(name = "ORDER_PHONE")
     private String orderPhone;

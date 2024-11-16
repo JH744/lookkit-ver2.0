@@ -1,0 +1,119 @@
+<template>
+      <h2 class="product-amount">PRODUCT(<span>{{ wishlist.length }}</span>)</h2>
+      <div class="product-grid">
+        <!-- Product Item 반복 출력 -->
+        <div class="product-item" v-for="wish in wishlist" :key="wish.productId">
+          <img class="product-image" :src="`/images/products/0${wish.productId}/${wish.productThumbnail}`" />
+          <h3 class="product-brand">{{ wish.brandName }}</h3>
+          <p class="product-name">{{ wish.productName }}</p>
+          <p class="product-price">
+            <span class="price-detail">{{ formatPrice(wish.productPrice) }}</span> 원
+          </p>
+          <div class="product-likes">
+            <img class="like-icon" src="/images/wish.png" alt="Like Icon" />
+            <span>{{ wish.likeCount }}</span>
+          </div>
+        </div>
+      </div>
+  </template>
+  
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import axios from 'axios';
+  
+  // 예제 데이터 (실제로는 API에서 받아오는 데이터로 설정)
+  const wishlist = ref([]);
+  
+  // 숫자 포맷 함수
+  function formatPrice(price) {
+    return price.toLocaleString('ko-KR');
+  }
+  
+  const loadWishlist = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/mypage/wishlist/5');
+      console.log(">>>>>>>>",response.data.data);
+      wishlist.value = response.data.data;
+    } catch (error) {
+      console.error('Error loading:', error);
+    }
+  }
+
+  onMounted(() => {
+  loadWishlist();
+});
+  </script>
+
+<style scoped>
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: -webkit-fill-available;
+  }
+
+  .product-amount {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 70px;
+    margin-top: 90px;
+    text-align: center;
+    min-width: 800px;
+  }
+  
+  .product-item {
+    border: 1px solid #ddd;
+    padding: 18px;
+    border-radius: 10px;
+  }
+  
+  .product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
+  }
+  
+  .product-brand {
+    font-size: 17px;
+    font-weight: normal;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    text-decoration: underline;
+  }
+  
+  .product-name {
+    font-size: 13px;
+    color: #454545;
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+  
+  .product-price {
+    font-size: 16px;
+    color: #000;
+    margin-top: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .price-detail {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .product-likes {
+    display: flex;
+    align-items: center;
+  }
+  
+  .product-likes img.like-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+  }
+  
+  .product-likes span {
+    font-size: 16px;
+    color: #e74c3c;
+  }
+  </style>
+  
