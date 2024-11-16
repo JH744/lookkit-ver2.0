@@ -25,8 +25,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID") // 컬럼명 명시
     private Long userId;
-    @Column(name = "USER_UUID")
-    private String userUid;
 
 
     @Column(name = "USER_UUID") // 컬럼명 명시

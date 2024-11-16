@@ -44,7 +44,7 @@ const routes = [
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
   {
-<<<<<<< HEAD
+
     path: "/codi/:codiId",
     component: () => import("@/views/Codi/CodiView.vue"),
   },
@@ -69,19 +69,14 @@ const routes = [
   {
     path: "/cart",
     component: () => import("@/views/Cart/CartView.vue"),
-=======
-<<<<<<< HEAD
-    path: "/updateInfo",
-    component: () => import("@/views/Mypage/UserInfoView.vue"),
-=======
-    path: "/userInfo",
-    component: () => import("@/views/mypage/UserInfoView.vue"),
+
+    // path: "/updateInfo",
+    // component: () => import("@/views/Mypage/UserInfoView.vue"),
   },
   {
     path: "/vali",
     component: () => import("@/views/Admin/Vali.vue"),
->>>>>>> 650cad9da8f4d0be70d37ae49ebec7799a12af01
->>>>>>> 4235013a5103c35a6ae84f6ecdb16a59bf4cc63a
+
   },
 ];
 
