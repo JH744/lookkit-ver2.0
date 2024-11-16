@@ -1,6 +1,7 @@
 package synerjs.lookkit2nd.wishlist.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import synerjs.lookkit2nd.codi.Codi;
@@ -11,15 +12,18 @@ import synerjs.lookkit2nd.wishlist.entity.Wishlist;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WishlistRequestDTO {
+public class WishlistDTO {
 
     private Long userId;
+    private Long wishlistId;
+    private Long productId;
+    private Long codiId;
 
     // DTO -> Entity
-    public Wishlist toEntity(Long userId, User user, Product product, Codi codi) {
+    @Builder
+    public Wishlist toEntity(Product product, Codi codi) {
         return Wishlist.builder()
-                .wishlistId(userId)
-                .user(user)
+                .userId(userId)
                 .product(product)
                 .codi(codi)
                 .build();

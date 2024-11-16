@@ -39,7 +39,11 @@ public class InquiryController {
         return new BaseResponse<>(response);
     }
 
-
+    @DeleteMapping("/{inquiryId}")
+    public BaseResponse<Long> deleteInquiry(@PathVariable Long inquiryId) {
+        inquiryService.deleteInquiry(inquiryId);
+        return new BaseResponse<>(inquiryId);
+    }
 
 
 

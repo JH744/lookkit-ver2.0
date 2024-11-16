@@ -20,18 +20,18 @@ public class Product {
     private Long productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "CATEGORY_ID")
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "codi_id")
+    @JoinColumn(name = "CODI_ID")
     private Codi codi;
 
     private String productName;
 
     private String productDescription;
 
-    private BigDecimal productPrice;
+    private int productPrice;
 
     private String brandName;
 

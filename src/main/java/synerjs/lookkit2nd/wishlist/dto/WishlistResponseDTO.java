@@ -9,24 +9,35 @@ import java.math.BigDecimal;
 
 @Getter
 @Builder
-@AllArgsConstructor
 public class WishlistResponseDTO {
 
-    private long productId;
+    private Long productId;
     private String productName;
     private String brandName;
-    private BigDecimal productPrice;
+    private int productPrice;
     private String productThumbnail;
-    private int likeCount;
+    private Long likeCount;
 
-    public static WishlistResponseDTO of(Wishlist wishlist, int likeCount) {
-        return WishlistResponseDTO.builder()
-                .productId(wishlist.getProduct().getProductId())
-                .brandName(wishlist.getProduct().getBrandName())
-                .productPrice(wishlist.getProduct().getProductPrice())
-                .productThumbnail(wishlist.getProduct().getProductThumbnail())
-                .likeCount(likeCount)
-                .build();
+    // Hibernate가 사용할 수 있도록 필요한 모든 필드를 포함하는 생성자 추가
+    public WishlistResponseDTO(Long productId, String productName, String brandName, int productPrice, String productThumbnail, Long likeCount) {
+        this.productId = productId;
+        this.productName = productName;
+        this.brandName = brandName;
+        this.productPrice = productPrice;
+        this.productThumbnail = productThumbnail;
+        this.likeCount = likeCount;
+    }
+
+    // Entity에서 DTO로 변환하는 정적 메서드
+    public static WishlistResponseDTO fromEntity(Wishlist wishlist, Long likeCount) {
+        return new WishlistResponseDTO(
+                wishlist.getProduct().getProductId(),
+                wishlist.getProduct().getProductName(),
+                wishlist.getProduct().getBrandName(),
+                wishlist.getProduct().getProductPrice(),
+                wishlist.getProduct().getProductThumbnail(),
+                likeCount
+        );
     }
 
 }

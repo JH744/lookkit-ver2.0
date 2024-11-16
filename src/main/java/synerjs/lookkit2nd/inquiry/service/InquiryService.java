@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import synerjs.lookkit2nd.common.exception.BaseException;
+import synerjs.lookkit2nd.common.response.BaseResponseStatus;
 import synerjs.lookkit2nd.common.util.FileUtil;
 import synerjs.lookkit2nd.inquiry.dto.InquiryImageDTO;
 import synerjs.lookkit2nd.inquiry.dto.InquiryRequestDTO;
@@ -79,5 +81,11 @@ public class InquiryService {
             }
         }
         return InquiryResponseDTO.fromEntity(inquiry, imagesToSave);
+    }
+
+    public void deleteInquiry(Long inquiryId) {
+        inqRepository.findById(inquiryId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.INQUIRY_NOT_FOUNT));
+        inqRepository.deleteById(inquiryId);
     }
 }

@@ -17,29 +17,34 @@
       </div>
   </template>
   
-  <script setup>
-  import { ref } from 'vue';
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import axios from 'axios';
   
   // 예제 데이터 (실제로는 API에서 받아오는 데이터로 설정)
-  const wishlist = ref([
-    {
-      productId: 1,
-      productThumbnail: 'thumb1.jpg',
-      brandName: 'Brand A',
-      productName: 'Product A',
-      productPrice: 10000,
-      likeCount: 150,
-    },
-    // 추가 아이템들...
-  ]);
+  const wishlist = ref([]);
   
   // 숫자 포맷 함수
   function formatPrice(price) {
     return price.toLocaleString('ko-KR');
   }
-  </script>
   
-  <style scoped>
+  const loadWishlist = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/mypage/wishlist/5');
+      console.log(">>>>>>>>",response.data.data);
+      wishlist.value = response.data.data;
+    } catch (error) {
+      console.error('Error loading:', error);
+    }
+  }
+
+  onMounted(() => {
+  loadWishlist();
+});
+  </script>
+
+<style scoped>
   .product-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
