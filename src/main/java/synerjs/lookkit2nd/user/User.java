@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -23,23 +23,44 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USER_ID") // 컬럼명 명시
     private Long userId;
 
+
+    @Column(name = "USER_UUID") // 컬럼명 명시
     private String userUuid;
-    private String userName;
+
+    @Column(name = "PASSWORD") // 컬럼명 명시 (필요 시)
     private String password;
+
+    @Column(name = "USER_NAME") // 컬럼명 명시
+    private String userName;
+
+    @Column(name = "GENDER") // 컬럼명 명시 (필요 시)
     private String gender;
+
     @DateTimeFormat(pattern = "yyMMdd")
-    @Column(name = "BIRTHDATE")
+    @Column(name = "BIRTHDATE") // 컬럼명 명시
     private LocalDate birthDate;
+
+    @Column(name = "EMAIL") // 컬럼명 명시 (필요 시)
     private String email;
-    @CreatedDate
-    @Column(updatable = false)
-    private Timestamp createdAt;
+
+    @Column(name = "PHONE") // 컬럼명 명시 (필요 시)
     private String phone;
+
+    @CreatedDate
+    @Column(name = "USER_CREATED_AT", updatable = false) // 컬럼명 명시
+    private Timestamp userCreatedAt;
+
+    @Column(name = "LAST_UPDATE") // 컬럼명 명시 (필요 시)
     @LastModifiedDate
     private Timestamp lastUpdate;
+
+    @Column(name = "ROLE") // 컬럼명 명시 (필요 시)
     private String role;
+
+    @Column(name = "ADDRESS") // 컬럼명 명시 (필요 시)
     private String address;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -47,7 +68,7 @@ public class User {
 
     @Builder
     public User(String userUuid, String password, String userName, String gender, LocalDate birthDate,
-                String email, String phone, Timestamp createdAt,Timestamp lastUpdate, String role, String address) {
+                String email, String phone, Timestamp userCreatedAt,Timestamp lastUpdate, String role, String address) {
         this.userUuid = userUuid;
         this.password = password;
         this.userName = userName;
@@ -55,7 +76,7 @@ public class User {
         this.birthDate = birthDate;
         this.email = email;
         this.phone = phone;
-        this.createdAt = createdAt;
+        this.userCreatedAt = userCreatedAt;
         this.lastUpdate=lastUpdate;
         this.role = role != null ? role : "USER"; //빌더 사용시 기본값은 일반유저
         this.address = address;
