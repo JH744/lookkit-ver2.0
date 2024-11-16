@@ -7,14 +7,12 @@ import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@ToString
 @Table(name = "reviews")
 public class Review {
 
@@ -27,16 +25,16 @@ public class Review {
     @JsonIgnore
     private Product product;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "codi_id")
-    @JsonIgnore
+    @JoinColumn(name = "CODI_ID")
     private Codi codi;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     private User user;
 
-    private Integer rating; // 1~5점
+    private Integer rating;
 
     private String reviewText;
 
@@ -51,4 +49,5 @@ public class Review {
         this.reviewText = reviewText;
         this.createdAt = createdAt;
     }
+
 }

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@ToString
 @Table(name = "codi")
 public class Codi {
 

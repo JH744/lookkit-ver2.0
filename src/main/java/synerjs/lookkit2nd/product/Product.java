@@ -2,9 +2,11 @@ package synerjs.lookkit2nd.product;
 
 import jakarta.persistence.*;
 import lombok.*;
+import synerjs.lookkit2nd.codi.Codi;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -20,17 +22,26 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
 
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CODI_ID")
+    private Codi codi;
+
     private String productName;
     private String brandName;
     private String productDescription;
+
     private Integer productPrice;
+
+
     private Integer productStock;
     private String genderTarget;
     private String productThumbnail;
+
     private Timestamp productCreatedAt;
     private Timestamp productUpdatedAt;
 
@@ -48,4 +59,5 @@ public class Product {
         this.productCreatedAt = productCreatedAt;
         this.productUpdatedAt = productUpdatedAt;
     }
+
 }
