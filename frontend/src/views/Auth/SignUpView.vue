@@ -6,12 +6,14 @@
         <div class="separator"></div>
       </div>
       <div class="formContainer">
-        <form action="/auth/signUp" method="post" id="signUpForm">
+        <form @submit.prevent="handleSignUp" id="signUpForm">
           <div class="buttonContainer">
             <button type="submit" class="signupButton" id="signupButton">
               회원가입
             </button>
-            <div class="cancelButton">취소하기</div>
+            <div class="cancelButton">
+              <router-link to="/auth/login">취소하기</router-link>
+            </div>
           </div>
           <div class="inputContainer">
             <div class="label">아이디</div>
@@ -19,18 +21,21 @@
               id="userUuid"
               type="text"
               name="userUuid"
+              v-model="userUuid"
               class="inputField"
-              placeholder="아이디를 입력하세요"
+              :class="{ 'error-input': userUuidError }"
+              placeholder="아이디를 입력하세요."
             />
             <button
               type="button"
               id="duplicateCheckButton"
               class="duplicateCheckButton"
+              @click="checkDuplicateID"
             >
               중복확인
             </button>
             <label id="idCheckLabel" class="idCheckLabel">
-              ✓ 사용가능한 아이디</label
+              {{ errors.userUuid }}</label
             >
           </div>
           <div class="passwordContainer">
@@ -40,31 +45,58 @@
               type="password"
               id="password"
               name="password"
+              v-model="password"
               class="passwordInput"
+              :class="{ 'error-input': passwordError }"
               placeholder="비밀번호 영문/특수문자/숫자 8~16자"
             />
 
-            <label id="pwCheckLabel" class="pwCheckLabel"> 비밀번호 체크</label>
+            <label id="pwCheckLabel" class="pwCheckLabel">
+              {{ errors.password }}</label
+            >
+          </div>
+          <div class="passwordCheckContainer">
+            <div class="passwordLabel">비밀번호 확인</div>
+
+            <input
+              type="password"
+              v-model="repeatPassword"
+              class="passwordInput"
+              :class="{ 'error-input': repeatPasswordError }"
+              placeholder="비밀번호를 재입력해주세요."
+            />
+
+            <label id="pwCheckLabel2" class="pwCheckLabel">
+              {{ repeatPasswordError }}</label
+            >
           </div>
           <div class="nameContainer">
             <div class="nameLabel">이름</div>
             <input
               type="text"
               id="userName"
+              v-model="userName"
               name="userName"
               class="nameInput"
-              placeholder="이름을 입력하세요"
+              :class="{ 'error-input': userNameError }"
+              placeholder="이름을 입력하세요."
             />
+            <label id="userNameCheckLabel" class="userNameCheckLabel">
+              {{ userNameError }}</label
+            >
           </div>
           <div class="phoneContainer">
             <div class="phoneLabel">휴대폰 번호</div>
             <input
               type=""
               id="phone"
+              v-model="phone"
               name="phone"
               class="nameInput"
-              placeholder="-없이 휴대폰 번호를 입력하세요"
+              :class="{ 'error-input': phoneError }"
+              placeholder="-없이 휴대폰 번호를 입력하세요."
             />
+            <label class="phoneCheckLabel"> {{ phoneError }}</label>
           </div>
           <div class="emailLabel">이메일 주소</div>
           <div class="emailContainer">
@@ -73,20 +105,30 @@
               id="email"
               name="email"
               class="emailInput"
+              :class="{ 'error-input': emailError }"
               placeholder="이메일주소"
+              v-model="email"
             />
             <label id="emailCheckLabel" class="emailCheckLabel">
-              이메일 체크</label
+              {{ errors.email }}</label
             >
           </div>
           <div class="addressLabel">주소 정보</div>
           <div class="addressContainer">
             <div class="addrBox">
-              <div id="addressSearch" class="postcodeInputBtn">주소검색</div>
+              <div
+                id="addressSearch"
+                class="postcodeInputBtn"
+                @click="openPostcodePopup"
+              >
+                주소검색
+              </div>
               <input
                 type="text"
                 class="addressInput"
                 id="user_address"
+                v-model="user_address"
+                :class="{ 'error-input': addressError }"
                 name="user_address"
                 placeholder="주소"
                 readonly
@@ -95,7 +137,8 @@
             <input
               type="text"
               id="user_detail_address"
-              name="user_detail_address"
+              ref="user_detail_address_input"
+              v-model="user_detail_address"
               class="detailedAddressInput"
               placeholder="상세주소"
             />
@@ -103,36 +146,59 @@
               type="text"
               id="user_total_address"
               name="address"
+              v-model="address"
               style="display: none"
             />
+            <label class="addressCheckLabel"> {{ addressError }}</label>
           </div>
           <div class="birthdateLabel">생년월일</div>
           <input
             type="date"
             id="birthDate"
+            v-model="birthDate"
             class="birthdateInput"
             name="birthDate"
-            placeholder="생년월일 6자리를 입력하세요"
+            placeholder="생년월일 6자리를 입력하세요."
           />
           <div class="genderMaleContainer">
             <input
               type="radio"
               name="gender"
               class="hidden-input"
+              :checked="isChecked"
               value="M"
               id="genderInputMan"
             />
-            <div class="genderMaleButton genderBtn checked-option">Man</div>
+            <div
+              :class="[
+                'genderMaleButton',
+                'genderBtn',
+                { 'checked-option': gender === 'M' },
+              ]"
+              @click="chooseGenderMan"
+            >
+              Man
+            </div>
           </div>
           <div class="genderFemaleContainer">
             <input
               type="radio"
               name="gender"
               class="hidden-input"
+              :checked="isChecked"
               value="F"
               id="genderInputWoman"
             />
-            <div class="genderFemaleButton genderBtn">Woman</div>
+            <div
+              :class="[
+                'genderFemaleButton',
+                'genderBtn',
+                { 'checked-option': gender === 'F' },
+              ]"
+              @click="chooseGenderWoman"
+            >
+              Woman
+            </div>
           </div>
         </form>
       </div>
@@ -140,11 +206,196 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "SignUpView",
-  setup() {},
-  data() {},
+<script setup>
+import { computed, ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+import { useForm, useField } from "vee-validate";
+import * as yup from "yup";
+
+const router = useRouter();
+
+const gender = ref("M");
+const user_detail_address = ref("");
+const birthDate = ref("");
+const isChecked = ref(false);
+const user_detail_address_input = ref(null);
+
+const total_address = computed(() => {
+  return `${user_address.value} ${user_detail_address.value}`;
+});
+
+// 유효성 검사 스키마 설정
+const schema = yup.object({
+  userName: yup
+    .string()
+    .matches(
+      /^[가-힣a-zA-Z]{2,15}$/,
+      "* 이름은 한글 또는 영문 2~15자여야 합니다."
+    )
+    .required("* 이름은 필수 항목입니다."),
+  email: yup
+    .string()
+    .matches(
+      /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/,
+      "* 올바른 이메일 주소를 입력해주세요."
+    )
+    .required("* 이메일을 입력해주세요"),
+  phone: yup
+    .string()
+    .matches(/^(010|011|016|070)\d{7,8}$/, "* 유효한 전화번호 형식이 아닙니다.")
+    .required("* 전화번호는 필수 항목입니다."),
+  userUuid: yup
+    .string()
+    .matches(
+      /^[a-zA-Z0-9]{6,12}$/,
+      "* 6~12자 영문 대소문자, 숫자만 입력하세요."
+    )
+    .required("* 아이디는 필수 입력 항목입니다."),
+  password: yup
+    .string()
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/,
+      "* 8-16자 이내 영문자, 숫자, 특수문자를 모두 포함해야 합니다."
+    )
+    .required("* 비밀번호는 필수 항목입니다."),
+  repeatPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "* 비밀번호가 일치하지 않습니다.") // 비밀번호 일치 검사
+    .required("* 비밀번호 확인은 필수 항목입니다."),
+  user_address: yup.string().required("* 주소는 필수 입력 항목입니다."), // 주소 필드 추가
+});
+
+const { validate, errors } = useForm({
+  validationSchema: schema,
+});
+
+const { value: userName, errorMessage: userNameError } = useField("userName");
+const { value: email, errorMessage: emailError } = useField("email");
+const { value: phone, errorMessage: phoneError } = useField("phone");
+const { value: user_address, errorMessage: addressError } =
+  useField("user_address");
+const { value: userUuid, errorMessage: userUuidError } = useField("userUuid");
+const { value: password, errorMessage: passwordError } = useField("password");
+const { value: repeatPassword, errorMessage: repeatPasswordError } =
+  useField("repeatPassword");
+
+// 유효성 검사 후 중복 체크
+const checkDuplicateID = () => {
+  console.log("userUuidError", userUuidError.value);
+  if (!userUuidError.value && userUuid.value != null) {
+    fetchDuplicateCheckId(userUuid.value);
+  } else {
+    alert("아이디를 올바르게 입력해주세요");
+  }
+};
+
+/**아이디 중복 확인 */
+const fetchDuplicateCheckId = async (Id) => {
+  try {
+    const response = await axios
+      // .get(`/api/users/check-id?userUuid=${Id}`)
+      .get(`http://localhost:8081/api/users/check-id?userUuid=${Id}`)
+      .then((res) => {
+        console.log(res);
+        alert("사용가능한 아이디입니다.");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("중복되는 아이디입니다.");
+      });
+  } catch {
+    console.error();
+    alert("중복확인 에러");
+  }
+};
+
+/**  회원가입 api 요청 핸들러*/
+const handleSignUp = async () => {
+  // 전체 유효성 검사 실행
+  const isValid = await validate();
+
+  if (!isValid) {
+    console.log("유효성 검사 실패");
+    return;
+  }
+
+  console.log(" total_address", total_address.value);
+
+  try {
+    const response = await axios
+      // .post("/api/auth/signup", {
+      .post("http://localhost:8081/api/auth/signup", {
+        userName: userName.value,
+        password: password.value,
+        userUuid: userUuid.value,
+        phone: phone.value,
+        email: email.value,
+        gender: gender.value,
+        address: total_address.value,
+        birthDate: birthDate.value,
+      })
+      .then((res) => {
+        console.log("res", res);
+      });
+    router.push("/auth/login");
+  } catch {
+    console.error();
+    alert("회원가입에 실패하였습니다.");
+  }
+};
+
+// 성별 선택 이벤트
+const chooseGenderWoman = () => {
+  gender.value = "F";
+  console.log(gender.value);
+};
+const chooseGenderMan = () => {
+  gender.value = "M";
+  console.log(gender.value);
+};
+
+/** 주소 api 불러오기*/
+const loadDaumPostcode = () => {
+  return new Promise((resolve, reject) => {
+    if (document.getElementById("daum-postcode-script")) {
+      resolve(); // 이미 스크립트가 로드된 경우
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src =
+      "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.id = "daum-postcode-script";
+    script.async = true;
+
+    script.onload = () => {
+      console.log("Daum Postcode script loaded");
+      resolve();
+    };
+
+    script.onerror = () =>
+      reject(new Error("Failed to load Daum Postcode script"));
+
+    document.body.appendChild(script);
+  });
+};
+
+/**  다음 주소 팝업창 열기 */
+const openPostcodePopup = () => {
+  loadDaumPostcode()
+    .then(() => {
+      new window.daum.Postcode({
+        oncomplete: (data) => {
+          console.log("user_address:", data.address);
+          user_address.value = data.address;
+          user_detail_address_input.value.focus();
+        },
+      }).open();
+    })
+    .catch((error) => {
+      console.error(error.message);
+    });
 };
 </script>
 
@@ -208,7 +459,7 @@ export default {
   height: 100px;
   position: absolute;
   left: 0px;
-  top: 1033px;
+  top: 1130px;
 }
 .signupButton {
   background: #0d1134;
@@ -325,14 +576,11 @@ export default {
   top: 29px;
 }
 .idCheckLabel {
-  font-size: 14px;
-  color: #ff294f;
   width: 293px;
   height: 57px;
   position: absolute;
   left: 5px;
   top: 93px;
-  display: none;
 }
 .inputPlaceholder {
   color: #797979;
@@ -354,6 +602,15 @@ export default {
   left: 0px;
   top: 126px;
 }
+
+.passwordCheckContainer {
+  width: 499px;
+  height: 86px;
+  position: absolute;
+  left: 0px;
+  top: 251px;
+}
+
 .passwordLabel {
   color: #000000;
   text-align: left;
@@ -399,7 +656,7 @@ export default {
   height: 87px;
   position: absolute;
   left: 0px;
-  top: 251px;
+  top: 377px;
 }
 .nameLabel {
   color: #000000;
@@ -445,7 +702,7 @@ export default {
   height: 87px;
   position: absolute;
   left: 0px;
-  top: 377px;
+  top: 755px;
 }
 .phoneLabel {
   color: #000000;
@@ -514,7 +771,7 @@ export default {
   font-weight: 400;
   position: absolute;
   left: 0px;
-  top: 755px;
+  top: 880px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -534,7 +791,7 @@ export default {
   height: 57px;
   position: absolute;
   right: 1px;
-  top: 731px;
+  top: 855px;
   cursor: pointer;
   text-align: center;
   align-content: center;
@@ -558,7 +815,7 @@ export default {
   height: 57px;
   position: absolute;
   left: 0px;
-  top: 731px;
+  top: 855px;
 }
 .detailedAddressInput {
   background: #ffffff;
@@ -569,7 +826,7 @@ export default {
   height: 57px;
   position: absolute;
   left: 0px;
-  top: 867px;
+  top: 980px;
 }
 .postcodeSearchText {
   color: #555553;
@@ -683,15 +940,29 @@ export default {
   position: absolute;
   top: 92px;
   left: 3px;
-  display: none;
 }
 .emailCheckLabel {
   position: absolute;
   top: 723px;
   left: 3px;
-  display: none;
 }
 
+.userNameCheckLabel {
+  position: absolute;
+  top: 94px;
+  left: 3px;
+}
+
+.phoneCheckLabel {
+  position: absolute;
+  top: 94px;
+  left: 3px;
+}
+.addressCheckLabel {
+  position: absolute;
+  top: 1043px;
+  left: 3px;
+}
 .passwordLabel,
 .label,
 .nameLabel,
@@ -701,7 +972,26 @@ export default {
 .addressLabel {
   min-width: 120px;
 }
+.addressCheckLabel,
+.idCheckLabel,
+.pwCheckLabel,
+.emailCheckLabel,
+.userNameCheckLabel,
+.phoneCheckLabel {
+  color: #ff294f;
+  font-size: 14px;
+}
+
 .hidden-input {
   display: none;
+}
+
+.error-input {
+  color: #ff294f !important;
+  border: 1.5px solid #ff294f !important;
+}
+
+input:focus::placeholder {
+  opacity: 0; /* 포커스 시 사라지도록 설정 */
 }
 </style>
