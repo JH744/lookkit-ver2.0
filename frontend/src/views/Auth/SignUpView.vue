@@ -294,8 +294,8 @@ const checkDuplicateID = () => {
 const fetchDuplicateCheckId = async (Id) => {
   try {
     const response = await axios
-      .get(`/api/users/check-id?userUuid=${Id}`)
-      // .get(`http://localhost:8081/api/users/check-id?userUuid=${Id}`)
+      // .get(`/api/users/check-id?userUuid=${Id}`)
+      .get(`http://localhost:8081/api/users/check-id?userUuid=${Id}`)
       .then((res) => {
         console.log(res);
         alert("사용가능한 아이디입니다.");

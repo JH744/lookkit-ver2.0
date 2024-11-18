@@ -1,5 +1,6 @@
 package synerjs.lookkit2nd.common.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,10 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+@Autowired
+private WebConfig webConfig;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,6 +41,8 @@ public class SecurityConfig {
 //                      .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자페이지 "ADMIN" 권한 필요
 //                      .anyRequest().authenticated() // 그 외의 모든 요청도 인증된 사용자만 접근 가능하도록 설정
         );
+
+        http.formLogin((formLogin) -> formLogin.disable()).addFilter(webConfig.corsFilter());
 //        http.formLogin((formLogin) -> formLogin
 //                .loginPage("/auth/login")
 ////                .defaultSuccessUrl("/main")

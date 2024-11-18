@@ -124,10 +124,15 @@ watch(
 const handleLogin = async () => {
   try {
     const response = await axios
-      .post("/api/auth/login", {
-        username: username.value,
-        password: password.value,
-      })
+      .post(
+        "http://localhost:8081/api/auth/login",
+        // "/api/auth/login",
+        {
+          username: username.value,
+          password: password.value,
+        },
+        { withCredentials: true }
+      )
       .then((jwt) => {
         // console.log("jwt", jwt);
 
