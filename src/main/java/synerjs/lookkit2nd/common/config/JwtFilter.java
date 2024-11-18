@@ -57,24 +57,26 @@ public class JwtFilter extends OncePerRequestFilter {
         // 유효성 검증,위조 여부 확인
         Claims claims;
         try {
-
-        claims =JwtUtil.extractToken(jwtCookie);
+        //
+        claims =JwtUtil.extractToken(jwtCookie); //토큰 파싱
 
         }catch (Exception e){
             filterChain.doFilter(request, response);
             return;
         }
         var arr =  claims.get("authorities").toString().split(",");
-        String username = claims.get("username").toString();
+        String username = claims.get("username").toString(); //토큰에서 유저아이디 가져오기
+        long userId = Double.valueOf(claims.get("userID").toString()).longValue(); // 토큰에서 유저 PK ID값 가져오기
+
          var authorities= Arrays.stream(arr).map(a-> new SimpleGrantedAuthority(a)).toList();
 
-        var customUser = new CustomUser(username,"none",authorities);
+        var customUser = new CustomUser(username,"none",authorities,userId);
         var authToken = new UsernamePasswordAuthenticationToken(
                 customUser,""
         );
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
 
         filterChain.doFilter(request, response);

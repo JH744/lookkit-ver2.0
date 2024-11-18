@@ -69,10 +69,25 @@
               </div>
             </div>
           </form>
-          <!-- 소셜로그인컴포넌트 
-           <button>구글</button>  
-           <button>카카오</button> 
-          <button>네이버</button> -->
+        </div>
+        <div class="social-login-container">
+          <!-- <div class="social-login-subtitle">
+            <h5>간편로그인</h5>
+          </div> -->
+          <div class="social-login-wrap">
+            <div class="social-login-box">
+              <img src="@/assets/logos/kakao_logo.svg" width="60" />
+              <span>카카오</span>
+            </div>
+            <div class="social-login-box">
+              <img src="@/assets/logos/naver_logo.svg" width="60" />
+              <span>네이버</span>
+            </div>
+            <div class="social-login-box">
+              <img src="@/assets/logos/google_logo.svg" width="60" />
+              <span>구글</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -109,10 +124,15 @@ watch(
 const handleLogin = async () => {
   try {
     const response = await axios
-      .post("/api/auth/login", {
-        username: username.value,
-        password: password.value,
-      })
+      .post(
+        "http://localhost:8081/api/auth/login",
+        // "/api/auth/login",
+        {
+          username: username.value,
+          password: password.value,
+        },
+        { withCredentials: true }
+      )
       .then((jwt) => {
         // console.log("jwt", jwt);
 
@@ -140,9 +160,9 @@ const handleLogin = async () => {
   height: 85vh;
   position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  margin-top: 80px;
 }
 .loginBox {
   width: 460px;
@@ -231,7 +251,7 @@ const handleLogin = async () => {
   color: #101010;
   text-align: left;
   font-family: "Inter-Regular", sans-serif;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 18px;
   font-weight: 400;
   margin-left: 28px;
@@ -293,7 +313,7 @@ const handleLogin = async () => {
   font-weight: 400;
   position: absolute;
   left: calc(50% - 89px);
-  top: 386px;
+  top: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -335,5 +355,38 @@ const handleLogin = async () => {
 
 .hidden {
   display: none;
+}
+
+.social-login-container {
+  width: 70%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  top: 470px;
+  gap: 10px;
+}
+.social-login-subtitle {
+  text-align: center;
+  color: #6a6a6a;
+  font-weight: 400;
+  padding: 5px;
+}
+.social-login-wrap {
+  display: flex;
+  justify-content: space-around;
+}
+.social-login-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #aeaeae;
+
+  img,
+  span {
+    cursor: pointer;
+  }
 }
 </style>

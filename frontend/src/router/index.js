@@ -43,6 +43,14 @@ const routes = [
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
+<<<<<<< HEAD
+=======
+
+  {
+    path: "/vali",
+    component: () => import("@/views/Admin/Vali.vue"),
+  },
+>>>>>>> e883148f1a2a4b949402c219be2a565f2b2d1954
   {
     path: "/codi/:codiId",
     component: () => import("@/views/Codi/CodiView.vue"),

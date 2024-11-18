@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @ToString
-@Table(name = "users")
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -54,6 +54,7 @@ public class User {
     @CreatedDate
     @Column(name = "CREATED_AT", updatable = false) // 컬럼명 명시
     private Timestamp createdAt;
+
 
     @Column(name = "LAST_UPDATE") // 컬럼명 명시 (필요 시)
     @LastModifiedDate
