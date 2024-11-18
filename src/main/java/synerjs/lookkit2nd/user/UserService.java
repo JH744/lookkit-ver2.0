@@ -24,8 +24,8 @@ public class UserService {
 
     }
 
+    @Autowired
     private PasswordEncoder passwordEncoder;
-    // private final UserMapper userMapper;
 
 
     // 아이디로 유저 조회
