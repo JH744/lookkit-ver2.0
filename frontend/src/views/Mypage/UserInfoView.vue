@@ -23,6 +23,7 @@
                   v-model="userData.password"
                   readonly
                 />
+                <!-- 비밀번호 변경 버튼 -->
                 <button
                   type="button"
                   class="btn-password-change"
@@ -53,9 +54,24 @@
               <label for="email">이메일 주소</label>
               <div class="inline">
                 <input id="email" type="email" v-model="userData.email" />
-                <button type="button" class="btn-email-check">중복확인</button>
+                <!-- 이메일 중복 확인 버튼 -->
+                <button
+                  type="button"
+                  class="btn-email-check"
+                  @click="checkEmailDuplicate"
+                >
+                  중복확인
+                </button>
               </div>
-              <span id="email-check-result"></span>
+              <!-- 중복 확인 결과 표시 -->
+              <span
+                id="email-check-result"
+                :class="{
+                  'error-message': emailCheckResult.isError,
+                  'success-message': !emailCheckResult.isError,
+                }"
+                >{{ emailCheckResult.message }}
+              </span>
             </div>
             <div class="address-group">
               <label>주소 정보</label>
@@ -65,9 +81,11 @@
                   id="user_address"
                   v-model="userData.address"
                 />
+                <!-- 우편번호 검색 버튼 -->
                 <button
                   type="button"
                   class="btn-postcode-search"
+                  @click="searchPostcode"
                   id="addressSearch"
                 >
                   우편번호 검색
@@ -88,10 +106,18 @@
               />
             </div>
           </div>
+          <!-- 저장 및 취소 버튼 -->
           <div class="button-group">
-            <button type="button" class="btn-cancel">취소하기</button>
+            <button type="button" class="btn-cancel" @click="cancelUpdate">
+              취소하기
+            </button>
             <button type="submit" class="btn-save" id="updateBtn">
               저장하기
+            </button>
+          </div>
+          <div class="withdrawal-group">
+            <button type="button" class="btn-withdrawal" @click="deleteAccount">
+              회원 탈퇴
             </button>
           </div>
         </form>
@@ -169,28 +195,123 @@ onMounted(async () => {
   }
 });
 
+// 비밀번호 변경 모달 열기
 const showPasswordChangeModal = () => {
+  console.log("비밀번호 변경 버튼 클릭됨");
   showModal.value = true;
 };
 
+// 비밀번호 변경 모달 닫기
 const closeModal = () => {
   showModal.value = false;
 };
 
+// 비밀번호 변경 로직
 const updatePassword = async () => {
   if (newPassword.value !== confirmPassword.value) {
     alert("새 비밀번호가 일치하지 않습니다.");
     return;
   }
-  // 비밀번호 변경 로직 추가 필요
+  try {
+    await axios.post(
+      "http://localhost:8081/api/v1/userinfo/6/change-password",
+      {
+        userUuid: userData.value.userUuid,
+        currentPassword: currentPassword.value,
+        newPassword: newPassword.value,
+      }
+    );
+    alert("비밀번호가 성공적으로 변경되었습니다.");
+    closeModal();
+    // 비밀번호 필드 초기화
+    currentPassword.value = "";
+    newPassword.value = "";
+    confirmPassword.value = "";
+  } catch (error) {
+    console.error("Error updating password:", error);
+    alert("비밀번호 변경에 실패했습니다.");
+  }
 };
 
+// 프로필 업데이트 로직
 const updateProfile = async () => {
   try {
-    // 여기에 프로필 업데이트 API 호출 로직 추가 필요
-    console.log("Updated Profile:", userData.value);
+    await axios.put(
+      "http://localhost:8081/api/v1/userinfo/update",
+      userData.value
+    );
+    alert("프로필이 성공적으로 업데이트되었습니다.");
   } catch (error) {
     console.error("Error updating profile:", error);
+    alert("프로필 업데이트에 실패했습니다.");
+  }
+};
+
+const emailCheckResult = ref({
+  message: "",
+  isError: false, // true이면 오류 메시지, false이면 성공 메시지
+});
+
+// 이메일 중복 확인 로직
+const checkEmailDuplicate = async () => {
+  if (!userData.value.email) {
+    emailCheckResult.value.message = "이메일을 입력해주세요.";
+    //emailCheckResult.value.isError = false;
+    return;
+  }
+
+  console.log("이메일 중복 확인 요청: ", userData.value.email);
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8081/api/v1/userinfo/check-email`,
+      {
+        params: {
+          email: userData.value.email,
+        },
+      }
+    );
+    console.log(response.data); // 응답 데이터 로그 확인
+    if (response.data.exists === true) {
+      emailCheckResult.value.message = "이미 사용 중인 이메일입니다.";
+      //emailCheckResult.value.isError = false;
+    } else {
+      emailCheckResult.value.message = "사용 가능한 이메일입니다.";
+      //emailCheckResult.value.isError = false;
+    }
+  } catch (error) {
+    console.error("Error checking email:", error);
+    emailCheckResult.value.message = "이메일 중복 확인에 실패했습니다.";
+    //emailCheckResult.value.isError = false;
+  }
+};
+
+// 우편번호 검색 로직 (예시, 실제 구현 필요)
+const searchPostcode = () => {
+  // 우편번호 검색 로직 구현
+  alert("우편번호 검색 기능은 아직 구현되지 않았습니다.");
+};
+
+// 취소 버튼 동작
+const cancelUpdate = () => {
+  // 원하는 취소 동작 구현 (예: 초기 데이터로 되돌리기 또는 다른 페이지로 이동)
+  alert("취소 버튼이 클릭되었습니다.");
+};
+
+// 탈퇴 요청 메서드
+const deleteAccount = async () => {
+  const userId = 6; // 여기에 실제 사용자 ID를 설정하세요
+  const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
+  if (confirmation) {
+    try {
+      await axios.delete(`http://localhost:8081/api/v1/userinfo/${userId}`);
+      alert("회원 탈퇴가 완료되었습니다.");
+      // 탈퇴 후 리다이렉트 동작 등 추가 가능
+      window.location.href = "/"; // 홈 페이지로 리다이렉트
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("회원 탈퇴에 실패했습니다.");
+    }
   }
 };
 </script>
@@ -586,24 +707,27 @@ const updateProfile = async () => {
 }
 
 .button-group {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* 버튼 간 간격 조정 */
   margin-top: 20px;
 }
 
 /* Modal Styles */
 .modal-container {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); /* Overlay */
+  display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-.pw-check-modal,
 .pw-change-modal {
   display: grid;
   background-color: white;
@@ -672,5 +796,34 @@ const updateProfile = async () => {
 
 .hidden-input {
   display: none !important;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
+.success-message {
+  color: green;
+  font-size: 14px;
+}
+
+.withdrawal-group {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btn-withdrawal {
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 110px;
+  border: none;
+}
+
+.btn-withdrawal:hover {
+  background-color: #d32f2f;
 }
 </style>
