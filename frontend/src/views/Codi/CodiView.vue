@@ -56,7 +56,8 @@
         <img :src="codiImage + '_detail_2.webp'" alt="코디사진2" />
       </div>
       <div v-if="activeTab === 'reviews'" class="tab-content" id="reviews">
-        <div class="review-filters">
+        <ReviewView :codiId="codiId"/>
+        <!-- <div class="review-filters">
           <button class="filter-button" @click="sortReviews('latest')">최신순</button>
           <button class="filter-button" @click="sortReviews('highRating')">별점 높은 순</button>
           <button class="filter-button" @click="sortReviews('lowRating')">별점 낮은 순</button>
@@ -75,7 +76,7 @@
               <p>{{ review.reviewText }}</p>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div v-if="activeTab === 'qna'" class="tab-content" id="qna">
       <p>상품 Q&A 내용이 여기에 표시됩니다.</p>
@@ -109,13 +110,12 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import "@/assets/styles/codi.css";
+import ReviewView from '@/views/Review/ReviewView.vue'; 
 
 const API_BASE_URL = 'http://localhost:8081/api/codi';
 
 const activeTab = ref('details');
-
 const codi = ref({});
-
 const route = useRoute(); // 현재 라우터의 정보를 가져오는 훅
 const codiId = ref(route.params.codiId); // URL에서 codiId 가져오기
 

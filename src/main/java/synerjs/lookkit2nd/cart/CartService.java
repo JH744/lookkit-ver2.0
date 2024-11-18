@@ -90,6 +90,7 @@ public class CartService {
                 .codiId(codiId)
                 .rentalStartDate(start)
                 .rentalEndDate(end)
+                .quantity(1)
                 .build();
 
         // Cart 객체를 데이터베이스에 저장

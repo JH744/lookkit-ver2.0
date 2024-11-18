@@ -52,8 +52,8 @@ public class User {
     // @Column(name = "CREATED_AT")
 
     @CreatedDate
-    @Column(name = "USER_CREATED_AT", updatable = false) // 컬럼명 명시
-    private Timestamp userCreatedAt;
+    @Column(name = "CREATED_AT", updatable = false) // 컬럼명 명시
+    private Timestamp CreatedAt;
 
     @Column(name = "LAST_UPDATE") // 컬럼명 명시 (필요 시)
     @LastModifiedDate
@@ -78,7 +78,7 @@ public class User {
         this.birthDate = birthDate;
         this.email = email;
         this.phone = phone;
-        this.userCreatedAt = userCreatedAt;
+        this.CreatedAt = CreatedAt;
         this.lastUpdate=lastUpdate;
         this.role = role != null ? role : "USER"; //빌더 사용시 기본값은 일반유저
         this.address = address;

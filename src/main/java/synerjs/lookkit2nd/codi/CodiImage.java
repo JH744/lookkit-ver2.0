@@ -16,9 +16,6 @@ public class CodiImage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codi_id")
-
-    private Codi coordiset;
-
     private Codi codi;
 
 

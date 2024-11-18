@@ -136,6 +136,7 @@
 </template>
 
 <script setup>
+
 import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import "@/assets/styles/order.css";
@@ -178,7 +179,7 @@ const completeOrder = () => {
 };
 
 // 사용자가 페이지를 떠날 때 selectedItems 초기화
-onBeforeUnmount(() => {
+onBeforeUnmount(() => {99/
   orderStore.clearSelectedItems();
   localStorage.removeItem('orderStore'); // 로컬 스토리지에서도 데이터 삭제
 });
@@ -240,7 +241,105 @@ const totalPrice = computed(() => {
   return 0;
 });
 
-// 총 수량 계산
+onMounted(() => {
+  // 아임포트 스크립트 동적 로드
+  const script = document.createElement('script');
+  script.src = "https://cdn.iamport.kr/js/iamport.payment-1.2.0.js";
+  script.async = true;
+  script.onload = () => {
+    console.log("Iamport script loaded successfully");
+    // 아임포트 초기화
+    const IMP = window.IMP;
+    if (IMP) {
+      IMP.init("imp40354073");
+    }
+  };
+  document.body.appendChild(script);
+});
+
+
+
+const processPayment = () => {
+  if (!selectedPaymentMethod.value) {
+    alert('결제 수단을 선택해주세요.');
+    return;
+  }
+
+  if (agreements.value.some(agreement => !agreement.checked)) {
+    alert('모든 필수 동의 항목에 체크해주세요.');
+    return;
+  }
+
+  // 아임포트 초기화
+  const IMP = window.IMP; 
+  IMP.init("imp40354073");
+
+  const orderName = orderStore.selectedItems.length > 0 ? orderStore.selectedItems[0].itemName : '주문 상품';
+  const buyerName = buyerRecipientName.value;
+  const buyerTel = buyerPhoneNumber.value;
+  const buyerAddr = buyerAddress.value;
+
+  IMP.request_pay({
+    pg: 'kcp',
+    pay_method: 'card',
+    merchant_uid: 'merchant_' + new Date().getTime(),
+    name: orderName,
+    amount: totalPrice.value,
+    buyer_name: buyerName,
+    buyer_tel: buyerTel,
+    buyer_addr: buyerAddr,
+  }, function (rsp) {
+    if (rsp.success) {
+      alert("결제가 완료되었습니다.\n고유ID: " + rsp.imp_uid);
+
+      // 주문 상세 정보 수집
+      const orderDetails = orderStore.selectedItems.map(item => ({
+        productId: item.itemId,
+        quantity: item.quantity,
+        productPrice: item.totalPrice,
+      }));
+
+      const paymentData = {
+        userId: 1, // 실제 유저 ID를 사용해야 합니다.
+        totalAmount: totalPrice.value,
+        orderAddress: buyerAddr,
+        orderAddressee: buyerName,
+        orderPhone: buyerTel,
+        orderDetails: orderDetails,
+        orderStatus: "결제완료",
+      };
+
+      // 주문 정보를 서버로 전송
+fetch("http://localhost:8081/api/order/complete", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(paymentData)
+})
+.then(response => response.json())
+.then(orderId => {
+  if (!orderId) {
+    alert("주문 ID를 받지 못했습니다. 문제가 발생했습니다.");
+    return;
+  }
+
+  // URL 파라미터로 orderId를 전달하여 주문 완료 페이지로 이동
+  window.location.href = `/order/orderComplete?orderId=${orderId}`;
+})
+.catch(() => {
+  alert("결제를 완료하는 데 실패했습니다.");
+});
+
+
+    } else {
+      alert("결제에 실패했습니다. 실패사유: " + rsp.error_msg);
+    }
+  });
+};
+
+
+//  총 수량 계산
 const totalQuantity = computed(() => {
   if (orderItem.value && orderItem.value.quantity) {
     return orderItem.value.quantity;
@@ -253,22 +352,9 @@ const totalQuantity = computed(() => {
   };
 
 
-const processPayment = () => {
-  if (!selectedPaymentMethod.value) {
-    alert('결제 수단을 선택해주세요.');
-    return;
-  }
-  if (agreements.value.some(agreement => !agreement.checked)) {
-    alert('모든 필수 동의 항목에 체크해주세요.');
-    return;
-  }
-  alert('결제가 진행됩니다.');
-};
 
 const navigateToAddAddress = () => {
   router.push({ path: '/add-address' });
 };
 
 </script>
-
-

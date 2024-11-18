@@ -25,6 +25,7 @@ public class Cart {
     private User user;
 
 
+   
     private Long productId; // 단일 상품 ID, null 가능
     private Long codiId;    // 코디 상품 ID, null 가능
 
@@ -45,16 +46,5 @@ public class Cart {
         this.rentalEndDate = rentalEndDate;
         this.quantity = quantity;
     }
-
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRODUCT_ID")
-    private Product product;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CODI_ID")
-    private Codi codi;
-
-//    private int quantity;
 
 }

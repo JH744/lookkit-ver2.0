@@ -191,15 +191,21 @@ const fetchCartItems = async () => {
 
   // 대여일에 따라 코디 상품의 총 가격 계산
   const getCodiTotalPrice = (item) => {
-    if (item.rentalStartDate && item.rentalEndDate) {
-      const startDate = new Date(item.rentalStartDate);
-      const endDate = new Date(item.rentalEndDate);
-      const diffTime = Math.abs(endDate - startDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return item.codiPrice * (diffDays || 1);
+  if (item.rentalStartDate && item.rentalEndDate) {
+    const startDate = new Date(item.rentalStartDate);
+    const endDate = new Date(item.rentalEndDate);
+    const diffTime = endDate - startDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 기본 3일 가격 + 추가 요금 계산
+    if (diffDays > 3) {
+      return item.codiPrice + (diffDays - 3) * 10000;
     }
-    return item.codiPrice;
-  };
+    return item.codiPrice; // 기본 3일 가격
+  }
+  return item.codiPrice;
+};
+
   
   // 선택된 아이템 삭제
   const deleteSelectedItems = async () => {

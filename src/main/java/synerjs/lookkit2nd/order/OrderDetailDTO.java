@@ -5,10 +5,14 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 @Data
-@Builder
 public class OrderDetailDTO {
 
+    private Long userId;
     private Long orderItemId;
     private Long orderId;
     private Long productId;     // 단일 상품 ID, null 가능
@@ -18,7 +22,14 @@ public class OrderDetailDTO {
     private LocalDate rentalStartDate; // 대여 시작일, null 가능
     private LocalDate rentalEndDate;   // 반납일, null 가능
 
-    public OrderDetailDTO(Long orderItemId, Long orderId, Long productId, Long codiId, Integer quantity, Boolean isPurchaseConfirmed, LocalDate rentalStartDate, LocalDate rentalEndDate) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+
+    @Builder
+    public OrderDetailDTO(Long userId, Long orderItemId, Long orderId, Long productId, Long codiId, Integer quantity, Boolean isPurchaseConfirmed, LocalDate rentalStartDate, LocalDate rentalEndDate) {
+        this.userId = userId;
         this.orderItemId = orderItemId;
         this.orderId = orderId;
         this.productId = productId;

@@ -22,16 +22,20 @@ public class Codi {
     private String codiThumbnail;
     private Integer codiPrice;
 
+    @Column(nullable = false)
+    private Integer quantity = 1; // 기본값으로 1 설정
+
     @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
-    public Codi(String codiName, String codiDescription, String codiThumbnail, Integer codiPrice) {
+    public Codi(String codiName, String codiDescription, String codiThumbnail, Integer codiPrice, Integer quantity) {
         this.codiName = codiName;
         this.codiDescription = codiDescription;
         this.codiThumbnail = codiThumbnail;
         this.codiPrice = codiPrice;
+        this.quantity = (quantity != null) ? quantity : 1;
     }
 }
 

@@ -231,7 +231,7 @@ body {
 
 /* 탭 내용 */
 .tab-content {
-    display: none;
+    /* display: none; */
     align-items: center;
     justify-content: center;
 }
