@@ -100,16 +100,13 @@ const routes = [
         component: () => import("@/views/mypage/WishList.vue"),
       },
     ],
+    path: "/updateInfo",
+    component: () => import("@/views/mypage/UserInfoView.vue"),
   },
-  // {
-  //   path: "/userInfo",
-  //   component: () => import("@/views/mypage/UserInfoView.vue"),
-  // },
-  // {
-  //   path: "/vali",
-  //   component: () => import("@/views/Admin/Vali.vue"),
-
-  // },
+  {
+    path: "/vali",
+    component: () => import("@/views/Admin/Vali.vue"),
+  },
 ];
 
 const router = createRouter({

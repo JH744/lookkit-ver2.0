@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @ToString
-@Table(name = "users")
+@Table(name = "USERS")
 public class User {
 
     @Id
