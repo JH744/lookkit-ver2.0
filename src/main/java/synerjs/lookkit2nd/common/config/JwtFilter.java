@@ -66,7 +66,8 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         var arr =  claims.get("authorities").toString().split(",");
         String username = claims.get("username").toString(); //토큰에서 유저아이디 가져오기
-        long userId =Integer.parseInt(claims.get("userID").toString()); //토큰에서 유저 PK ID값 가져오기
+        long userId = Double.valueOf(claims.get("userID").toString()).longValue(); // 토큰에서 유저 PK ID값 가져오기
+
          var authorities= Arrays.stream(arr).map(a-> new SimpleGrantedAuthority(a)).toList();
 
         var customUser = new CustomUser(username,"none",authorities,userId);
@@ -75,7 +76,7 @@ public class JwtFilter extends OncePerRequestFilter {
         );
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().getAuthentication();
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
 
         filterChain.doFilter(request, response);

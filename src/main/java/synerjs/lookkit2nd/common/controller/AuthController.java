@@ -81,6 +81,23 @@ public class AuthController {
      }
     }
 
+//    @GetMapping("/api/auth/test")
+//    public ResponseEntity test(Authentication auth){
+//        System.out.println("auth test 응답받음");
+//        CustomUser user=(CustomUser)auth.getPrincipal();
+//        System.out.println("auth"+auth);
+//        System.out.println("user"+user);
+//        System.out.println("저장된 유저 유저id : "+user.getUserId());
+//        System.out.println("유저uuid : "+auth.getName());
+//        System.out.println("role : "+auth.getAuthorities());
+//        System.out.println("인증여부: "+auth.isAuthenticated());
+//
+//        if (true){
+//            return    ResponseEntity.status(200).body("테스트 성공");
+//        }else {
+//            return ResponseEntity.status(500).body("테스트 실패");
+//        }
+//    }
 
 
     @GetMapping("/kakao-login")
