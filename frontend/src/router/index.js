@@ -43,6 +43,19 @@ const routes = [
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
+  {
+    path: "/storage",
+    children: [
+      {
+        path: "uploader",
+        component: () => import("@/firebase/StorageUploader.vue"),
+      },
+      {
+        path: "dragUploader",
+        component: () => import("@/firebase/StorageDragDropUploader.vue"),
+      },
+    ],
+  },
 
   {
     path: "/vali",
