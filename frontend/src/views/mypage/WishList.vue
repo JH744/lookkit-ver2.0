@@ -1,48 +1,54 @@
 <template>
-      <h2 class="product-amount">PRODUCT(<span>{{ wishlist.length }}</span>)</h2>
-      <div class="product-grid">
-        <!-- Product Item 반복 출력 -->
-        <div class="product-item" v-for="wish in wishlist" :key="wish.productId">
-          <img class="product-image" :src="`/images/products/0${wish.productId}/${wish.productThumbnail}`" />
-          <h3 class="product-brand">{{ wish.brandName }}</h3>
-          <p class="product-name">{{ wish.productName }}</p>
-          <p class="product-price">
-            <span class="price-detail">{{ formatPrice(wish.productPrice) }}</span> 원
-          </p>
-          <div class="product-likes">
-            <img class="like-icon" src="/images/wish.png" alt="Like Icon" />
-            <span>{{ wish.likeCount }}</span>
-          </div>
-        </div>
+  <h2 class="product-amount">PRODUCT(<span>{{ wishlist.length }}</span>)</h2>
+  <div class="product-grid">
+    <!-- Product Item 반복 출력 -->
+    <div class="product-item" v-for="wish in wishlist" :key="wish.productId">
+      <img class="product-image" :src="`/images/products/0${wish.productId}/${wish.productThumbnail}`" />
+      <div class="fix-height">
+        <h3 class="product-brand">{{ wish.brandName }}</h3>
+        <p class="product-name">{{ wish.productName }}</p>
       </div>
-  </template>
-  
-<script setup>
-  import { ref, onMounted } from 'vue';
-  import axios from 'axios';
-  
-  // 예제 데이터 (실제로는 API에서 받아오는 데이터로 설정)
-  const wishlist = ref([]);
-  
-  // 숫자 포맷 함수
-  function formatPrice(price) {
-    return price.toLocaleString('ko-KR');
-  }
-  
-  const loadWishlist = async () => {
-    try {
-      const response = await axios.get('http://localhost:8081/api/mypage/wishlist/5');
-      console.log(">>>>>>>>",response.data.data);
-      wishlist.value = response.data.data;
-    } catch (error) {
-      console.error('Error loading:', error);
-    }
-  }
+      <p class="product-price">
+        <span class="price-detail">{{ formatPrice(wish.productPrice) }}</span> 원
+      </p>
+      <div class="product-likes">
+        <img class="like-icon" :src="wish.isLiked ? '/images/like.png' : '/images/dislike.png'" 
+             alt="Like Icon" 
+             @click="toggleLike(wish)"/>
+        <span>{{ wish.likeCount }}</span>
+      </div>
+    </div>
+  </div>
+</template>
 
-  onMounted(() => {
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { toggleLike } from '../../utils/likeFunction';
+
+const wishlist = ref([]);
+
+// 숫자 포맷 함수
+function formatPrice(price) {
+  return price.toLocaleString('ko-KR');
+}
+
+const loadWishlist = async () => {
+  try {
+    const response = await axios.get('http://localhost:8081/api/mypage/wishlist/5');
+    wishlist.value = response.data.data.map(item => ({
+      ...item,
+      isLiked: true,
+    }));
+  } catch (error) {
+    console.error('Error loading:', error);
+  }
+}
+
+onMounted(() => {
   loadWishlist();
 });
-  </script>
+</script>
 
 <style scoped>
   .product-grid {
@@ -62,8 +68,6 @@
   }
   
   .product-item {
-    border: 1px solid #ddd;
-    padding: 18px;
     border-radius: 10px;
   }
   
@@ -74,8 +78,8 @@
   }
   
   .product-brand {
-    font-size: 17px;
-    font-weight: normal;
+    font-size: 15px;
+    font-weight: bold;
     margin-top: 3px;
     margin-bottom: 3px;
     text-decoration: underline;
@@ -84,15 +88,14 @@
   .product-name {
     font-size: 13px;
     color: #454545;
-    margin-top: 3px;
-    margin-bottom: 3px;
+    margin-top: 7px;
   }
   
   .product-price {
     font-size: 16px;
     color: #000;
     margin-top: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
   }
   
   .price-detail {
@@ -110,10 +113,17 @@
     height: 20px;
     margin-right: 5px;
   }
+  .like-icon:hover {
+    cursor: pointer;
+  }
   
   .product-likes span {
     font-size: 16px;
     color: #e74c3c;
+  }
+
+  .fix-height {
+    height: 50px;
   }
   </style>
   

@@ -9,13 +9,12 @@ import lombok.*;
 @Table(name = "codi_images")
 @ToString
 public class CodiImage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codiImgId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "codi_id")
+    @JoinColumn(name = "CODI_ID")
     private Codi codi;
 
     private String imgPath;

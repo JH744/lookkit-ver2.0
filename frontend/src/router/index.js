@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Mypage from "@/views/mypage/Mypage.vue";
 
 const routes = [
   {
@@ -45,8 +44,38 @@ const routes = [
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
   {
+    path: "/codi/:codiId",
+    component: () => import("@/views/Codi/CodiView.vue"),
+  },
+  {
+    path: "/product/:productId",
+    component: () => import("@/views/Product/ProductView.vue"),
+  },
+  {
+    path: "/order",
+    component: () => import("@/views/Order/OrderView.vue"),
+    children: [
+      {
+        path: "addaddress",
+        component: () => import("@/views/Order/AddAddressView.vue"),
+      },
+      {
+        path: "complete",
+        component: () => import("@/views/Order/OrderCompleteView.vue"),
+      },
+    ],
+  },
+  {
+    path: "/cart",
+    component: () => import("@/views/Cart/CartView.vue"),
+  },
+  {
+    path: "/updateInfo",
+    component: () => import("@/views/mypage/UserInfoView.vue"),
+  },
+  {
     path: "/mypage",
-    component: Mypage,
+    component: () => import("@/views/mypage/Mypage.vue"),
     children: [
       {
         path: "manage",
@@ -79,6 +108,7 @@ const routes = [
   // {
   //   path: "/vali",
   //   component: () => import("@/views/Admin/Vali.vue"),
+
   // },
 ];
 
