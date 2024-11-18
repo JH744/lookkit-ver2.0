@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-
 const routes = [
   {
     path: "/main",
@@ -44,8 +43,12 @@ const routes = [
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
-  {
 
+  {
+    path: "/vali",
+    component: () => import("@/views/Admin/Vali.vue"),
+  },
+  {
     path: "/codi/:codiId",
     component: () => import("@/views/Codi/CodiView.vue"),
   },
@@ -71,13 +74,13 @@ const routes = [
     path: "/cart",
     component: () => import("@/views/Cart/CartView.vue"),
   },
-{
+  {
     path: "/updateInfo",
     component: () => import("@/views/Mypage/UserInfoView.vue"),
-},
-{
+  },
+  {
     path: "/mypage",
-   
+
     children: [
       {
         path: "manage",
@@ -102,13 +105,12 @@ const routes = [
         component: () => import("@/views/Mypage/WishList.vue"),
       },
     ],
-    path: "/userInfo",
-    component: () => import("@/views/mypage/UserInfoView.vue"),
+    path: "/updateInfo",
+    component: () => import("@/views/Mypage/UserInfoView.vue"),
   },
   {
     path: "/vali",
     component: () => import("@/views/Admin/Vali.vue"),
-
   },
 ];
 

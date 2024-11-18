@@ -34,4 +34,3 @@ public class Codi {
         this.codiPrice = codiPrice;
     }
 }
-
