@@ -71,42 +71,36 @@ const routes = [
     ],
   },
   {
-    path: "/cart",
-    component: () => import("@/views/Cart/CartView.vue"),
-  },
-  {
-    path: "/updateInfo",
-    component: () => import("@/views/Mypage/UserInfoView.vue"),
-  },
-  {
     path: "/mypage",
-
+    component: () => import("@/views/mypage/Mypage.vue"),
     children: [
       {
         path: "manage",
-        component: () => import("@/views/Mypage/OrderManagement.vue"),
+        component: () => import("@/views/mypage/OrderManagement.vue"),
       },
       {
         path: "inquiry",
-        component: () => import("@/views/Mypage/inquiry/UserInquiryList.vue"),
+        component: () => import("@/views/mypage/inquiry/UserInquiryList.vue"),
       },
       {
         path: "inquiry/create",
-        component: () => import("@/views/Mypage/inquiry/InquiryForm.vue"),
+        component: () => import("@/views/mypage/inquiry/InquiryForm.vue"),
       },
       {
         path: "inquiry/:inquiryId",
         name: "InquiryDetail",
-        component: () => import("@/views/Mypage/inquiry/InquiryDetail.vue"),
-        props: true, // URL의 파라미터를 컴포넌트의 props로 전달할 수 있게 함
+        component: () => import("@/views/mypage/inquiry/InquiryDetail.vue"),
+        props: true,
       },
       {
         path: "wishlist",
-        component: () => import("@/views/Mypage/WishList.vue"),
+        component: () => import("@/views/mypage/WishList.vue"),
       },
     ],
+  },
+  {
     path: "/updateInfo",
-    component: () => import("@/views/Mypage/UserInfoView.vue"),
+    component: () => import("@/views/mypage/UserInfoView.vue"),
   },
   {
     path: "/vali",

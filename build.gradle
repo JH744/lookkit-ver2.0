@@ -45,9 +45,6 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5' // or jjwt-gson
-	implementation 'com.google.firebase:firebase-admin:8.1.0'
-
-
 }
 
 tasks.named('test') {

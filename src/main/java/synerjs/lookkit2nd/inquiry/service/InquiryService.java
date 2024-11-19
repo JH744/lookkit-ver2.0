@@ -2,12 +2,14 @@ package synerjs.lookkit2nd.inquiry.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import synerjs.lookkit2nd.common.exception.BaseException;
 import synerjs.lookkit2nd.common.response.BaseResponseStatus;
 import synerjs.lookkit2nd.common.util.FileUtil;
+import synerjs.lookkit2nd.common.util.FirebaseStorageService;
 import synerjs.lookkit2nd.inquiry.dto.InquiryImageDTO;
 import synerjs.lookkit2nd.inquiry.dto.InquiryRequestDTO;
 import synerjs.lookkit2nd.inquiry.dto.InquiryResponseDTO;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 public class InquiryService {
     private final InquiryRepository inqRepository;
     private final InquiryImageRepository imgRepository;
+    private final FirebaseStorageService firebaseStorageService;
+
 
     // 사용자의 문의 리스트
     @Transactional(readOnly = true)
@@ -42,7 +46,7 @@ public class InquiryService {
     @Transactional(readOnly = true)
     public InquiryResponseDTO getInquiryDetail(Long inquiryId) {
         Inquiry inquiry = inqRepository.findById(inquiryId)
-                .orElseThrow(() -> new RuntimeException("Inquiry not found"));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.INQUIRY_NOT_FOUNT));
 
         List<InquiryImageDTO> inquiryImages = imgRepository.findInquiryByIdWithImage(inquiryId)
                 .stream()
@@ -53,11 +57,11 @@ public class InquiryService {
     }
 
     // 문의하기
+    @Transactional
     public InquiryResponseDTO createInquiry(InquiryRequestDTO request, List<MultipartFile> files) throws IOException {
         // Inquiry Entity 변환 및 저장
         Inquiry inquiry = request.toEntity();
         inqRepository.save(inquiry);
-
 
         List<InquiryImageDTO> imagesToSave = new ArrayList<>();
 
@@ -65,13 +69,13 @@ public class InquiryService {
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
-                    String savedFileName = FileUtil.saveFile(file);
-                    String imagePath = "/upload/inquiry/" + savedFileName;
+                    // Firebase Storage에 파일 업로드
+                    String imageUrl = firebaseStorageService.uploadImage(file);
 
                     // 이미지 정보 DB 저장
                     InquiryImage saveImg = InquiryImage.builder()
                             .inquiryId(inquiry.getInquiryId())
-                            .imagePath(imagePath)
+                            .imagePath(imageUrl)  // Firebase Storage에 저장된 URL 사용
                             .build();
                     imgRepository.save(saveImg);
 
@@ -82,6 +86,40 @@ public class InquiryService {
         }
         return InquiryResponseDTO.fromEntity(inquiry, imagesToSave);
     }
+
+
+
+
+    // 문의하기
+//    public InquiryResponseDTO createInquiry(InquiryRequestDTO request, List<MultipartFile> files) throws IOException {
+//        // Inquiry Entity 변환 및 저장
+//        Inquiry inquiry = request.toEntity();
+//        inqRepository.save(inquiry);
+//
+//
+//        List<InquiryImageDTO> imagesToSave = new ArrayList<>();
+//
+//        // 이미지가 있는 경우, 이미지 저장 및 정보 DB 저장
+//        if (files != null && !files.isEmpty()) {
+//            for (MultipartFile file : files) {
+//                if (!file.isEmpty()) {
+//                    String savedFileName = FileUtil.saveFile(file);
+//                    String imagePath = "/upload/inquiry/" + savedFileName;
+//
+//                    // 이미지 정보 DB 저장
+//                    InquiryImage saveImg = InquiryImage.builder()
+//                            .inquiryId(inquiry.getInquiryId())
+//                            .imagePath(imagePath)
+//                            .build();
+//                    imgRepository.save(saveImg);
+//
+//                    // DTO 리스트에 추가
+//                    imagesToSave.add(InquiryImageDTO.fromEntity(saveImg));
+//                }
+//            }
+//        }
+//        return InquiryResponseDTO.fromEntity(inquiry, imagesToSave);
+//    }
 
     public void deleteInquiry(Long inquiryId) {
         inqRepository.findById(inquiryId)
