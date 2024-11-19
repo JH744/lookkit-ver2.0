@@ -50,7 +50,7 @@ public class CartService {
         // Codi 정보 추가
         if (cart.getCodiId() != null) {
             Codi codi = codiService.getCodiById(cart.getCodiId());
-            dtoBuilder.codiName(codi.getCodiName())
+            dtoBuilder.codiDescription(codi.getCodiDescription())
                       .codiPrice(codi.getCodiPrice());
         }
 

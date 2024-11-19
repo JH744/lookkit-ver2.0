@@ -84,7 +84,7 @@ const routes = [
       {
         path: "review",
         component: () => import("@/views/Review/ReviewView.vue"),
-        props: route => ({ codiId: route.params.codiId }), 
+        props: route => ({ productId: route.params.productId }), 
       },
     ],
   },

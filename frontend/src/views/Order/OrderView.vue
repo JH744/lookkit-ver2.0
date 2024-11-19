@@ -189,59 +189,137 @@ onBeforeUnmount(() => {99/
 const orderItem = ref(null);
 const route = useRoute();
 
-orderItem.value = route.params.orderItem;
+//----------------------------------------------------
+// orderItem.value = route.params.orderItem;
+// const params = route.query;
 
-const params = route.query;
+// // 구매인지 대여인지 구분하여 데이터 할당
+// if (params.itemType === 'product') {
+// orderItem.value = {
+//   itemId: params.itemId,
+//   itemName: params.itemName,
+//   brandName: params.brandName,
+//   quantity: parseInt(params.quantity, 10),
+//   price: parseInt(params.price, 10),
+//   totalPrice: parseInt(params.totalPrice, 10),
+//   type: 'product'
+// };
+// } else if (params.itemType === 'codi') {
+// orderItem.value = {
+//   itemId: params.itemId,
+//   itemName: params.itemName,
+//   startDate: params.startDate,
+//   endDate: params.endDate,
+//   price: parseInt(params.price, 10),
+//   totalPrice: parseInt(params.totalPrice, 10),
+//   type: 'codi'
+// };
+// }
 
-// 구매인지 대여인지 구분하여 데이터 할당
-if (params.itemType === 'product') {
-orderItem.value = {
-  itemId: params.itemId,
-  itemName: params.itemName,
-  brandName: params.brandName,
-  quantity: parseInt(params.quantity, 10),
-  price: parseInt(params.price, 10),
-  totalPrice: parseInt(params.totalPrice, 10),
-  type: 'product'
-};
-} else if (params.itemType === 'codi') {
-orderItem.value = {
-  itemId: params.itemId,
-  itemName: params.itemName,
-  startDate: params.startDate,
-  endDate: params.endDate,
-  price: parseInt(params.price, 10),
-  totalPrice: parseInt(params.totalPrice, 10),
-  type: 'codi'
-};
-}
+// //  총 수량 계산
+// const totalQuantity = computed(() => {
+//   if (orderItem.value && orderItem.value.quantity) {
+//     return orderItem.value.quantity;
+//   }
+//   return 1; // Codi의 경우 수량은 1개로 간주
+// });
 
+// // 총 대여일 계산
+// const rentalDays = computed(() => {
+// if (orderItem.value && orderItem.value.startDate && orderItem.value.endDate) {
+//   const startDate = new Date(orderItem.value.startDate);
+//   const endDate = new Date(orderItem.value.endDate);
+//   return (endDate - startDate) / (1000 * 60 * 60 * 24);
+// }
+// return 0;
+// });
 
+// // 총 가격 계산
+// const totalPrice = computed(() => {
+//   if (orderItem.value) {
+//     if (orderItem.value.quantity) {
+//       // Product의 경우 수량에 따라 총 가격 계산
+//       return orderItem.value.quantity * orderItem.value.price;
+//     } else {
+//       // Codi의 경우 대여 가격 사용
+//       return orderItem.value.price;
+//     }
+//   }
+//   return 0;
+// });
 
-// 총 대여일 계산
-const rentalDays = computed(() => {
-if (orderItem.value && orderItem.value.startDate && orderItem.value.endDate) {
-  const startDate = new Date(orderItem.value.startDate);
-  const endDate = new Date(orderItem.value.endDate);
-  return (endDate - startDate) / (1000 * 60 * 60 * 24);
-}
-return 0;
+//   const formatPrice = (price) => {
+//     return price ? price.toLocaleString() : '0';
+//   };
+
+//--------------------------------------------------------
+// 주문 페이지로 넘어온 단일 상품 정보 (URL에서 가져온 파라미터로 설정)
+onMounted(() => {
+  const params = route.query;
+  if (params.itemId) {
+    orderItem.value = {
+      itemId: params.itemId,
+      itemName: params.itemName,
+      brandName: params.brandName,
+      quantity: parseInt(params.quantity, 10) || 1,
+      startDate: params.startDate,
+      endDate: params.endDate,
+      price: parseInt(params.price, 10),
+      totalPrice: parseInt(params.totalPrice, 10),
+      type: params.itemType || 'product',
+    };
+  }
 });
 
+// 총 수량 계산
+const totalQuantity = computed(() => {
+  if (orderItem.value) {
+    return orderItem.value.quantity || 1; // 단일 상품일 경우 수량을 직접 계산
+  }
+  return orderStore.selectedItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+});
+
+// 총 대여 일수 계산 (코디 아이템만 해당)
+const rentalDays = computed(() => {
+  if (orderItem.value && orderItem.value.type === 'codi' && orderItem.value.startDate && orderItem.value.endDate) {
+    const startDate = new Date(orderItem.value.startDate);
+    const endDate = new Date(orderItem.value.endDate);
+    return Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+  }
+
+  return orderStore.selectedItems.reduce((acc, item) => {
+    if (item.type === 'codi' && item.startDate && item.endDate) {
+      const startDate = new Date(item.startDate);
+      const endDate = new Date(item.endDate);
+      return acc + Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    }
+    return acc;
+  }, 0);
+});
 
 // 총 가격 계산
 const totalPrice = computed(() => {
   if (orderItem.value) {
-    if (orderItem.value.quantity) {
-      // Product의 경우 수량에 따라 총 가격 계산
+    // 단일 주문 아이템이 있는 경우
+    if (orderItem.value.type === 'product') {
       return orderItem.value.quantity * orderItem.value.price;
-    } else {
-      // Codi의 경우 대여 가격 사용
-      return orderItem.value.price;
+    } else if (orderItem.value.type === 'codi') {
+      const days = rentalDays.value > 3 ? rentalDays.value - 3 : 0; // 3일 초과 시 추가 요금 계산
+      const extraFee = days * 10000;
+      return orderItem.value.price + extraFee;
     }
   }
-  return 0;
+
+  // 장바구니에 여러 아이템이 있는 경우
+  return orderStore.totalFinalPrice || 0;
 });
+
+
+
+// 포맷된 가격 표시
+const formatPrice = (price) => {
+  return price ? price.toLocaleString() : '0';
+};
 
 onMounted(() => {
   // 아임포트 스크립트 동적 로드
@@ -354,17 +432,6 @@ fetch("http://localhost:8081/api/order/complete", {
 };
 
 
-//  총 수량 계산
-const totalQuantity = computed(() => {
-  if (orderItem.value && orderItem.value.quantity) {
-    return orderItem.value.quantity;
-  }
-  return 1; // Codi의 경우 수량은 1개로 간주
-});
-
-  const formatPrice = (price) => {
-    return price ? price.toLocaleString() : '0';
-  };
 
 
   const showAddAddressModal = ref(false);

@@ -32,7 +32,7 @@
             </a>
           </div>
           <div class="item-description">
-            <div class="product-name">{{ item.codiName }}</div>
+            <div class="product-name">{{ item.codiDescription }}</div>
           </div>
           <div class="item-description">
             <div class="product-variant">
@@ -106,7 +106,7 @@
         </a>
       </div>
       <div class="item-description">
-        <div class="product-name">{{ item.productName || item.codiName }}</div>
+        <div class="product-name">{{ item.productName || item.codiDescription }}</div>
       </div>
       <div class="item-description">
         <div v-if="item.quantity !== null" class="product-variant">{{ item.quantity }}개</div>
@@ -313,17 +313,20 @@ const fetchCartItems = async () => {
 
   // 구매하기 버튼을 클릭한 경우에만 데이터 저장
   orderStore.$patch({
-    selectedItems: selectedItems.value.map(item => ({
-      itemId: item.productId || item.codiId,
-      itemName: item.productName || item.codiName,
-      brandName: item.brandName || '',
-      type: item.type,
-      quantity: item.quantity || 1,
-      startDate: item.rentalStartDate || null,
-      endDate: item.rentalEndDate || null,
-      totalPrice: item.productPrice || item.codiPrice,
-    }))
-  });
+  selectedItems: selectedItems.value.map(item => ({
+    itemId: item.productId || item.codiId,
+    itemName: item.productName || item.codiName,
+    brandName: item.brandName || '',
+    type: item.type,
+    quantity: item.quantity || 1,
+    startDate: item.rentalStartDate || null,
+    endDate: item.rentalEndDate || null,
+    totalPrice: item.productPrice || item.codiPrice,
+  })),
+  totalFinalPrice: totalFinalPrice.value, // Cart에서 계산된 총 금액을 저장
+});
+
+  orderStore.setSelectedItems(selectedItems.value, totalFinalPrice.value);
 
   // 데이터를 로컬 스토리지에 저장
   localStorage.setItem('orderStore', JSON.stringify(orderStore.selectedItems));

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="image-section">
-      <img src="lookkit/codi/0codiId/codiId_thumbnail.webp" alt="썸네일" />
+      <img alt="썸네일" />
     </div>
     <div class="details-section">
       <div>
@@ -14,21 +14,22 @@
         <div class="rental-terms-section">
           <h4 class="rental-terms-title">대여 조건</h4>
           <ul class="rental-terms-list">
+            <li>3일 이후부터 대여 가능</li>
             <li>최소 대여 기간 3일</li>
             <li>3일이후 대여료 + 추가요금</li>
             <li>추가 요금: 10,000원 / 1일</li>
           </ul>
         </div>
         <div class="rental-section">
-          <label for="rental-start-date" class="rental-label">대여일</label>
-          <input type="date" v-model="rentalStartDate" id="rental-start-date" class="rental-input" />
-          <label for="rental-end-date" class="rental-label">반납일</label>
-          <input type="date" v-model="rentalEndDate" id="rental-end-date" class="rental-input" />
+          <div class="rental-label">대여기간</div>
+          <Datepicker v-model="rentalStartDate" :format="format" :disabled-dates="disabledStartDates" 
+          @update:model-value="validateRentalStartDate" class="rental-input" />
+          <Datepicker v-model="rentalEndDate" :format="format" class="rental-input" />
         </div>
         <div v-if="rentalStartDate && rentalEndDate" class="selected-rental-info">
           <div class="selected-rental-summary">
-            <p>대여일 {{ rentalStartDate }}</p>
-            <p>반납일 {{ rentalEndDate }}</p>
+            <p>대여일 {{ formattedRentalStartDate }}</p>
+            <p>반납일 {{ formattedRentalEndDate }}</p>
             <p>대여 일수 {{ totalRentalDays }}일</p>
             <p><strong style="font-size: 1.5em;">총 대여 금액 {{ formattedTotalPrice }}</strong></p>
           </div>
@@ -57,26 +58,6 @@
       </div>
       <div v-if="activeTab === 'reviews'" class="tab-content" id="reviews">
         <ReviewView :codiId="codiId"/>
-        <!-- <div class="review-filters">
-          <button class="filter-button" @click="sortReviews('latest')">최신순</button>
-          <button class="filter-button" @click="sortReviews('highRating')">별점 높은 순</button>
-          <button class="filter-button" @click="sortReviews('lowRating')">별점 낮은 순</button>
-        </div>
-        <div v-if="reviews.length === 0">
-          <p>작성된 리뷰가 없습니다.</p>
-        </div>
-        <div v-else class="review-list">
-          <div v-for="review in reviews" :key="review.id" class="review-item">
-            <div class="review-header">
-              <span class="review-rating">{{ review.rating }}점</span>
-              <span class="review-user">{{ review.userId }}</span>
-              <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
-            </div>
-            <div class="review-content">
-              <p>{{ review.reviewText }}</p>
-            </div>
-          </div>
-        </div> -->
       </div>
       <div v-if="activeTab === 'qna'" class="tab-content" id="qna">
       <p>상품 Q&A 내용이 여기에 표시됩니다.</p>
@@ -93,8 +74,8 @@
     </div>
     <div class="selected-rental-summary2">
       <div>
-        <p>대여일 {{ rentalStartDate }}</p>
-        <p>반납일 {{ rentalEndDate }}</p>
+        <p>대여일 {{ formattedRentalStartDate }}</p>
+        <p>반납일 {{ formattedRentalEndDate }}</p>
       </div>
       <p><strong style="font-size: 1.5em;">총 대여 금액 {{ formattedTotalPrice }}</strong></p>
     </div>
@@ -111,6 +92,7 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import "@/assets/styles/codi.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
+import Datepicker from 'vue3-datepicker';
 
 const API_BASE_URL = 'http://localhost:8081/api/codi';
 
@@ -140,6 +122,41 @@ const codiImage = computed(() => `/images/codi/${codi.value.codiId}/${codi.value
 const rentalStartDate = ref(null);
 const rentalEndDate = ref(null);
 
+// 오늘로부터 최소 3일 이후를 설정
+const today = new Date();
+const minStartDate = new Date(today);
+minStartDate.setDate(today.getDate() + 3);
+
+// 대여 시작일에 3일 이후 날짜만 선택 가능하도록 제한하는 함수
+const disabledStartDates = (date) => {
+  return date < minStartDate;
+};
+
+// 대여 시작일 검증 함수
+const validateRentalStartDate = (value) => {
+  if (value && new Date(value) < minStartDate) {
+    alert('대여 시작일은 최소 3일 이후만 가능합니다.');
+    rentalStartDate.value = null; // 잘못된 선택을 초기화
+  }
+};
+
+// 날짜 포맷 함수 정의
+const formatDate = (date) => {
+  if (!date) return '';
+  
+  const options = {
+    year: undefined,
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+  };
+  return new Intl.DateTimeFormat('ko-KR', options).format(new Date(date));
+};
+
+// 포맷된 대여일 및 반납일 계산
+const formattedRentalStartDate = computed(() => formatDate(rentalStartDate.value));
+const formattedRentalEndDate = computed(() => formatDate(rentalEndDate.value));
+
 const totalRentalDays = computed(() => {
   if (rentalStartDate.value && rentalEndDate.value) {
     const start = new Date(rentalStartDate.value);
@@ -166,12 +183,23 @@ const resetRentalDates = () => {
   rentalEndDate.value = null;
 };
 
+const getFormattedDate = (date) => {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const addToCart = async () => {
   try {
     const userId = 1;
+    const formattedStartDate = getFormattedDate(new Date(rentalStartDate.value));
+    const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
+
     const API_BASE_URL = 'http://localhost:8081/api/cart';
     const response = await axios.post(
-      `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${rentalStartDate.value}&rentalEndDate=${rentalEndDate.value}&userId=${userId}`
+      `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${formattedStartDate}&rentalEndDate=${formattedEndDate}&userId=${userId}`
     );
     alert('옷장에 추가되었습니다.');
     window.location.href = '/cart';
@@ -183,9 +211,11 @@ const addToCart = async () => {
 
 const rentNow = async () => {
   try {
+    const formattedStartDate = getFormattedDate(new Date(rentalStartDate.value));
+    const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
+
     const API_BASE_URL = 'http://localhost:8081/api/codi';
-    // 대여 정보 API 호출
-    const response = await axios.post(`${API_BASE_URL}/rent?codiId=${codi.value.codiId}&startDate=${rentalStartDate.value}&endDate=${rentalEndDate.value}`);
+    const response = await axios.post(`${API_BASE_URL}/rent?codiId=${codi.value.codiId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
 
     // API 호출 결과로부터 OrderDTO 객체를 반환받음
     const orderDTO = response.data;
