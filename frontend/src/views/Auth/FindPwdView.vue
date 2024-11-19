@@ -6,6 +6,11 @@
       ><p>비밀번호 변경완료</p>
     </FindResultModal>
   </div>
+  <ConfirmModal
+    v-if="isShowConfirmModal"
+    :confirmMessage="confirmMessage"
+    @onCloseModal="HandleShowConfirmModal"
+  />
   <div class="findIdContainer">
     <div class="findIdTitle">
       <img src="@/assets/logos/Logo2.png" width="300px" />
@@ -46,6 +51,8 @@ const isShowModal = ref(false);
 const resultMessage = ref("");
 const errorMessage = ref("");
 const errorMessage2 = ref("");
+const isShowConfirmModal = ref(false);
+const confirmMessage = ref("");
 // 모달창 오픈 토글이벤트
 const HandleShowModal = () => {
   console.log("HandleShowModal 호출");
@@ -70,7 +77,7 @@ const sendEmail = (data) => {
     // alert(errorMessage.value);
     return;
   }
-
+  errorMessage.value = "이메일 인증 요청중입니다....";
   sendEmailVerification();
 };
 
@@ -85,6 +92,8 @@ const sendEmailVerification = async () => {
     .then((res) => {
       console.log("인증코드", res.data);
       verificationCode.value = String(res.data);
+      isShowConfirmModal.value = true;
+      confirmMessage.value = "입력하신 이메일로 인증번호를 발송했습니다.";
       alert("입력하신 이메일로 인증번호를 발송했습니다.");
       alert("인증코드: " + verificationCode.value);
       selectBox.value = "box2"; // 박스 체인지
