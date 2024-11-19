@@ -1,41 +1,103 @@
 <template>
+  <div v-if="isShowModal">
+    <FindResultModal
+      :resultMessage="resultMessage"
+      @onCloseModal="HandleShowModal"
+      ><p>비밀번호 변경완료</p>
+    </FindResultModal>
+  </div>
   <div class="findIdContainer">
     <div class="findIdTitle">
       <img src="@/assets/logos/Logo2.png" width="300px" />
     </div>
     <div class="findIdBackground">
-      <div class="tabContainer">
-        <div class="tabActive">
-          <div class="tabTextActive">비밀번호찾기</div>
-        </div>
-      </div>
-      <div class="formContainer">
-        <div class="formLabel">이름</div>
-        <input
-          class="formInput"
-          placeholder="이름을 입력해 주세요"
-          name="name"
-        />
-        <div class="formLabel">이메일</div>
-        <input
-          class="formInput"
-          placeholder="이메일을 입력해 주세요"
-          name="email"
-        />
-        <div id="authenticationBtn" class="buttonContainer">인증받기</div>
-      </div>
-
-      <AuthenticationEmail />
-      <UpdatePassword />
-      <CompleteModal />
+      <FindPassword v-if="selectBox == 'box1'" @onEmailSender="sendEmail">
+        <span>{{ errorMessage }}</span>
+      </FindPassword>
+      <AuthenticationEmail
+        v-if="selectBox == 'box2'"
+        :verification-code="verificationCode"
+        @completeAuthentication="completeAuthentication"
+      >
+        <span>{{ errorMessage2 }}</span>
+      </AuthenticationEmail>
+      <UpdatePassword
+        v-if="selectBox == 'box3'"
+        :userUuid="userUuid"
+        @onOpenModal="HandleShowModal"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
 import AuthenticationEmail from "./components/AuthenticationEmail.vue";
-import CompleteModal from "./components/CompleteModal.vue";
 import UpdatePassword from "./components/UpdatePassword.vue";
+import FindPassword from "./components/FindPasswordForm.vue";
+import { ref } from "vue";
+import axios from "axios";
+import FindResultModal from "./components/FindResultModal.vue";
+
+const selectBox = ref("box1");
+const verificationCode = ref("");
+const userUuid = ref("");
+const email = ref("");
+const isShowModal = ref(false);
+const resultMessage = ref("");
+const errorMessage = ref("");
+const errorMessage2 = ref("");
+// 모달창 오픈 토글이벤트
+const HandleShowModal = () => {
+  console.log("HandleShowModal 호출");
+  isShowModal.value = !isShowModal.value;
+  resultMessage.value = "비밀번호를 성공적으로 변경하였습니다.";
+};
+
+/**이메일 인증 발송 */
+const sendEmail = (data) => {
+  console.log("userUuid", data.userUuid);
+  console.log("email", data.email);
+  userUuid.value = data.userUuid;
+  email.value = data.email;
+  let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (data.userUuid.trim() === "") {
+    errorMessage.value = "아이디를 입력해 주세요.";
+    // alert(errorMessage.value);
+    return;
+  }
+  if (!emailPattern.test(email.value)) {
+    errorMessage.value = "올바른 이메일 형식을 입력해 주세요.";
+    // alert(errorMessage.value);
+    return;
+  }
+
+  sendEmailVerification();
+};
+
+/** 이메일 인증 요청 함수 */
+const sendEmailVerification = async () => {
+  await axios
+    // .post("/api/mailsender", { userName: userName.value, email: email.value })
+    .post("http://localhost:8081/api/mailsender", {
+      userUuid: userUuid.value,
+      email: email.value,
+    })
+    .then((res) => {
+      console.log("인증코드", res.data);
+      verificationCode.value = String(res.data);
+      alert("입력하신 이메일로 인증번호를 발송했습니다.");
+      alert("인증코드: " + verificationCode.value);
+      selectBox.value = "box2"; // 박스 체인지
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      errorMessage2.value = "이메일 인증에 실패했습니다. 다시 시도해 주세요.";
+    });
+};
+
+const completeAuthentication = () => {
+  selectBox.value = "box3"; // 박스 체인지
+};
 </script>
 
 <style scoped>
@@ -119,7 +181,7 @@ body {
 }
 
 .formContainer {
-  padding: calc(31.5px * 1.2) 20px 24px 20px;
+  padding: calc(25px * 1.2) 20px 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -128,6 +190,10 @@ body {
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
+}
+
+.formInput::placeholder {
+  font-size: 16px;
 }
 
 .formContainer2 {

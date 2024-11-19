@@ -58,4 +58,27 @@ public class UserService {
     public User getUserInfo(Long id) {
         return userRepository.findById(id).get();
     }
+
+    public String findById(UserDTO userDTO) {
+        String userName = userDTO.getUserName();
+        String email = userDTO.getEmail();
+
+        return userRepository.findByUserNameAndEmail(userName, email)
+                .map(User::getUserUuid)  // 값이 존재할 경우 User의 userUuid 반환하기
+                .orElse("결과없음");
+       }
+
+
+       // 아이디 조회 후 비밀번호 수정하기
+    public String updatePassword(UserDTO userDTO) {
+     Optional<User> optionalUser =  userRepository.findByUserUuid(userDTO.getUserUuid());
+        if(optionalUser.isPresent()){
+           User user= optionalUser.get();
+           user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            userRepository.save(user);
+            return "성공";
+        }else {
+            return "실패";
+        }
+    }
 }

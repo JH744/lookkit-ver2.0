@@ -3,93 +3,75 @@
     <div class="tabActive">
       <div class="tabTextActive">비밀번호찾기</div>
     </div>
+    <div class="error-text-box">
+      <span class="error-text"><slot></slot></span>
+    </div>
   </div>
-
-  <form action="/auth/updatePwd" method="post" class="formContainer3">
-    <span class="">새비밀번호입력</span>
+  <div class="formContainer">
+    <div class="formLabel">아이디</div>
     <input
-      type="password"
       class="formInput"
-      placeholder="새비밀번호를 입력해 주세요"
-      id="newPwd"
-      v-model="newPassword"
+      placeholder="아이디를 입력해 주세요"
+      v-model="userUuid"
     />
-
-    <span class="">새비밀번호 재입력</span>
+    <div class="formLabel">이메일</div>
     <input
-      type="password"
       class="formInput"
-      placeholder="새비밀번호를 재입력해 주세요"
-      id="newPwd2"
-      v-model="reNewPassword"
+      placeholder="이메일을 입력해 주세요"
+      v-model="email"
     />
     <div
-      id="ModifyBtn"
+      id="authenticationBtn"
       class="buttonContainer"
-      @click.prevent="fetchUpdatePassword"
+      @click="handleAuthenticationUser"
     >
-      확인
+      인증받기
     </div>
-  </form>
+  </div>
 </template>
 
 <script setup>
-import { ref, defineEmits } from "vue";
-import axios from "axios";
-const props = defineProps({
-  userUuid: String,
-});
+import { ref } from "vue";
+
+const userUuid = ref("");
+const email = ref("");
 
 // 이벤트 정의
-const emit = defineEmits(["onOpenModal"]);
-const handleModal = () => {
-  console.log("비밀번호찾기완료창 오픈전");
-  emit("onOpenModal");
-};
-
-const newPassword = ref("");
-const reNewPassword = ref("");
-
-const fetchUpdatePassword = async () => {
-  if (newPassword.value == reNewPassword.value) {
-    axios
-      .post("http://localhost:8081/api/users/update/password", {
-        userUuid: props.userUuid,
-        password: newPassword.value,
-      })
-      .then((res) => {
-        console.log(res);
-        handleModal(); // 모달창 오픈 핸들러 에밋호출
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  } else {
-    alert("번호가 일치하지 않음");
-  }
+const emit = defineEmits(["onEmailSender"]);
+const handleAuthenticationUser = () => {
+  console.log("에밋발사전");
+  emit("onEmailSender", { userUuid: userUuid.value, email: email.value });
 };
 </script>
 
 <style scoped>
-.formContainer3 {
-  padding: calc(31.5px * 1.2) 10px 14px 10px;
+.formContainer {
+  padding: calc(20.5px * 1.2) 20px 24px 20px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
   align-items: flex-start;
   justify-content: flex-start;
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
-  gap: 16px;
+}
 
-  height: 400px;
-  span {
-    font-size: 18px;
-  }
-  input {
-    width: 100%;
-  }
-  /* display: none; */
+.formLabel {
+  color: var(--wwwkurlycom-mine-shaft, #333333);
+  text-align: left;
+  font-family: "NotoSansKr-Thin", sans-serif;
+  font-size: var(--font-size-14, 16px);
+  line-height: var(--line-height-19, 19px);
+  font-weight: var(--opacity-100, 400);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.formInput::placeholder {
+  font-size: 16px;
 }
 
 .formInput {
@@ -124,6 +106,18 @@ const fetchUpdatePassword = async () => {
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  margin-top: 30px;
+}
+
+.tabContainer {
+  background: var(--color-white-solid, #ffffff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
 }
 
 .tabActive {
@@ -140,23 +134,6 @@ const fetchUpdatePassword = async () => {
   margin-top: 40px;
 }
 
-.buttonContainer:hover {
-  background: #0d1134;
-  color: #ffffff;
-  transition: all 5ms;
-}
-
-.tabContainer {
-  background: var(--color-white-solid, #ffffff);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  align-self: stretch;
-  flex-shrink: 0;
-  position: relative;
-}
-
 .tabTextActive {
   color: var(--wwwkurlycom-pigment-indigo, #0d1134);
   text-align: center;
@@ -168,5 +145,21 @@ const fetchUpdatePassword = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.buttonContainer:hover {
+  background: #0d1134;
+  color: #ffffff;
+  transition: all 5ms;
+}
+
+.error-text-box {
+  margin-top: 14px;
+  height: 14px;
+}
+
+.error-text {
+  color: #ff294f;
+  font-size: 14px;
 }
 </style>
