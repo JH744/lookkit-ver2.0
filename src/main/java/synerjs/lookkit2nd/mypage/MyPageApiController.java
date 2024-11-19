@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.user.User;
 
@@ -15,7 +16,14 @@ import java.util.Map;
 @RequestMapping("/api/v1")
 public class MyPageApiController {
     @Autowired
+     PasswordEncoder encoder;
+
+
+    @Autowired
     MypageService mypageService;
+
+
+
 
     //  조회하기
     @GetMapping("/userinfo/{id}")
@@ -26,7 +34,7 @@ public class MyPageApiController {
     //  회원 정보 업데이트
     @PostMapping("/userinfo")
     public ResponseEntity<User> update(@RequestBody MypageDTO dto) {
-        Long id = 6L; //JWT 토큰에서 받아오는 부분
+        Long id = 8L; //JWT 토큰에서 받아오는 부분
         // 1. 로그 확인
         log.info("id: {}, user: {}", id, dto.toString());
         // 2. 업데이트
@@ -52,6 +60,8 @@ public class MyPageApiController {
     //  비밀번호 변경
     @PostMapping("/userinfo/{id}/change-password")
     public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody PwChangeDTO pwchangedto){
+        id=8l;
+
         // 1. 로그 확인
         log.info("비밀번호 변경 요청 - ID {}, 현재 비밀번호: {}, 새로운 비밀번호: {}",
                 id, pwchangedto.getCurrentPassword(), pwchangedto.getNewPassword());
@@ -59,14 +69,24 @@ public class MyPageApiController {
         if (mypageService.isCurrentPassword(id, pwchangedto.getNewPassword())){
             return ResponseEntity.badRequest().body("이미 사용 중인 비밀번호 입니다.");
         }
+
+        System.out.println("newPassword"+pwchangedto.getNewPassword());
+        System.out.println("newPassword"+pwchangedto.getConfirmNewPassword());
+
         // 3. 새로운 비밀번호가 두 번 입력된 것과 일치하는지 확인
         if (!pwchangedto.getNewPassword().equals(pwchangedto.getConfirmNewPassword())){
             return ResponseEntity.badRequest().body("새로운 비밀번호가 일치하지 않습니다.");
         }
+
+        boolean result =encoder.matches(pwchangedto.getCurrentPassword(), mypageService.getCurrentPassword(8L));
+
+        if(!result){
+            return ResponseEntity.badRequest().body("현재 비밀번호가 정확하지 않거나 회원 정보를 찾을 수 없습니다.");
+        }
         // 4. 비밀번호 변경 시도
-        boolean isUpdated = mypageService.updatePassword(id, pwchangedto.getCurrentPassword(), pwchangedto.getNewPassword());
+        boolean isUpdated = mypageService.updatePassword(id, pwchangedto.getNewPassword());
         return isUpdated ? ResponseEntity.ok("성공적으로 변경되었습니다.")
-                : ResponseEntity.badRequest().body("현재 비밀번호가 정확하지 않거나 회원 정보를 찾을 수 없습니다.");
+                : ResponseEntity.badRequest().body("비밀번호 변경 실패");
 //        if (!isUpdated){
 //            return ResponseEntity.badRequest().body("현재 비밀번호가 일치하지 않거나 사용자 정보가 없습니다.");
 //        }

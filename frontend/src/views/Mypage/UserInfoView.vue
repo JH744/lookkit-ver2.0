@@ -67,8 +67,8 @@
               <span
                 id="email-check-result"
                 :class="{
-                  'error-message': emailCheckResult.isError,
                   'success-message': !emailCheckResult.isError,
+                  'error-message': emailCheckResult.isError,
                 }"
                 >{{ emailCheckResult.message }}
               </span>
@@ -188,7 +188,7 @@ const confirmPassword = ref("");
 
 onMounted(async () => {
   try {
-    const response = await axios.get("http://localhost:8081/api/v1/userinfo/6");
+    const response = await axios.get("http://localhost:8081/api/v1/userinfo/8");
     Object.assign(userData.value, response.data);
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -214,11 +214,11 @@ const updatePassword = async () => {
   }
   try {
     await axios.post(
-      "http://localhost:8081/api/v1/userinfo/6/change-password",
+      "http://localhost:8081/api/v1/userinfo/8/change-password",
       {
-        userUuid: userData.value.userUuid,
         currentPassword: currentPassword.value,
         newPassword: newPassword.value,
+        confirmNewPassword: confirmPassword.value,
       }
     );
     alert("비밀번호가 성공적으로 변경되었습니다.");
