@@ -43,9 +43,26 @@ const routes = [
     path: "/admin",
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
+  {
+    path: "/storage", // 파이어베이스 테스트 경로
+    children: [
+      {
+        path: "upload",
+        component: () => import("@/firebase/StorageUploader.vue"),
+      },
+      {
+        path: "dragUpload",
+        component: () => import("@/firebase/StorageDragDropUploader.vue"),
+      },
+      {
+        path: "load",
+        component: () => import("@/firebase/StorageImageDownloader.vue"),
+      },
+    ],
+  },
 
   {
-    path: "/vali",
+    path: "/vali", //임시 뷰 파일
     component: () => import("@/views/Admin/Vali.vue"),
   },
   {
@@ -97,8 +114,7 @@ const routes = [
         component: () => import("@/views/mypage/WishList.vue"),
       },
     ],
-  },
-  {
+
     path: "/updateInfo",
     component: () => import("@/views/mypage/UserInfoView.vue"),
   },

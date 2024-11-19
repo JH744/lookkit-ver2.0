@@ -38,7 +38,7 @@ public class User {
 
     @Column(name = "GENDER") // 컬럼명 명시 (필요 시)
     private String gender;
-    
+
 
     @DateTimeFormat(pattern = "yyMMdd")
     @Column(name = "BIRTHDATE") // 컬럼명 명시

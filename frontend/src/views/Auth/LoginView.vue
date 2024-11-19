@@ -75,7 +75,7 @@
             <h5>간편로그인</h5>
           </div> -->
           <div class="social-login-wrap">
-            <div class="social-login-box">
+            <div class="social-login-box" @click="handleSocialLogin">
               <img src="@/assets/logos/kakao_logo.svg" width="60" />
               <span>카카오</span>
             </div>
@@ -148,6 +148,16 @@ const handleLogin = async () => {
   } catch (error) {
     loginError.value = true; // 에러 메시지 출력
   }
+};
+
+const handleSocialLogin = async () => {
+  const response = await axios
+    .get(
+      "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=8fa3f276e24fa30b91e188091e7b2082&redirect_uri=http://localhost:8081/kakao-login"
+    )
+    .then((res) => {
+      console.log("res", res);
+    });
 };
 </script>
 
