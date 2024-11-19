@@ -1,9 +1,13 @@
 <template>
   <div class="review-container">
-    <HeaderFragment />
-    <div class="side-and-main">
-      <SidebarFragment />
       <div class="review-section">
+        <div class="average-rating">
+          <div class="star-ratings">
+           <div class="star-ratings-fill" :style="{ width: `${(averageRating / 5) * 100}%` }"></div>
+          </div>
+          <h3>평균 평점 {{ averageRating }} / 5</h3>
+        </div>
+        <div class="add-review">
         <button class="add-review-button" @click="toggleReviewForm">리뷰 작성하기</button>
         <div v-if="showReviewForm" class="expanded-review-form">
           <div class="rating-section">
@@ -17,20 +21,32 @@
             </select>
           </div>
           <textarea v-model="reviewText" placeholder="리뷰를 작성해주세요"></textarea>
+          <div class="image-upload-section">
+            <label for="image-upload" class="image-upload-label">이미지 업로드:</label>
+            <input type="file" id="image-upload" @change="onImageUpload" accept="image/*" />
+            <div v-if="uploadedImage" class="image-preview">
+              <img :src="uploadedImage" alt="업로드된 이미지 미리보기" />
+            </div>
+          </div>
           <button type="button" class="submit-review" @click="submitReview">리뷰 제출하기</button>
         </div>
-        <div class="average-rating">
-          <h3>평균 평점: {{ averageRating }} / 5</h3>
         </div>
+      </div>
+      <div class="review-section2">
         <div v-if="reviews && reviews.length" class="review-list">
         <div v-for="review in paginatedReviews" :key="review.reviewId" class="review-item">
         <div class="review-header">
           <span class="review-rating">{{ review.rating }}점</span>
-          <span class="review-user">{{ review.userId }}</span>
-          <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
+          <div v-if="review.imageUrl" class="review-image">
+            <img :src="review.imageUrl" alt="리뷰 이미지" />
+          </div>
         </div>
-        <div class="review-content">
+        <div class="review-text">
           <p>{{ review.reviewText }}</p>
+        </div>
+        <div class="review-info">
+          <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
+          <span class="review-user">{{ review.userId }}</span>
         </div>
         </div>
         <div class="pagination">
@@ -44,7 +60,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -52,12 +67,12 @@ import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
 const reviews = ref([]); 
-// const activeTab = ref('product');
 const reviewRating = ref(5);
 const reviewText = ref('');
 const showReviewForm = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 5;
+const uploadedImage = ref(null);
 
 const props = defineProps({
   codiId: {
@@ -69,6 +84,18 @@ const props = defineProps({
     default: null
   }
 });
+
+// 이미지 파일 업로드 핸들러
+const onImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImage.value = e.target.result; // 이미지 미리보기 URL
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
 onMounted(async () => {
   try {
@@ -158,6 +185,7 @@ const submitReview = async () => {
       userId,
       rating: reviewRating.value,
       reviewText: reviewText.value,
+      imageUrl: uploadedImage.value
     };
 
     const response = await axios.post('http://localhost:8081/api/reviews/write', reviewData);
@@ -166,7 +194,7 @@ const submitReview = async () => {
       reviews.value.push({
         ...reviewData,
         createdAt: new Date().toISOString(),
-        reviewId: reviews.value.length + 1, // 임시로 추가
+        reviewId: reviews.value.length + 1, //임시로
       });
       toggleReviewForm();
     } else {
@@ -177,44 +205,6 @@ const submitReview = async () => {
     alert('리뷰 작성에 실패했습니다.');
   }
 };
-// const submitReview = async () => {
-//   if (!reviewText.value || !reviewRating.value) {
-//     alert('평점과 리뷰 내용을 입력해주세요.');
-//     return;
-//   }
-//   // 리뷰 데이터 생성
-//   const newReview = {
-//     productId: activeTab.value === 'product' ? 1 : null, // 예시로 productId를 1로 설정
-//     codiId: activeTab.value === 'codi' ? 1 : null, // 예시로 codiId를 1로 설정
-//     userId: 1, // 예시로 userId를 1로 설정
-//     rating: reviewRating.value,
-//     reviewText: reviewText.value,
-//   };
-//   try {
-//     const response = await fetch('http://localhost:8081/api/reviews/write', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify(newReview)
-//     });
-//     if (response.ok) {
-//       alert('리뷰 작성 완료');
-//       reviews.value.push({
-//         ...newReview,
-//         reviewId: reviews.value.length + 1,
-//         createdAt: new Date().toISOString(),
-//         thumbnail: '/images/placeholder.png' // 임시 이미지 경로
-//       });
-//       toggleReviewForm();
-//     } else {
-//       alert('리뷰 작성 실패');
-//     }
-//   } catch (error) {
-//     console.error('Error submitting review:', error);
-//     alert('리뷰 작성 중 오류가 발생했습니다.');
-//   }
-// };
 
 // 날짜 포맷팅 함수
 const formatReviewDate = (dateString) => {
@@ -226,7 +216,6 @@ const formatReviewDate = (dateString) => {
 <style scoped>
 .review-container {
   display: grid;
-  margin-top: 20px;
   width: 1100px;
   margin-left: auto;
   margin-right: auto;
@@ -235,6 +224,10 @@ const formatReviewDate = (dateString) => {
 
 .review-section {
   border-bottom: 2px solid #727272;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .second-grid {
@@ -265,11 +258,37 @@ const formatReviewDate = (dateString) => {
   border-bottom: 3px solid #0d1134;
   font-weight: bold;
 }
-
-.review-list {
-  margin-top: 50px;
+.review-section2 {
+  margin-top: 30px;
 }
 
+.review-header img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.image-upload-section {
+  width:25%;
+}
+
+.image-preview img {
+  width: 80px;
+  height: 80px;
+  margin-top: 10px;
+}
+
+.review-header {
+
+}
+.review-text {
+width: 40%;
+}
+.review-info {
+  display: flex;
+  gap: 20px;
+}
 .empty-message {
   text-align: center;
   color: #818181;
@@ -279,10 +298,12 @@ const formatReviewDate = (dateString) => {
 
 .review-item {
   display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #cdcdcd;
+    gap: 20px;
+    padding: 20px;
+    border-bottom: 1px solid #cdcdcd;
+    flex-direction: row;
+    justify-content: space-around;
+    
 }
 
 .product-info {
@@ -321,19 +342,20 @@ const formatReviewDate = (dateString) => {
 
 .expanded-review-form {
   margin-top: 10px;
-  padding: 15px;
+  padding-bottom: 5px;
   background: #f9f9f9;
   border-radius: 10px;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .rating-section {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
 .rating-section select {
-  width: 100px;
+  width: 50px;
 }
 
 .order-section {
@@ -392,7 +414,7 @@ const formatReviewDate = (dateString) => {
 }
 
 .add-review-button {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   padding: 10px 20px;
   background-color: #0d1134;
   color: white;
@@ -401,10 +423,43 @@ const formatReviewDate = (dateString) => {
   font-size: 16px;
   border-radius: 5px;
 }
+.add-review {
+  display: flex;
+ 
+}
 
 .average-rating {
-  margin-top: 20px;
+  margin-bottom: 10px;
   font-size: 18px;
-  font-weight: bold;
+    font-weight: bold;
+    gap: 10%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
+.star-ratings {
+  display: inline-block;
+  position: relative;
+  font-size: 2rem;
+  color: #d3d3d3; /* 별의 기본 색상 (비어 있는 별) */
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+.star-ratings-fill {
+  color: #ffc107; /* 채워진 별의 색상 */
+  position: absolute;
+  left: 10;
+  top: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width 0.3s ease-in-out;
+}
+.star-ratings::before {
+  content: "★★★★★"; /* 별 모양을 5개로 고정 */
+}
+.star-ratings-fill::before {
+  content: "★★★★★";
+}
+
 </style>
