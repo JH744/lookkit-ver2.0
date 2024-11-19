@@ -28,7 +28,7 @@ public class AuthController {
 
 
     @PostMapping("/api/auth/login")
-    public String login(@RequestBody  Map<String,String> data, HttpServletResponse response,Authentication authvariable){
+    public String login(@RequestBody  Map<String,String> data, HttpServletResponse response){
         // body로부터 아이디,비밀번호 가져오기
         // 사용자 인증을 위한 UsernamePasswordAuthenticationToken 생성
          var authToken = new UsernamePasswordAuthenticationToken(
@@ -51,15 +51,6 @@ public class AuthController {
 
 
 
-        // auth 확인
-        if (authvariable != null) {
-            System.out.println("auth변수확인");
-       CustomUser user =(CustomUser)authvariable.getPrincipal();
-            System.out.println(user);
-            System.out.println(user.getUserId());
-            System.out.println(user.getAuthorities());
-            System.out.println(user.getUsername());
-        }
 
         return jwt;
     }

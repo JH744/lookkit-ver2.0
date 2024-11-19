@@ -15,6 +15,7 @@ const routes = [
       {
         path: "search",
         component: () => import("@/views/Main/SearchView.vue"),
+        props: (route) => ({ keyword: route.query.keyword }),
       },
     ],
   },

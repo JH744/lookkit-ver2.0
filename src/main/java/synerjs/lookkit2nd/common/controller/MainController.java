@@ -4,6 +4,7 @@ package synerjs.lookkit2nd.common.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import synerjs.lookkit2nd.inquiry.dto.CodiProductDTO;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.product.ProductDTO;
 import synerjs.lookkit2nd.product.ProductService;
+import synerjs.lookkit2nd.user.CustomUser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,15 +31,30 @@ public class MainController {
 
     // 모든 코디 반환
     @GetMapping("/codis/all")
-    public ResponseEntity<List<CodiDTO>> getLatestEightCodiSets() {
+    public ResponseEntity<List<CodiDTO>> getLatestEightCodiSets(Authentication auth) {
+
+
+
         return ResponseEntity.ok(coordisetService.getCodiSets());
     }
 
-    /**
-     * 코디 세트와 연관된 상품 10개 조회 API
-     */
+     // 코디 세트와 연관된 상품 20개 조회 API
     @GetMapping("/codiset")
-    public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts() {
+    public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts(Authentication auth) {
+
+        // auth 확인
+        if (auth != null) {
+            System.out.println("auth변수확인");
+            CustomUser user =(CustomUser)auth.getPrincipal();
+            System.out.println(user);
+            System.out.println(user.getUserId());
+            System.out.println(user.getAuthorities());
+            System.out.println(user.getUsername());
+        }else {
+            System.out.println("auth : null");
+        }
+
+
         return ResponseEntity.ok(coordisetService.getAllCoordiWithProducts());
     }
 
@@ -49,17 +66,13 @@ public class MainController {
       return  ResponseEntity.ok(productService.getProductsByCategory(type));
     }
 
-
-//
-//    @GetMapping("/main/search")
-//    public String mainSearchPage(Model model, @RequestParam String keyword){
-//        System.out.println("키워드: "+keyword);
-//        List<ProductVO> productsList= productService.searchProductsByKeyword(keyword);
-//        model.addAttribute("keyword", keyword);
-//        model.addAttribute("productsList", productsList);
-//        return "/home/search";
-//    }
-//
+    //검색 결과 페이지
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> mainSearchPage(@RequestParam String keyword) {
+        System.out.println("키워드: " + keyword);
+        List<ProductDTO> productsList = productService.searchProductsByKeyword(keyword);
+        return ResponseEntity.ok(productsList);
+    }
 
 
 //    // 좋아요 추가 및 삭제

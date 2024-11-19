@@ -21,4 +21,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCodi_CodiId(Long codiId);
 
 
+    @Query("SELECT p FROM Product p WHERE " +
+            "LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.brandName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.productDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<Product> searchProductsByKeyword(@Param("keyword") String keyword);
+
 }

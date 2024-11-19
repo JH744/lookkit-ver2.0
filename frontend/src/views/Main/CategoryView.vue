@@ -25,6 +25,7 @@
     </div>
 
     <div class="main-content">
+      <!--반복문시작  -->
       <div class="product-list">
         <div
           v-for="product in products"

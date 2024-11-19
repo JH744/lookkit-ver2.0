@@ -41,6 +41,22 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+
+    public List<ProductDTO> searchProductsByKeyword(String keyword) {
+        List<Product> products = productRepository.searchProductsByKeyword(keyword);
+        return products.stream()
+                .map(product -> ProductDTO.builder()
+                        .productId(product.getProductId())
+                        .categoryId(product.getCategory().getCategoryId())
+                        .productName(product.getProductName())
+                        .brandName(product.getBrandName())
+                        .productPrice(product.getProductPrice())
+                        .genderTarget(product.getGenderTarget())
+                        .productThumbnail(product.getProductThumbnail())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }
 
 

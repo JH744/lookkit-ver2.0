@@ -3,8 +3,8 @@
     <div class="page-container">
       <div class="title-section">
         <div class="title-box">
-          <h1 text="'\'' + ${keyword} + '\' 검색완료'">검색어</h1>
-          <h1 text="${productsList.size()}">검색결과수</h1>
+          <h1>{{ `'  ${keyword}  ' 검색완료` }}</h1>
+          <h1>{{ "검색결과수 " + products.length }}</h1>
         </div>
         <div class="filter-section">
           <div class="filter-btn">
@@ -34,34 +34,26 @@
       </div>
       <div class="main-content">
         <div class="product-list">
-          <div th:each="product :${productsList}" class="product-item">
+          <div
+            v-for="product in products"
+            :key="product.productId"
+            class="product-item"
+          >
             <img
-              th:src="@{'/images/products/0'+${product.productId}+'/'+${product.productId}+'_detail_1.webp'}"
-              alt=""
+              class="product-img"
+              :src="encodedProductImageUrl(product.productId)"
+              alt="상품썸네일"
+              @error="handleImageError"
             />
-            <img
-              th:src="@{/images/icon/heart2.svg}"
-              class="like-btn"
-              alt="좋아요버튼"
-              sec:authorize="isAuthenticated()"
-            />
+
             <div class="product-info">
-              <a th:href="@{|/product/${product.productId}|}">
-                <div class="product-name" th:text="${product.productName}">
-                  아우터
-                </div>
+              <a :href="`/product/${product.productId}`">
+                <div class="brand-name">{{ product.brandName }}</div>
+                <div class="product-name">{{ product.productName }}</div>
               </a>
               <div class="product-price-box">
-                <div
-                  class="product-price"
-                  th:text="${product.productPrice}+'원'"
-                >
-                  120,000원
-                </div>
+                <div class="product-price">{{ product.productPrice }}원</div>
                 <div class="product-price-discount">20%</div>
-                <div class="hidden-id" th:text="${product.productId}">
-                  상품ID
-                </div>
               </div>
               <div class="like-box">
                 <img
@@ -86,20 +78,61 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
+import axios from "axios";
+import defaultImage from "@/assets/img_none.png";
 
-export default {
-  setup() {
-    const route = useRoute();
+const products = ref([]); // 상품 리스트
+const route = useRoute();
+const keyword = ref(route.query.keyword); // 초기값 설정
 
-    // 쿼리 스트링 값
-    const query = route.query;
+const imageBaseUrl = ref(
+  "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
+);
 
-    return {
-      query,
-    };
-  },
+const handleImageError = (event) => {
+  event.target.src = defaultImage; // 이미지 로드 실패 시 기본 이미지로 대체
+};
+
+// 쿼리스트링이 변경될 때마다 keyword를 업데이트하고 데이터를 다시 불러옴
+watch(
+  () => route.query.keyword,
+  (newKeyword) => {
+    keyword.value = newKeyword; // keyword 값 갱신
+    fetchProductByKeyword(); // 데이터 재조회
+  }
+);
+
+// 상품 데이터를 가져오는 함수
+const fetchProductByKeyword = async () => {
+  try {
+    const response = await axios.get("http://localhost:8081/api/main/search", {
+      params: {
+        keyword: keyword.value,
+      },
+    });
+    products.value = response.data;
+    console.log("검색결과 리스트:", products.value);
+  } catch (error) {
+    console.error("상품 데이터 조회 오류 발생:", error);
+  }
+};
+
+// 초기 데이터 로드
+onMounted(() => {
+  fetchProductByKeyword();
+});
+
+//스토리지 이미지url 인코딩
+const encodedProductImageUrl = (productId) => {
+  const folderPath = `/products/0${productId}`;
+  const fileName = `/${productId}_thumbnail.webp`;
+  const encodedPath = `${encodeURIComponent(folderPath)}${encodeURIComponent(
+    fileName
+  )}`;
+  return `${imageBaseUrl.value}${encodedPath}?alt=media`;
 };
 </script>
 
@@ -244,5 +277,10 @@ export default {
 }
 .hidden-id {
   display: none;
+}
+
+.product-img {
+  width: 200px;
+  height: 270px;
 }
 </style>
