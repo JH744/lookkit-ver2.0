@@ -4,10 +4,12 @@ package synerjs.lookkit2nd.codi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import synerjs.lookkit2nd.inquiry.dto.CodiProductDTO;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.product.ProductRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +28,35 @@ public class CodiService {
     }
 
 
-
-     // 최신 코디 세트 8개 조회
-    public List<Codi> getLatestEightCodiSets() {
-        return codiRepository.findTop8ByOrderByCodiIdAsc();
+    //전체 코디셋
+    public List<CodiDTO> getCodiSets() {
+        return codiRepository.findAll().stream()
+                .map(codi -> new CodiDTO(
+                        codi.getCodiId(),
+                        codi.getCodiName(),
+                        codi.getCodiDescription(),
+                        codi.getCodiThumbnail(),
+                        codi.getCodiPrice()
+                ))
+                .collect(Collectors.toList());
     }
 
-     // 코디 세트& 연관 상품 최대 10개 조회
-    public List<Codi> getAllCoordiWithProducts() {
-        return codiRepository.findTop10WithProducts();
+    public List<CodiProductDTO> getAllCoordiWithProducts() {
+        List<Object[]> results = codiRepository.findTop10CoordiWithProductsNative();
+
+        return results.stream()
+                .map(row -> {
+                    Long codiId = ((Number) row[0]).longValue();
+                    List<Product> products = productRepository.findByCodi_CodiId(codiId);
+                    return new CodiProductDTO(
+                            codiId,
+                            (String) row[1],  // codiName
+                            (String) row[2],  // codiThumbnail
+                            (Integer) row[3], // codiPrice
+                            products          // 연관된 상품 리스트
+                    );
+                })
+                .toList();
     }
 
      // 특정 코디 ID에 속하는 상품 조회

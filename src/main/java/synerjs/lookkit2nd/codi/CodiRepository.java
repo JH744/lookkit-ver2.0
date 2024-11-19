@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.lang.annotation.Native;
 import java.util.List;
 
 @Repository
@@ -11,17 +12,20 @@ public interface CodiRepository extends JpaRepository<Codi,Long> {
 
 
 
-    // 최신 코디 세트 8개 조회
-    @Query("SELECT c FROM Codi c ORDER BY c.codiId")
-    List<Codi> findTop8ByOrderByCodiIdAsc();
 
 
-    /**
-     * 코디 세트와 연관된 상품 데이터를 최대 10개 조회하는 메서드.
-     * @return 코디 세트 리스트, 각 코디 세트는 연관된 상품 정보를 포함.
-     */
-    @Query("SELECT c FROM Codi c LEFT JOIN FETCH c.products p WHERE c.codiId IS NOT NULL")
-    List<Codi> findTop10WithProducts();
+    // 코디 세트와 연관된 상품 리스트를 최대 10개 조회하는 메서드
+    @Query(value = """
+        SELECT c.codi_id AS codiId, 
+               c.codi_name AS codiName,
+               c.codi_thumbnail AS codiThumbnail, 
+               c.codi_price AS codiPrice
+        FROM codi c
+        GROUP BY c.codi_id
+        ORDER BY c.codi_id
+        LIMIT 20
+        """, nativeQuery = true)
+    List<Object[]> findTop10CoordiWithProductsNative();
 
 
 
