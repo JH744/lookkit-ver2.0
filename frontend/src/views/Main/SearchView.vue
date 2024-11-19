@@ -83,6 +83,9 @@ import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 import defaultImage from "@/assets/img_none.png";
+import { useAuthStore } from "@/stores/authStore";
+
+const authStore = useAuthStore();
 
 const products = ref([]); // 상품 리스트
 const route = useRoute();
@@ -122,6 +125,8 @@ const fetchProductByKeyword = async () => {
 
 // 초기 데이터 로드
 onMounted(() => {
+  console.log("유저정보", authStore.user);
+
   fetchProductByKeyword();
 });
 

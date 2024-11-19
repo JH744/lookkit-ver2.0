@@ -41,7 +41,6 @@ public class MainController {
      // 코디 세트와 연관된 상품 20개 조회 API
     @GetMapping("/codiset")
     public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts(Authentication auth) {
-
         // auth 확인
         if (auth != null) {
             System.out.println("auth변수확인");
@@ -52,6 +51,7 @@ public class MainController {
             System.out.println(user.getUsername());
         }else {
             System.out.println("auth : null");
+
         }
 
 
