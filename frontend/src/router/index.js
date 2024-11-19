@@ -44,15 +44,19 @@ const routes = [
     component: () => import("@/views/Admin/AdminDashboard.vue"),
   },
   {
-    path: "/storage",
+    path: "/storage", // 파이어베이스 테스트 경로
     children: [
       {
-        path: "uploader",
+        path: "upload",
         component: () => import("@/firebase/StorageUploader.vue"),
       },
       {
-        path: "dragUploader",
+        path: "dragUpload",
         component: () => import("@/firebase/StorageDragDropUploader.vue"),
+      },
+      {
+        path: "load",
+        component: () => import("@/firebase/StorageImageDownloader.vue"),
       },
     ],
   },
