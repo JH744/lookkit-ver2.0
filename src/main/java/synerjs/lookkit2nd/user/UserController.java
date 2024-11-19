@@ -21,6 +21,9 @@ public class UserController {
         }
     }
 
-
-
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserInfo(@PathVariable Long id){
+        User user = userService.getUserInfo(id);
+        return ResponseEntity.ok(user);
+    }
 }

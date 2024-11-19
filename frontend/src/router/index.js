@@ -62,7 +62,7 @@ const routes = [
   },
 
   {
-    path: "/vali",
+    path: "/vali", //임시 뷰 파일
     component: () => import("@/views/Admin/Vali.vue"),
   },
   {
@@ -122,12 +122,9 @@ const routes = [
         component: () => import("@/views/Mypage/WishList.vue"),
       },
     ],
+
     path: "/updateInfo",
     component: () => import("@/views/Mypage/UserInfoView.vue"),
-  },
-  {
-    path: "/vali",
-    component: () => import("@/views/Admin/Vali.vue"),
   },
 ];
 
