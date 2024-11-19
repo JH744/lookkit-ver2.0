@@ -51,7 +51,7 @@ public class CartService {
         if (cart.getCodiId() != null) {
             Codi codi = codiService.getCodiById(cart.getCodiId());
             dtoBuilder.codiName(codi.getCodiName())
-                      .codiPrice(codi.getCodiPrice()); 
+                      .codiPrice(codi.getCodiPrice());
         }
 
         return dtoBuilder.build();
@@ -63,7 +63,7 @@ public class CartService {
         // 제품을 장바구니에 추가하는 로직을 구현합니다.
         System.out.println("Adding product to cart for user: " + user.getUserName() +
                 ", Product ID: " + productId + ", Quantity: " + quantity);
-    
+
         // Cart 객체 생성
         Cart newCart = Cart.builder()
                 .user(user)
@@ -72,7 +72,7 @@ public class CartService {
                 .build();
 
         // Cart 객체를 데이터베이스에 저장
-        cartRepository.save(newCart);        
+        cartRepository.save(newCart);
     }
 
     public void addCodiToCart(User user, Long codiId, String rentalStartDate, String rentalEndDate) {

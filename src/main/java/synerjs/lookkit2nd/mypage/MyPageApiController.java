@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.user.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @Slf4j
 @RequestMapping("/api/v1")
@@ -21,8 +24,9 @@ public class MyPageApiController {
     }
 
     //  회원 정보 업데이트
-    @PatchMapping("/userinfo/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody MypageDTO dto) {
+    @PostMapping("/userinfo")
+    public ResponseEntity<User> update(@RequestBody MypageDTO dto) {
+        Long id = 6L; //JWT 토큰에서 받아오는 부분
         // 1. 로그 확인
         log.info("id: {}, user: {}", id, dto.toString());
         // 2. 업데이트
@@ -46,7 +50,7 @@ public class MyPageApiController {
     }
 
     //  비밀번호 변경
-    @PatchMapping("/userinfo/{id}/change-password")
+    @PostMapping("/userinfo/{id}/change-password")
     public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody PwChangeDTO pwchangedto){
         // 1. 로그 확인
         log.info("비밀번호 변경 요청 - ID {}, 현재 비밀번호: {}, 새로운 비밀번호: {}",
@@ -67,6 +71,16 @@ public class MyPageApiController {
 //            return ResponseEntity.badRequest().body("현재 비밀번호가 일치하지 않거나 사용자 정보가 없습니다.");
 //        }
 //        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+    }
+
+    // 이메일 중복 확인 엔드포인트 추가
+    @GetMapping("/userinfo/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmailDuplicate(@RequestParam String email){
+        log.info("이메일 중복 확인 요청 - 이메일: {}", email);
+        boolean exists = mypageService.existsByEmail(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
     }
 
     // 이메일 변경

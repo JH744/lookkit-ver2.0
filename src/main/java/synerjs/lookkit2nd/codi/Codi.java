@@ -38,4 +38,3 @@ public class Codi {
         this.quantity = (quantity != null) ? quantity : 1;
     }
 }
-

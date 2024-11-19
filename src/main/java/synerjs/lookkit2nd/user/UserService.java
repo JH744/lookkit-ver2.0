@@ -24,8 +24,8 @@ public class UserService {
 
     }
 
+    @Autowired
     private PasswordEncoder passwordEncoder;
-    // private final UserMapper userMapper;
 
 
     // 아이디로 유저 조회
@@ -53,5 +53,9 @@ public class UserService {
            result =false; // 에러 발생시 결과에 false 리턴
         }
         return result;
+    }
+
+    public User getUserInfo(Long id) {
+        return userRepository.findById(id).get();
     }
 }

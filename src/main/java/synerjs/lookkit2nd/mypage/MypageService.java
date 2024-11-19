@@ -84,4 +84,8 @@ public class MypageService {
         userRepository.save(user);
         return true;
     }
+
+    public boolean existsByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
 }

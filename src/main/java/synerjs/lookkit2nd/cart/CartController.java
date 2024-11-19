@@ -45,11 +45,11 @@ public class CartController {
                         .build())
                 .collect(Collectors.toList());
     }
-    
+
     @PostMapping("/add/product/{productId}")
     public ResponseEntity<String> addProductToCart(
-        @PathVariable("productId") Long productId, 
-        @RequestParam("quantity") int quantity, 
+        @PathVariable("productId") Long productId,
+        @RequestParam("quantity") int quantity,
         @RequestParam("userId") Long userId) {
 
         try {
@@ -59,17 +59,17 @@ public class CartController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body("Failed to add product to cart: " + e.getMessage());
-        }                         
+        }
     }
 
-    
+
     @PostMapping("/add/codi/{codiId}")
     public ResponseEntity<String> addCodiToCart(
-        @PathVariable("codiId") Long codiId, 
+        @PathVariable("codiId") Long codiId,
         @RequestParam("rentalStartDate") String rentalStartDate,
         @RequestParam("rentalEndDate") String rentalEndDate,
         @RequestParam("userId") Long userId) {
-    
+
         try {
             User user = userService.getUserById(userId);
             cartService.addCodiToCart(user, codiId, rentalStartDate, rentalEndDate);
@@ -77,7 +77,7 @@ public class CartController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body("Failed to add codi to cart: " + e.getMessage());
-        }                         
+        }
     }
 
     @PostMapping("/update")

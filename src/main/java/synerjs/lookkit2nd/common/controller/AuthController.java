@@ -44,7 +44,7 @@ public class AuthController {
 
         // 쿠키 생성 + jwt 보관
         var cookie = new Cookie("jwt", jwt); //Key:value로 저장가능
-        cookie.setMaxAge(3600);               // 쿠키의 유효기간은 3600초 (1시간)
+        cookie.setMaxAge(60 * 60 * 24);         // 하루 동안 유효
         cookie.setHttpOnly(true);             // HttpOnly 설정으로 자바스크립트 접근 방지
         cookie.setPath("/");                  // 쿠키가 전송될 URL 경로를 모든 경로로 설정
         response.addCookie(cookie);           // 브라우저에 쿠키 전달
@@ -81,6 +81,23 @@ public class AuthController {
      }
     }
 
+//    @GetMapping("/api/auth/test")
+//    public ResponseEntity test(Authentication auth){
+//        System.out.println("auth test 응답받음");
+//        CustomUser user=(CustomUser)auth.getPrincipal();
+//        System.out.println("auth"+auth);
+//        System.out.println("user"+user);
+//        System.out.println("저장된 유저 유저id : "+user.getUserId());
+//        System.out.println("유저uuid : "+auth.getName());
+//        System.out.println("role : "+auth.getAuthorities());
+//        System.out.println("인증여부: "+auth.isAuthenticated());
+//
+//        if (true){
+//            return    ResponseEntity.status(200).body("테스트 성공");
+//        }else {
+//            return ResponseEntity.status(500).body("테스트 실패");
+//        }
+//    }
 
 
     @GetMapping("/kakao-login")

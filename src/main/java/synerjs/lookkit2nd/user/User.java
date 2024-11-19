@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @ToString
-@Table(name = "users")
+@Table(name = "USERS")
 public class User {
 
     @Id
@@ -38,7 +38,7 @@ public class User {
 
     @Column(name = "GENDER") // 컬럼명 명시 (필요 시)
     private String gender;
-    
+
 
     @DateTimeFormat(pattern = "yyMMdd")
     @Column(name = "BIRTHDATE") // 컬럼명 명시
@@ -53,7 +53,8 @@ public class User {
 
     @CreatedDate
     @Column(name = "CREATED_AT", updatable = false) // 컬럼명 명시
-    private Timestamp CreatedAt;
+    private Timestamp createdAt;
+
 
     @Column(name = "LAST_UPDATE") // 컬럼명 명시 (필요 시)
     @LastModifiedDate
@@ -70,7 +71,7 @@ public class User {
 
     @Builder
     public User(String userUuid, String password, String userName, String gender, LocalDate birthDate,
-                String email, String phone, Timestamp userCreatedAt,Timestamp lastUpdate, String role, String address) {
+                String email, String phone, Timestamp createdAt,Timestamp lastUpdate, String role, String address) {
         this.userUuid = userUuid;
         this.password = password;
         this.userName = userName;
@@ -78,7 +79,7 @@ public class User {
         this.birthDate = birthDate;
         this.email = email;
         this.phone = phone;
-        this.CreatedAt = CreatedAt;
+        this.createdAt = createdAt;
         this.lastUpdate=lastUpdate;
         this.role = role != null ? role : "USER"; //빌더 사용시 기본값은 일반유저
         this.address = address;
