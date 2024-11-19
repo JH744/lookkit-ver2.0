@@ -1,5 +1,7 @@
 package synerjs.lookkit2nd.product;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import synerjs.lookkit2nd.codi.Codi;
@@ -28,7 +30,8 @@ public class Product {
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CODI_ID")
+    @JoinColumn(name = "codi_id")
+    @JsonBackReference // 순환 참조 방지
     private Codi codi;
 
     private String productName;
