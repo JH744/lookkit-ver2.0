@@ -38,7 +38,7 @@ public class CartController {
                         .rentalEndDate(cart.getRentalEndDate())
                         .quantity(cart.getQuantity())
                         .productName(cart.getProductName())
-                        .codiName(cart.getCodiName())
+                        .codiDescription(cart.getCodiDescription())
                         .brandName(cart.getBrandName())
                         .productPrice(cart.getProductPrice())
                         .codiPrice(cart.getCodiPrice())

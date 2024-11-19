@@ -15,14 +15,14 @@ public class CartDTO {
     private String brandName;
     private Integer productPrice;
     private Long codiId;
-    private String codiName;
+    private String codiDescription;
     private Integer codiPrice;
     private LocalDate rentalStartDate;
     private LocalDate rentalEndDate;
     private Integer quantity;
 
     public CartDTO(Long cartId, Long userId, Long productId, String productName, String brandName, Integer productPrice, 
-                   Long codiId, String codiName, Integer codiPrice,
+                   Long codiId, String codiDescription, Integer codiPrice,
                    LocalDate rentalStartDate, LocalDate rentalEndDate, Integer quantity) {
         this.cartId = cartId;
         this.userId = userId;
@@ -31,7 +31,7 @@ public class CartDTO {
         this.brandName = brandName;
         this.productPrice = productPrice;
         this.codiId = codiId;
-        this.codiName = codiName;
+        this.codiDescription = codiDescription;
         this.codiPrice = codiPrice;
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;

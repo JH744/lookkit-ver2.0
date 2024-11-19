@@ -49,26 +49,7 @@
         <img :src="productImage + '_detail_4.webp'" alt="상품사진4" />
       </div>
       <div v-if="activeTab === 'reviews'" class="tab-content" id="reviews">
-        <div class="review-filters">
-          <button class="filter-button" @click="sortReviews('latest')">최신순</button>
-          <button class="filter-button" @click="sortReviews('highRating')">별점 높은 순</button>
-          <button class="filter-button" @click="sortReviews('lowRating')">별점 낮은 순</button>
-        </div>
-        <div v-if="reviews.length === 0">
-          <p>작성된 리뷰가 없습니다.</p>
-        </div>
-        <div v-else class="review-list">
-          <div v-for="review in reviews" :key="review.id" class="review-item">
-            <div class="review-header">
-              <span class="review-rating">{{ review.rating }}점</span>
-              <span class="review-user">{{ review.userId }}</span>
-              <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
-            </div>
-            <div class="review-content">
-              <p>{{ review.reviewText }}</p>
-            </div>
-          </div>
-        </div>
+        <ReviewView :productId="productId"/>
       </div>
       <div v-if="activeTab === 'qna'" class="tab-content" id="qna">
         <p>상품 Q&A 내용이 여기에 표시됩니다.</p>
@@ -102,11 +83,11 @@
   import axios from 'axios';
   import { useRoute } from 'vue-router';
   import "@/assets/styles/product.css";
-  
+  import ReviewView from '@/views/Review/ReviewView.vue'; 
+
   const API_BASE_URL = 'http://localhost:8081/api/products';
 
   const activeTab = ref('details');
-
   const product = ref({});
   const reviews = ref([]); 
   const route = useRoute(); 
@@ -128,10 +109,7 @@
   const productImage = computed(() => `/images/products/0${product.value.productId}/${product.value.productThumbnail}`);
   const productThumbnail = computed(() => `/images/products/0${product.value.productId}/${product.value.productId}_thumbnail.webp`);
 
-  const formatReviewDate = (date) => {
-    const options = { year: '2-digit', month: '2-digit', day: '2-digit' };
-    return new Date(date).toLocaleDateString('ko-KR', options);
-  };
+  
   const quantity = ref(0);
   const quantityBottom = ref(0);
   
@@ -163,18 +141,7 @@
     }
   };
   
-  // const updateCartQuantity = async (additionalQuantity) => {
-  //   try {
-  //     await axios.put('/cart/update', {
-  //       productId: product.value.productId,
-  //       additionalQuantity: additionalQuantity
-  //     });
-  //     alert('장바구니 수량이 업데이트되었습니다.');
-  //     window.location.href = '/cart';
-  //   } catch (error) {
-  //     alert('장바구니 수량 업데이트에 실패했습니다.');
-  //   }
-  // };
+
   
   const buyNow = async () => { 
   try {

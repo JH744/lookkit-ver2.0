@@ -50,7 +50,7 @@ public class CartService {
         // Codi 정보 추가
         if (cart.getCodiId() != null) {
             Codi codi = codiService.getCodiById(cart.getCodiId());
-            dtoBuilder.codiName(codi.getCodiName())
+            dtoBuilder.codiDescription(codi.getCodiDescription())
                       .codiPrice(codi.getCodiPrice());
         }
 
@@ -90,6 +90,7 @@ public class CartService {
                 .codiId(codiId)
                 .rentalStartDate(start)
                 .rentalEndDate(end)
+                .quantity(1)
                 .build();
 
         // Cart 객체를 데이터베이스에 저장
