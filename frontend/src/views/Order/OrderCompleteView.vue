@@ -69,29 +69,12 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="final-payment">
         <div class="final-payment-header">
           <div class="final-payment-title">최종 결제금액</div>
         </div>
         <div class="final-payment-border">
-          <div class="final-payment-table">
-            <div class="final-payment-body">
-              <div class="final-payment-row">
-                <div class="final-payment-cell">총 상품금액</div>
-                <div class="final-payment-data">
-                  <span class="span final-payment-amount">{{ formatPrice(totalAmount) }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="final-payment-footer">
-              <div class="final-payment-row">
-                <div class="final-payment-cell">최종 결제금액</div>
-                <div class="final-payment-data">
-                  <span class="span final-payment-amount">{{ formatPrice(finalAmount) }}</span>
-                </div>
-              </div>
-            </div>
+          <div class="final-payment-data">
+            <span class="span final-payment-amount">{{ formatPrice(totalAmount) }} 원</span>
           </div>
         </div>
       </div>
@@ -183,6 +166,7 @@ const goHome = () => {
 };
 
 onMounted(() => {
+  console.log("Order ID from route:", route.query.orderId);
   fetchOrderData();
 });
 </script>

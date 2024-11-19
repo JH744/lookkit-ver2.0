@@ -1,5 +1,6 @@
 <template>
   <div class="order-container">
+    
     <div class="order-title">
       <h2>결제/주문</h2>
     </div>
@@ -10,25 +11,24 @@
       <div class="info-table">
         <div class="info-row">
           <span class="label-title">배송지 정보</span>
-          <button class="link-text" @click="navigateToAddAddress">
-            <span>배송지를 등록하세요</span>
-          </button>            
+          <button class="link-text" @click="showAddAddressModal = true">배송지 등록하기</button> 
+          <AddAddressView v-if="showAddAddressModal" @close="showAddAddressModal = false" @addressRegistered="updateAddress"/>          
         </div>
         <div class="info-row">
           <div class="info-label">배송지명</div>
-          <input type="text" v-model="buyerAddressName" class="input-field" readonly>
+          <input type="text" v-model="address.addressName" class="input-field" readonly>
         </div>
         <div class="info-row">
           <div class="info-label">받는 사람</div>
-          <input type="text" v-model="buyerRecipientName" class="input-field" readonly>
+          <input type="text" v-model="address.recipientName" class="input-field" readonly>
         </div>
         <div class="info-row">
           <div class="info-label">휴대폰 번호</div>
-          <input type="text" v-model="buyerPhoneNumber" class="input-field" readonly>
+          <input type="text" v-model="address.phoneNumber" class="input-field" readonly>
         </div>
         <div class="info-row">
           <div class="info-label">주소</div>
-          <input type="text" v-model="buyerAddress" class="input-field" readonly>
+          <input type="text" v-model="address.fullAddress" class="input-field" readonly>
         </div>
       </div>
       <div class="info-row2">
@@ -138,9 +138,11 @@
 <script setup>
 
 import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import "@/assets/styles/order.css";
 import { useOrderStore } from '@/store/orderStore';
+import AddAddressView from '@/views/Order/AddAddressView.vue';
+
 
 const buyerAddressName = ref('');
 const buyerRecipientName = ref('');
@@ -270,14 +272,20 @@ const processPayment = () => {
     return;
   }
 
+  if (!address.value) {
+    alert('배송지를 등록해주세요.');
+    return;
+  }
+
   // 아임포트 초기화
   const IMP = window.IMP; 
   IMP.init("imp40354073");
 
+
   const orderName = orderStore.selectedItems.length > 0 ? orderStore.selectedItems[0].itemName : '주문 상품';
-  const buyerName = buyerRecipientName.value;
-  const buyerTel = buyerPhoneNumber.value;
-  const buyerAddr = buyerAddress.value;
+  const buyerName = address.value.recipientName;
+  const buyerTel = address.value.phoneNumber;
+  const buyerAddr = address.value.fullAddress;
 
   IMP.request_pay({
     pg: 'kcp',
@@ -294,9 +302,12 @@ const processPayment = () => {
 
       // 주문 상세 정보 수집
       const orderDetails = orderStore.selectedItems.map(item => ({
-        productId: item.itemId,
-        quantity: item.quantity,
-        productPrice: item.totalPrice,
+        productId: item.type === 'product' ? item.itemId : null, // 단일 상품 ID
+        codiId: item.type === 'codi' ? item.itemId : null, // 코디 상품 ID
+        quantity: item.type === 'product' ? item.quantity : 1, // 수량 (상품의 경우 지정, 코디는 1로 설정)
+        rentalStartDate: item.type === 'codi' ? item.startDate : null, // 대여 시작일 (코디에 해당)
+        rentalEndDate: item.type === 'codi' ? item.endDate : null, // 대여 종료일 (코디에 해당)
+        productPrice: item.price // 상품 또는 대여 가격
       }));
 
       const paymentData = {
@@ -305,8 +316,9 @@ const processPayment = () => {
         orderAddress: buyerAddr,
         orderAddressee: buyerName,
         orderPhone: buyerTel,
-        orderDetails: orderDetails,
+        orderComment: selectedMemo.value,
         orderStatus: "결제완료",
+        orderDetails: orderDetails
       };
 
       // 주문 정보를 서버로 전송
@@ -324,8 +336,11 @@ fetch("http://localhost:8081/api/order/complete", {
     return;
   }
 
-  // URL 파라미터로 orderId를 전달하여 주문 완료 페이지로 이동
-  window.location.href = `/order/orderComplete?orderId=${orderId}`;
+  // Vue 라우터를 사용해 주문 완료 페이지로 이동합니다.
+  router.push({
+    path: '/order/orderComplete',
+    query: { orderId: orderId }
+  });
 })
 .catch(() => {
   alert("결제를 완료하는 데 실패했습니다.");
@@ -352,9 +367,16 @@ const totalQuantity = computed(() => {
   };
 
 
+  const showAddAddressModal = ref(false);
+  const address = ref({
+    addressName: '',
+    recipientName: '',
+    phoneNumber: '',
+    fullAddress: ''
+  });
 
-const navigateToAddAddress = () => {
-  router.push({ path: '/add-address' });
-};
-
+  // 주소 업데이트 메서드
+  const updateAddress = (newAddress) => {
+    address.value = newAddress;
+  };
 </script>

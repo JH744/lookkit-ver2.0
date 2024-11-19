@@ -54,4 +54,8 @@ public class OrderDetail {
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;
     }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }

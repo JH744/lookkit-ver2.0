@@ -25,7 +25,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Long saveOrder(OrderDTO orderDTO) {
+public Long saveOrder(OrderDTO orderDTO) {
     User user = userService.getUserById(orderDTO.getUserId());
 
     // Order 엔티티 생성
@@ -40,38 +40,24 @@ public class OrderService {
             .orderPhone(orderDTO.getOrderPhone())
             .build();
 
-    // Order 엔티티를 데이터베이스에 저장
-    orderRepository.save(order);
-
-    // OrderDetail 엔티티 생성 및 저장
+    // OrderDetail 엔티티 생성 및 Order와 연관 설정
     for (OrderDetailDTO detailDTO : orderDTO.getOrderDetails()) {
-        OrderDetail.OrderDetailBuilder detailBuilder = OrderDetail.builder()
-                .order(order)
+        OrderDetail orderDetail = OrderDetail.builder()
                 .user(user)
                 .isPurchaseConfirmed(false)
-                .quantity(detailDTO.getQuantity() != null ? detailDTO.getQuantity() : 1);
+                .quantity(detailDTO.getQuantity() != null ? detailDTO.getQuantity() : 1)
+                .productId(detailDTO.getProductId())
+                .codiId(detailDTO.getCodiId())
+                .rentalStartDate(detailDTO.getRentalStartDate())
+                .rentalEndDate(detailDTO.getRentalEndDate())
+                .build();
 
-        if (detailDTO.getProductId() != null) {
-            // 단일 상품인 경우
-            detailBuilder.productId(detailDTO.getProductId());
-        } else if (detailDTO.getCodiId() != null) {
-            // 코디 상품인 경우, 대여 기간 정보도 함께 설정
-            detailBuilder.codiId(detailDTO.getCodiId())
-                         .rentalStartDate(detailDTO.getRentalStartDate())
-                         .rentalEndDate(detailDTO.getRentalEndDate());
-        } else {
-            // 상품 정보가 없다면 로그를 남김
-            System.out.println("Warning: Both productId and codiId are null for an OrderDetail");
-        }
-
-        // OrderDetail 엔티티를 데이터베이스에 저장
-        OrderDetail orderDetail = detailBuilder.build();
-        orderDetailRepository.save(orderDetail);
-
-        order.getOrderDetails().add(orderDetail);
+        order.addOrderDetail(orderDetail); // Order와 OrderDetail 관계 설정
     }
 
-    // 저장된 order의 ID 반환
+    // Order 엔티티를 데이터베이스에 저장 (연관된 OrderDetail도 자동으로 저장됨)
+    orderRepository.save(order);
+
     return order.getOrderId();
 }
 

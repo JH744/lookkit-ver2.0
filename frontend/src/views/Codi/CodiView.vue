@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="image-section">
-      <img :src="codiImage" alt="코디 썸네일" />
+      <img src="lookkit/codi/0codiId/codiId_thumbnail.webp" alt="썸네일" />
     </div>
     <div class="details-section">
       <div>

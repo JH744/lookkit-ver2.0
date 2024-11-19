@@ -59,29 +59,26 @@ const routes = [
   {
     path: "/product/:productId",
     component: () => import("@/views/Product/ProductView.vue"),
+    children: [
+      {
+        path: "review",
+        component: () => import("@/views/Review/ReviewView.vue"),
+        props: route => ({ codiId: route.params.codiId }), 
+      },
+    ],
   },
   {
     path: "/order",
     component: () => import("@/views/Order/OrderView.vue"),
-    children: [
-      {
-        path: "/addaddress",
-        component: () => import("@/views/Order/AddAddressView.vue"),
-      },
-      {
-        path: "/orderComplete",  
-        component: () => import("@/views/Order/OrderCompleteView.vue"),
-      },
-    ],
+  },
+  {
+    path: "/order/orderComplete",
+    component: () => import("@/views/Order/OrderCompleteView.vue"),
   },
   {
     path: "/cart",
     component: () => import("@/views/Cart/CartView.vue"),
   },
-  // {
-  //   path: "/review",
-  //   component: () => import("@/views/Review/ReviewView.vue"),
-  // },
 {
     path: "/mypage",
    

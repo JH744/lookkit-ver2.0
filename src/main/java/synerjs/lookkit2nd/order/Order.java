@@ -62,4 +62,9 @@ public class Order {
         this.orderAddress = orderAddress;
         this.orderPhone = orderPhone;
     }
+
+    public void addOrderDetail(OrderDetail orderDetail) {
+        orderDetails.add(orderDetail);
+        orderDetail.setOrder(this); // 양방향 관계 설정
+    }
 }
