@@ -98,4 +98,13 @@ public class MypageService {
     public boolean existsByEmail(String email){
         return userRepository.existsByEmail(email);
     }
+
+    public boolean verifyPassword(Long id, String currentPassword) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user == null){
+            return false; // 사용자 정보가 없는 경우
+        }
+        // 암호화된 비밀번호와 비교
+        return encoder.matches(currentPassword, user.getPassword());
+    }
 }

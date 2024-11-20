@@ -97,6 +97,7 @@ const routes = [
   },
   {
     path: "/mypage",
+    component: () => import("@/views/Mypage/Mypage.vue"),
 
     children: [
       {
@@ -121,9 +122,15 @@ const routes = [
         path: "wishlist",
         component: () => import("@/views/Mypage/WishList.vue"),
       },
+      {
+        path: "enter-password",
+        component: () => import("@/components/layouts/PwCheckModal.vue"),
+      },
+      {
+        path: "updateInfo",
+        component: () => import("@/views/Mypage/UserInfoView.vue"),
+      },
     ],
-    path: "/updateInfo",
-    component: () => import("@/views/Mypage/UserInfoView.vue"),
   },
 ];
 

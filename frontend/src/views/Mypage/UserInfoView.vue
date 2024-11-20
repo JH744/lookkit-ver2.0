@@ -108,11 +108,8 @@
           </div>
           <!-- 저장 및 취소 버튼 -->
           <div class="button-group">
-            <button type="button" class="btn-cancel" @click="cancelUpdate">
-              취소하기
-            </button>
             <button type="submit" class="btn-save" id="updateBtn">
-              저장하기
+              수정완료
             </button>
           </div>
           <div class="withdrawal-group">
@@ -130,8 +127,8 @@
       <span class="modal-title">비밀번호 변경</span>
       <span class="modal-subtitle">변경하실 비밀번호를 입력해주세요</span>
       <div class="input-container">
+        <h3 class="modal-current-password"><span>현재 비밀번호</span></h3>
         <div class="input-group">
-          <label for="current-password-change">현재 비밀번호</label>
           <input
             type="password"
             id="current-password-change"
@@ -139,8 +136,8 @@
             placeholder="현재 비밀번호를 입력하세요"
           />
         </div>
+        <h4 class="modal-new-password"><span>새 비밀번호</span></h4>
         <div class="input-group">
-          <label for="new-password">새 비밀번호</label>
           <input
             type="password"
             id="new-password"
@@ -148,8 +145,8 @@
             placeholder="새 비밀번호를 입력하세요"
           />
         </div>
+        <h5 class="modal-confirm-password"><span>새 비밀번호 확인</span></h5>
         <div class="input-group">
-          <label for="confirm-password">새 비밀번호 확인</label>
           <input
             type="password"
             id="confirm-password"
@@ -188,7 +185,9 @@ const confirmPassword = ref("");
 
 onMounted(async () => {
   try {
-    const response = await axios.get("http://localhost:8081/api/v1/userinfo/8");
+    const response = await axios.get(
+      "http://localhost:8081/api/v1/userinfo/10"
+    );
     Object.assign(userData.value, response.data);
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -214,7 +213,7 @@ const updatePassword = async () => {
   }
   try {
     await axios.post(
-      "http://localhost:8081/api/v1/userinfo/8/change-password",
+      "http://localhost:8081/api/v1/userinfo/10/change-password",
       {
         currentPassword: currentPassword.value,
         newPassword: newPassword.value,
@@ -300,7 +299,7 @@ const cancelUpdate = () => {
 
 // 탈퇴 요청 메서드
 const deleteAccount = async () => {
-  const userId = 6; // 여기에 실제 사용자 ID를 설정하세요
+  const userId = 10; // 여기에 실제 사용자 ID를 설정하세요
   const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
   if (confirmation) {
     try {
@@ -368,9 +367,9 @@ const deleteAccount = async () => {
 .profile-management-content {
   margin-left: auto;
   margin-right: auto;
-  width: 380px;
+  width: 450px;
   flex: 1;
-  padding: 40px;
+  padding: 30px;
   background-color: #fff;
 }
 
@@ -711,7 +710,7 @@ const deleteAccount = async () => {
   display: flex;
   justify-content: center;
   gap: 10px; /* 버튼 간 간격 조정 */
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 /* Modal Styles */
@@ -731,28 +730,34 @@ const deleteAccount = async () => {
 .pw-change-modal {
   display: grid;
   background-color: white;
-  width: 530px;
+  width: 500px;
+  height: 500px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
 }
 
 .modal-title {
-  font-size: 16px;
-  margin-bottom: 50px;
-  margin-left: 3px;
-  padding: 5px;
+  width: 100%;
+  height: 10px;
+  font-size: 17px;
+  padding-right: 52px;
+  padding-left: 17px;
   color: #555353;
+  letter-spacing: 0;
 }
 
 .modal-subtitle {
-  font-size: 21px;
-  margin-bottom: 30px;
+  font-size: 20px;
   text-align: center;
+  border: 0;
+  padding: 30px 0;
+  height: 80px;
+  line-height: 1;
   color: #555;
 }
 
 .input-group {
-  margin-bottom: 20px;
+  margin-bottom: 50px;
 }
 
 .input-group label {
@@ -762,20 +767,62 @@ const deleteAccount = async () => {
 }
 
 .input-group input {
-  width: 350px;
-  padding: 10px;
+  height: 46px;
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  margin-top: 0px;
+  top: 0px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 10px 14px;
+  line-height: 46px;
+  white-space: nowrap;
+  cursor: text;
+  /* width: 350px; */
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
 }
 
+.modal-current-password {
+  padding: 0 0 9px 1px;
+  vertical-align: 0;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+}
+
+.modal-new-password {
+  margin-top: 23px;
+  padding: 0 0 9px 1px;
+  vertical-align: 0;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+}
+
+.modal-confirm-password {
+  margin-top: 23px;
+  padding: 0 0 9px 1px;
+  vertical-align: 0;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+}
+
 .input-container {
+  min-width: 0;
+  padding: 0 22px;
+  width: 470px;
   justify-self: center;
 }
 
 .modal-footer {
-  text-align: center;
-  margin: 20px 0px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .modal-footer button {
@@ -786,8 +833,8 @@ const deleteAccount = async () => {
   border-radius: 30px;
   font-size: 15px;
   cursor: pointer;
-  width: 200px;
-  height: 42px;
+  width: 186px;
+  height: 35px;
 }
 
 .modal-footer button:hover {
@@ -814,16 +861,24 @@ const deleteAccount = async () => {
 }
 
 .btn-withdrawal {
-  background-color: #f44336;
-  color: white;
+  display: inline-block;
   padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 110px;
+  color: #999;
+  font-size: 13px;
+  background-color: transparent;
   border: none;
+  cursor: pointer;
+  text-decoration: underline; /* 밑줄 추가 */
+  width: auto;
 }
 
-.btn-withdrawal:hover {
-  background-color: #d32f2f;
+.pw-change-moda h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  white-space: nowrap;
+  position: static;
+  margin-top: 12px;
+  font-size: 17px;
 }
 </style>

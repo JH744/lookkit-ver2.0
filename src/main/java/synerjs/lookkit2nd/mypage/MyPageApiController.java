@@ -8,8 +8,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.user.User;
 
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @Slf4j
@@ -18,12 +20,26 @@ public class MyPageApiController {
     @Autowired
      PasswordEncoder encoder;
 
-
     @Autowired
     MypageService mypageService;
 
+    // 비밀번호 검증 모달창
+    @PostMapping("/mypage/verifyPassword")
+    public ResponseEntity<Map<String, Object>> verifyPassword(@RequestBody PwVerifyDTO pwverifydto,
+                                                              @RequestParam Long id){
+        log.info("비밀번호 확인 요청 - Id {}, 입력된 비밀번호: {}", id, pwverifydto.getCurrentPassword());
+        boolean isCorrect = mypageService.verifyPassword(id, pwverifydto.getCurrentPassword());
+        Map<String, Object> response = new HashMap<>();
 
-
+        if (isCorrect){
+            response.put("success", true);
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("success", false);
+            response.put("message", "비밀번호가 올바르지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
 
     //  조회하기
     @GetMapping("/userinfo/{id}")
@@ -34,7 +50,7 @@ public class MyPageApiController {
     //  회원 정보 업데이트
     @PostMapping("/userinfo")
     public ResponseEntity<User> update(@RequestBody MypageDTO dto) {
-        Long id = 8L; //JWT 토큰에서 받아오는 부분
+        Long id = 10L; //JWT 토큰에서 받아오는 부분
         // 1. 로그 확인
         log.info("id: {}, user: {}", id, dto.toString());
         // 2. 업데이트
@@ -60,7 +76,7 @@ public class MyPageApiController {
     //  비밀번호 변경
     @PostMapping("/userinfo/{id}/change-password")
     public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody PwChangeDTO pwchangedto){
-        id=8l;
+        id=10l;
 
         // 1. 로그 확인
         log.info("비밀번호 변경 요청 - ID {}, 현재 비밀번호: {}, 새로운 비밀번호: {}",
@@ -87,10 +103,6 @@ public class MyPageApiController {
         boolean isUpdated = mypageService.updatePassword(id, pwchangedto.getNewPassword());
         return isUpdated ? ResponseEntity.ok("성공적으로 변경되었습니다.")
                 : ResponseEntity.badRequest().body("비밀번호 변경 실패");
-//        if (!isUpdated){
-//            return ResponseEntity.badRequest().body("현재 비밀번호가 일치하지 않거나 사용자 정보가 없습니다.");
-//        }
-//        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
 
     // 이메일 중복 확인 엔드포인트 추가
@@ -113,8 +125,3 @@ public class MyPageApiController {
                 ResponseEntity.badRequest().body("중복된 이메일 이거나 회원 정보를 찾을 수 없습니다.");
     }
 }
-//        if (updateUser == null) {
-//            log.info("중복된 이메일 이거나 사용자 없음");
-//            return ResponseEntity.badRequest().body("이메일 중복 또는 사용자 정보 없음");
-//
-//        return ResponseEntity.ok("이메일이 성공적으로 변경되었습니다.");
