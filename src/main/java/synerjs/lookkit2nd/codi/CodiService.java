@@ -36,7 +36,8 @@ public class CodiService {
                         codi.getCodiName(),
                         codi.getCodiDescription(),
                         codi.getCodiThumbnail(),
-                        codi.getCodiPrice()
+                        codi.getCodiPrice(),
+                        codi.getQuantity()
                 ))
                 .collect(Collectors.toList());
     }
