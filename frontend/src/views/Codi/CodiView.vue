@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="image-section">
-      <img alt="썸네일" />
+      <img :src="thumbnailUrl" alt="썸네일" />
     </div>
     <div class="details-section">
       <div>
@@ -16,15 +16,14 @@
           <ul class="rental-terms-list">
             <li>3일 이후부터 대여 가능</li>
             <li>최소 대여 기간 3일</li>
-            <li>3일이후 대여료 + 추가요금</li>
+            <li>3일 이후 대여료 + 추가요금</li>
             <li>추가 요금: 10,000원 / 1일</li>
           </ul>
         </div>
         <div class="rental-section">
           <div class="rental-label">대여기간</div>
-          <Datepicker v-model="rentalStartDate" :format="format" :disabled-dates="disabledStartDates" 
-          @update:model-value="validateRentalStartDate" class="rental-input" />
-          <Datepicker v-model="rentalEndDate" :format="format" class="rental-input" />
+          <Datepicker v-model="rentalStartDate" :format="format" :disabled-dates="disabledStartDates" @update:model-value="validateRentalStartDate" class="rental-input" placeholder="대여일"/>
+          <Datepicker v-model="rentalEndDate" :format="format" class="rental-input" placeholder="반납일"/>
         </div>
         <div v-if="rentalStartDate && rentalEndDate" class="selected-rental-info">
           <div class="selected-rental-summary">
@@ -53,23 +52,24 @@
     </div>
     <div class="container">
       <div v-if="activeTab === 'details'" class="tab-content" id="details">
-        <img :src="codiImage + '_detail_1.webp'" alt="코디사진1" />
-        <img :src="codiImage + '_detail_2.webp'" alt="코디사진2" />
+        <div v-for="(detailUrl, index) in detailImageUrls" :key="index">
+          <img :src="detailUrl" :alt="'코디사진' + (index + 1)" />
+        </div>
       </div>
       <div v-if="activeTab === 'reviews'" class="tab-content" id="reviews">
         <ReviewView :codiId="codiId"/>
       </div>
       <div v-if="activeTab === 'qna'" class="tab-content" id="qna">
-      <p>상품 Q&A 내용이 여기에 표시됩니다.</p>
+        <p>상품 Q&A 내용이 여기에 표시됩니다.</p>
       </div>
       <div v-if="activeTab === 'seller'" class="tab-content" id="seller">
-      <p>판매자 정보가 여기에 표시됩니다.</p>
+        <p>판매자 정보가 여기에 표시됩니다.</p>
       </div>
     </div>
   </div>
   <div class="bottom-fixed-bar">
     <div class="product-info">
-      <img :src="productThumbnail" alt="상품 이미지" />
+      <img :src="thumbnailUrl" alt="상품 이미지" />
       <div class="product-description">{{ codi.codiName }}</div>
     </div>
     <div class="selected-rental-summary2">
@@ -89,6 +89,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
+import { storage } from "@/firebase/firebaseConfig";
 import axios from 'axios';
 import "@/assets/styles/codi.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
@@ -98,11 +100,33 @@ const API_BASE_URL = 'http://localhost:8081/api/codi';
 
 const activeTab = ref('details');
 const codi = ref({});
-const route = useRoute(); // 현재 라우터의 정보를 가져오는 훅
-const codiId = ref(route.params.codiId); // URL에서 codiId 가져오기
+const route = useRoute();
+const codiId = ref(route.params.codiId);
 
-const reviews = ref([]); // 빈 배열로 초기화하여 undefined 방지
+const thumbnailUrl = ref(""); 
+const detailImageUrls = ref([]); // 여러 상세 이미지 URL을 저장할 배열
 
+// Firebase에서 이미지 가져오기 함수
+const fetchImages = async () => {
+  try {
+    // 썸네일 이미지 가져오기
+    const thumbnailRef = firebaseRef(storage, `lookkit/codi/0${codiId.value}/${codiId.value}_thumbnail.webp`);
+    thumbnailUrl.value = await getDownloadURL(thumbnailRef);
+
+    // 상세 이미지 가져오기 (최소 4장, 최대 6장)
+    for (let i = 1; i <= 6; i++) {
+      try {
+        const detailRef = firebaseRef(storage, `lookkit/codi/0${codiId.value}/${codiId.value}_detail_${i}.webp`);
+        const detailUrl = await getDownloadURL(detailRef);
+        detailImageUrls.value.push(detailUrl);
+      } catch (error) {
+        console.log(`디테일 이미지 ${i} 가져오기 실패 (존재하지 않을 수 있음)`, error);
+      }
+    }
+  } catch (error) {
+    console.error("이미지 가져오기 실패:", error);
+  }
+};
 
 const fetchCodi = async () => {
   try {
@@ -115,9 +139,8 @@ const fetchCodi = async () => {
 
 onMounted(() => {
   fetchCodi();
+  fetchImages(); // 이미지 가져오기 호출
 });
-
-const codiImage = computed(() => `/images/codi/${codi.value.codiId}/${codi.value.codiThumbnail}`);
 
 const rentalStartDate = ref(null);
 const rentalEndDate = ref(null);
@@ -186,7 +209,7 @@ const resetRentalDates = () => {
 const getFormattedDate = (date) => {
   if (!date) return '';
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1 필요
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
@@ -194,10 +217,10 @@ const getFormattedDate = (date) => {
 const addToCart = async () => {
   try {
     const userId = 1;
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
     const formattedStartDate = getFormattedDate(new Date(rentalStartDate.value));
     const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
 
-    const API_BASE_URL = 'http://localhost:8081/api/cart';
     const response = await axios.post(
       `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${formattedStartDate}&rentalEndDate=${formattedEndDate}&userId=${userId}`
     );
@@ -214,13 +237,10 @@ const rentNow = async () => {
     const formattedStartDate = getFormattedDate(new Date(rentalStartDate.value));
     const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
 
-    const API_BASE_URL = 'http://localhost:8081/api/codi';
     const response = await axios.post(`${API_BASE_URL}/rent?codiId=${codi.value.codiId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
 
-    // API 호출 결과로부터 OrderDTO 객체를 반환받음
     const orderDTO = response.data;
 
-    // 주문 페이지로 이동 시 대여 정보를 URL 파라미터에 추가하여 전달
     const orderParams = new URLSearchParams({
       itemId: orderDTO.itemId,
       itemName: orderDTO.itemName,
@@ -228,7 +248,7 @@ const rentNow = async () => {
       endDate: orderDTO.endDate,
       price: orderDTO.price,
       totalPrice: orderDTO.totalPrice,
-      itemType: 'codi'  // 상품인지 코디인지 구분을 위한 파라미터
+      itemType: 'codi'
     });
 
     alert('대여가 완료되었습니다.');
@@ -238,6 +258,4 @@ const rentNow = async () => {
     console.error("대여 오류:", error);
   }
 };
-
 </script>
-
