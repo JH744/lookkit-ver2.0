@@ -3,7 +3,7 @@
   <div class="product-grid">
     <!-- Product Item 반복 출력 -->
     <div class="product-item" v-for="wish in wishlist" :key="wish.productId">
-      <img class="product-image" :src="`/images/products/0${wish.productId}/${wish.productThumbnail}`" />
+      <img class="product-image" :src="wish.thumbnailUrl || '/images/placeholder.png'" />
       <div class="fix-height">
         <h3 class="product-brand">{{ wish.brandName }}</h3>
         <p class="product-name">{{ wish.productName }}</p>
@@ -26,6 +26,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { toggleLike } from '../../utils/likeFunction';
 import { useAuthStore } from '@/stores/authStore';
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 
 const authStore = useAuthStore();
 const wishlist = ref([]);
@@ -41,11 +42,23 @@ const loadWishlist = async () => {
     wishlist.value = response.data.data.map(item => ({
       ...item,
       isLiked: true,
+      thumbnailUrl: ''
     }));
+
+    for (let product of wishlist.value) {
+      try {
+        const storagePath = `lookkit/products/0${product.productId}/${product.productId}_thumbnail.webp`;
+        const imageRef = firebaseRef(firebaseStorage, storagePath);
+        const url = await getDownloadURL(imageRef);
+        product.thumbnailUrl = url; // 썸네일 URL을 할당
+      } catch (error) {
+        console.error(`Error loading thumbnail for product ${product.productId}:`, error);
+      }
+    }
   } catch (error) {
-    console.error('Error loading:', error);
+    console.error('Error loading wishlist:', error);
   }
-}
+};
 
 onMounted(() => {
   loadWishlist();

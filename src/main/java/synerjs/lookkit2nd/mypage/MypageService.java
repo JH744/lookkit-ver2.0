@@ -3,6 +3,7 @@ package synerjs.lookkit2nd.mypage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import synerjs.lookkit2nd.user.User;
 import synerjs.lookkit2nd.user.UserRepository;
@@ -13,6 +14,11 @@ import java.util.List;
 public class MypageService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    PasswordEncoder encoder;
+
+
 
     public List<User> index() {
         return userRepository.findAll();
@@ -72,14 +78,18 @@ public class MypageService {
         User user = userRepository.findById(id).orElse(null);
         return user != null && user.getPassword().equals(newPassword); // 현재 비밀번호가 새 비밀번호와 같은지 확인
     }
-        // 비밀번호 변경
-    public boolean updatePassword(Long id, String currentPassword, String newPassword){
+
+    public String getCurrentPassword(Long id){
         User user = userRepository.findById(id).orElse(null);
-        if (user == null || !user.getPassword().equals(currentPassword)){
-            return false; // 사용자 정보가 없거나 현재 비밀번호가 일치하지 않을 경우
-        }
+        return user.getPassword(); //
+    }
+
+
+        // 비밀번호 변경
+    public boolean updatePassword(Long id, String newPassword){
+        User user = userRepository.findById(id).orElse(null);
+        user.setPassword(encoder.encode(newPassword));// 암호화
         // 새로운 비밀번호로 업데이트
-        user.setPassword(newPassword);
         user.setLastUpdate(new java.sql.Timestamp(System.currentTimeMillis())); // 마지막 업데이트 시간 설정
         userRepository.save(user);
         return true;
@@ -87,5 +97,14 @@ public class MypageService {
 
     public boolean existsByEmail(String email){
         return userRepository.existsByEmail(email);
+    }
+
+    public boolean verifyPassword(Long id, String currentPassword) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user == null){
+            return false; // 사용자 정보가 없는 경우
+        }
+        // 암호화된 비밀번호와 비교
+        return encoder.matches(currentPassword, user.getPassword());
     }
 }

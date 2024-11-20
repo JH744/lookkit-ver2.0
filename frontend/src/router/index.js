@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+// import UserInfoView from "@/views/UserInfoView.vue";
 
 const routes = [
   {
@@ -102,10 +103,6 @@ const routes = [
     component: () => import("@/views/Cart/CartView.vue"),
   },
   {
-    path: "/updateInfo",
-    component: () => import("@/views/mypage/UserInfoView.vue"),
-  },
-  {
     path: "/mypage",
     component: () => import("@/views/mypage/Mypage.vue"),
 
@@ -131,6 +128,14 @@ const routes = [
       {
         path: "wishlist",
         component: () => import("@/views/mypage/WishList.vue"),
+      },
+      {
+        path: "enter-password",
+        component: () => import("@/components/layouts/PwCheckModal.vue"),
+      },
+      {
+        path: "updateInfo",
+        component: () => import("@/views/mypage/UserInfoView.vue"),
       },
     ],
   },
