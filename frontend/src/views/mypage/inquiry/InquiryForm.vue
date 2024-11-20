@@ -60,9 +60,11 @@
 import { ref, reactive } from 'vue';
 import axios from 'axios';
 import router from '@/router';
+import { useAuthStore } from '@/stores/authStore';
 import { uploadBytes } from "firebase/storage";
 import { storage } from "@/firebase/firebaseConfig";
 
+const authStore = useAuthStore();
 const formData = reactive({
   title: '',
   content: '',
@@ -137,7 +139,7 @@ const submitForm = async () => {
     const formDataToSend = new FormData();
      // JSON 데이터로 변경
      const requestPayload = {
-      userId: 5,
+      userId: authStore.userId,
       inquiryTitle: formData.title,
       inquiryContents: formData.content
     };

@@ -29,7 +29,7 @@ public class JwtUtil {
 
         String jwt = Jwts.builder()
                 .claim("username", user.getUsername())
-                .claim("userID", user.getUserId())
+                .claim("userId", user.getUserId())
                 .claim("authorities", user.getAuthorities())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 60000))

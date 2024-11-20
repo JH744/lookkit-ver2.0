@@ -98,6 +98,9 @@
 import { ref, watch, onMounted, reactive } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { jwtDecode } from "jwt-decode";
+
 const router = useRouter();
 const username = ref("");
 const password = ref("");
@@ -123,30 +126,38 @@ watch(
 
 const handleLogin = async () => {
   try {
-    const response = await axios
-      .post(
-        "http://localhost:8081/api/auth/login",
-        // "/api/auth/login",
-        {
-          username: username.value,
-          password: password.value,
-        },
-        { withCredentials: true }
-      )
-      .then((jwt) => {
-        // console.log("jwt", jwt);
+    const response = await axios.post(
+      "http://localhost:8081/api/auth/login",
+      {
+        username: username.value,
+        password: password.value,
+      },
+      { withCredentials: true }
+    );
 
-        // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
-        if (isRememberId.value) {
-          localStorage.setItem("savedId", username.value);
-        } else {
-          // 미체크시 기존저장된 아이디를 삭제
-          localStorage.removeItem("savedId");
-        }
-      });
+    const jwt = response.data; // 백엔드에서 리턴한 JWT 추출
+    console.log("jwt", jwt);
+
+    // JWT 디코딩
+    const decodedToken = jwtDecode(jwt);
+    console.log("디코드 토큰 확인>>>>>", decodedToken);
+
+    const authStore = useAuthStore();
+    // 피니아 스토어에 인증 데이터 저장
+    authStore.setAuthData(decodedToken);
+
+    // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
+    if (isRememberId.value) {
+      localStorage.setItem("savedId", username.value);
+    } else {
+      localStorage.removeItem("savedId");
+    }
+
+    // 메인 페이지로 이동
     router.push("/main");
   } catch (error) {
     loginError.value = true; // 에러 메시지 출력
+    console.error("로그인 오류:", error);
   }
 };
 

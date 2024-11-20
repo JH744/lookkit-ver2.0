@@ -90,8 +90,10 @@ import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useModalStore, useConfirmModalStore } from '@/stores/modalStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const products = ref([]);
+const authStore = useAuthStore();
 
 // 주문을 주문번호별로 그룹화하는 계산 속성
 const productsGroupedByOrderId = computed(() => {
@@ -171,7 +173,7 @@ const confirmRental = async (product) => {
 // 주문 정보 불러오기
 const loadOrder = async () => {
   try {
-    const response = await axios.get('http://localhost:8081/api/mypage/manage/5');
+    const response = await axios.get(`http://localhost:8081/api/mypage/manage/${authStore.userId}`);
     products.value = response.data.data.products;
   } catch (error) {
     console.log(error);

@@ -38,15 +38,19 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import router from '@/router';
 import { useModalStore, useConfirmModalStore } from '@/stores/modalStore';
+import { useAuthStore } from '@/stores/authStore';
+
 
 // 데이터 상태 관리
 const inquiries = ref([]);
+const authStore = useAuthStore();
 
-// 데이터 로드 함수
 const loadInquiries = async () => {
+  console.log(">>>>>>>>>>>>>>>>",authStore.userId);
   try {
-    const response = await axios.get('http://localhost:8081/api/mypage/inquiry/user/5');
+    const response = await axios.get(`http://localhost:8081/api/mypage/inquiry/user/${authStore.userId}`);
     inquiries.value = response.data.data;
+    console.log(response.data.data);
   } catch (error) {
     console.error('Error loading inquiries:', error);
   }

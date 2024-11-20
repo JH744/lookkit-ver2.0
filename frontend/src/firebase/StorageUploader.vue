@@ -9,7 +9,7 @@
 
 <script>
 import { ref, uploadBytes } from "firebase/storage";
-import { storage } from "@/firebase/firebaseConfig";
+///////////////////
 
 export default {
   data() {
