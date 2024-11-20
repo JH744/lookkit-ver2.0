@@ -5,42 +5,45 @@
   </section>
 
   <div class="inquiry-form">
-    <div class="form-title">
-      <form @submit.prevent="submitForm" enctype="multipart/form-data">
+    <form @submit.prevent="submitForm" enctype="multipart/form-data">
+      <div class="form-title">
         <div class="inquiry-inline">
           <p class="inquiry-content-title">문의 제목</p>
           <p class="error-message" v-if="titleError">문의명을 입력해주세요</p>
         </div>
         <input type="text" v-model="formData.title" class="input-title" placeholder="문의명을 입력하세요" required />
-      </form>
-    </div>
-    <div class="form-content">
-      <div class="inquiry-inline">
-        <p class="inquiry-content-title">문의 내용</p>
-        <p class="error-message" v-if="contentError">내용을 입력해 주세요</p>
-      </div>
-      <textarea v-model="formData.content" class="input-content" placeholder="문의 내용은 2,000자 이내로 입력하세요" required></textarea>
-    </div>
-    <div class="image-upload">
-      <!-- 각 개별 이미지 업로드 영역 -->
-      <div v-for="(image, index) in imagePreview" :key="index" class="image-placeholder" @click="selectSingleFile(index)">
-        <input :ref="el => fileInputs[index] = el" style="display:none;" type="file" accept="image/*" @change="event => handleSingleFileChange(event, index)" />
-        <div v-if="!image" class="plus-text">+</div>
-        <img v-else :src="image" />
       </div>
 
-      <!-- 다중 파일 업로드 버튼 -->
-      <div class="upload-button" @click="triggerFileInput">
-        <input type="file" ref="multipleFileInput" style="display:none;" accept="image/*" multiple @change="handleMultipleFileChange" />
-        <img class="upload-icon" src="/images/add_img.png">
-        <span class="upload-text">여러장 선택하기</span>
+      <div class="form-content">
+        <div class="inquiry-inline">
+          <p class="inquiry-content-title">문의 내용</p>
+          <p class="error-message" v-if="contentError">내용을 입력해 주세요</p>
+        </div>
+        <textarea v-model="formData.content" class="input-content" placeholder="문의 내용은 2,000자 이내로 입력하세요" required></textarea>
       </div>
-    </div>
 
-    <div class="button-group">
-      <div class="btn-submit" @click="submitForm">등록하기</div>
-      <div class="btn-cancel" @click="cancelForm">취소하기</div>
-    </div>
+      <div class="image-upload">
+        <!-- 각 개별 이미지 업로드 영역 -->
+        <div v-for="(image, index) in imagePreview" :key="index" class="image-placeholder" @click="selectSingleFile(index)">
+          <input :ref="el => fileInputs[index] = el" style="display:none;" type="file" accept="image/*" @change="event => handleSingleFileChange(event, index)" />
+          <div v-if="!image" class="plus-text">+</div>
+          <img v-else :src="image" />
+        </div>
+
+        <!-- 다중 파일 업로드 버튼 -->
+        <div class="upload-button" @click="triggerFileInput">
+          <input type="file" ref="multipleFileInput" style="display:none;" accept="image/*" multiple @change="handleMultipleFileChange" />
+          <img class="upload-icon" src="/images/add_img.png">
+          <span class="upload-text">여러장 선택하기</span>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn-submit">등록하기</button>
+        <div class="btn-cancel" @click="cancelForm">취소하기</div>
+      </div>
+    </form>
+
     <div class="notice">
       <div class="notice-icon-block">
         <p class="notice-icon">!</p>
@@ -60,7 +63,11 @@
 import { ref, reactive } from 'vue';
 import axios from 'axios';
 import router from '@/router';
+import { useAuthStore } from '@/stores/authStore';
+import { ref as firebaseRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 
+const authStore = useAuthStore();
 const formData = reactive({
   title: '',
   content: '',
@@ -72,10 +79,10 @@ const contentError = ref(false);
 
 // 단일 파일 업로드 영역
 const fileInputs = ref([]);
-//다중 파일 업로드 영역
+// 다중 파일 업로드 영역
 const multipleFileInput = ref(null);
-//미리보기 영역
-const imagePreview = ref([null,null,null]);
+// 미리보기 영역
+const imagePreview = ref([null, null, null]);
 
 // 단일 파일 업로드 선택 트리거
 const selectSingleFile = (index) => {
@@ -95,9 +102,7 @@ const triggerFileInput = () => {
 // 단일 파일 변경 처리
 const handleSingleFileChange = (event, index) => {
   const file = event.target.files[0];
-
   if (!file) return;
-
   formData.imageFile[index] = file; // 파일 객체 저장
   imagePreview.value[index] = URL.createObjectURL(file); // 미리보기 URL 저장
 };
@@ -105,18 +110,12 @@ const handleSingleFileChange = (event, index) => {
 // 여러 파일 변경 처리
 const handleMultipleFileChange = (event) => {
   const files = Array.from(event.target.files);
-
-  // 이미지 최대 개수 검사
   if (files.length > 3) {
     alert('사진은 최대 3개까지만 업로드 가능합니다.');
     return;
   }
-
-  // 기존 파일 및 미리보기 초기화
   formData.imageFile = [];
   imagePreview.value = [null, null, null];
-
-  // 새로 선택한 파일로 업데이트
   files.forEach((file, index) => {
     if (index < 3) {
       formData.imageFile[index] = file;
@@ -130,48 +129,62 @@ const submitForm = async () => {
   contentError.value = !formData.content;
 
   if (!titleError.value && !contentError.value) {
-    console.log('Form Submitted:', formData);
-    
-    const formDataToSend = new FormData();
-     // JSON 데이터로 변경
-     const requestPayload = {
-      userId: 5,
-      inquiryTitle: formData.title,
-      inquiryContents: formData.content
-    };
-    formDataToSend.append('request', new Blob([JSON.stringify(requestPayload)], { type: 'application/json' }));
+    try {
+      const imageUrls = await uploadImagesToFirebase();
 
-     // 파일이 있는 경우에만 추가
-     if (formData.imageFile && formData.imageFile.length > 0) {
-        formData.imageFile.forEach((file) => {
-          formDataToSend.append('files', file);
-        });
-      }
+      const requestPayload = {
+        userId: authStore.user.userId,
+        inquiryTitle: formData.title,
+        inquiryContents: formData.content,
+        imageUrls // 업로드된 이미지의 URL 리스트 추가
+      };
 
-      try {
-        const response = await axios.post('http://localhost:8081/api/mypage/inquiry', formDataToSend, {
-          headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-        });
-        router.push({
-          name: 'InquiryDetail',
-          params: {inquiryId: response.data.data.inquiryId}
-        })
+      const response = await axios.post('http://localhost:8081/api/mypage/inquiry', requestPayload);
+      router.push({
+        name: 'InquiryDetail',
+        params: { inquiryId: response.data.data.inquiryId }
+      });
 
-        console.log(response.data.data);
-      } catch (error) {
-        console.error('Error loading inquiries:', error);
-      }
-  };
+    } catch (error) {
+      console.log('문의 등록 중 오류:', error);
+    }
   }
+};
+
+// Firebase에 이미지들을 업로드하는 함수
+const uploadImagesToFirebase = async () => {
+  const urls = [];
+  for (let i = 0; i < formData.imageFile.length; i++) {
+    if (formData.imageFile[i]) {
+      const file = formData.imageFile[i];
+      const uniqueName = `${Date.now()}-${file.name}`; // 고유한 파일 이름 생성
+      const storageRef = firebaseRef(firebaseStorage, `uploads/inquiry/${uniqueName}`);
+      console.log(">>>?????",storageRef);
+      try {
+        if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+          throw new Error(`파일 ${file.name}이 5MB를 초과합니다`);
+        }
+        
+        console.log("업로드 시작:", file.name);
+        const snapshot = await uploadBytes(storageRef, file);
+        console.log("업로드 완료:", snapshot);
+
+        const url = await getDownloadURL(storageRef);
+        console.log("저장 url 확인 : ",url);
+        urls.push(url); // 업로드된 이미지의 URL을 리스트에 추가합니다.
+      } catch (error) {
+        console.error(`Error uploading image ${file.name}:`, error);
+      }
+    }
+  }
+  return urls; // 업로드된 이미지의 URL 리스트 반환
+};
 
 const cancelForm = () => {
   history.back();
 };
-
-
 </script>
+
 
 <style scoped>
 .section-inquiries {

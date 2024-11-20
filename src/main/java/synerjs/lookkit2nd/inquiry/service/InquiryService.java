@@ -31,6 +31,7 @@ public class InquiryService {
     private final InquiryRepository inqRepository;
     private final InquiryImageRepository imgRepository;
 
+
     // 사용자의 문의 리스트
     @Transactional(readOnly = true)
     public List<InquiryResponseDTO> getUserInquiries(Long userId) {
@@ -44,7 +45,7 @@ public class InquiryService {
     @Transactional(readOnly = true)
     public InquiryResponseDTO getInquiryDetail(Long inquiryId) {
         Inquiry inquiry = inqRepository.findById(inquiryId)
-                .orElseThrow(() -> new RuntimeException("Inquiry not found"));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.INQUIRY_NOT_FOUNT));
 
         List<InquiryImageDTO> inquiryImages = imgRepository.findInquiryByIdWithImage(inquiryId)
                 .stream()
@@ -55,31 +56,27 @@ public class InquiryService {
     }
 
     // 문의하기
-    public InquiryResponseDTO createInquiry(InquiryRequestDTO request, List<MultipartFile> files) throws IOException {
-        // Inquiry Entity 변환 및 저장
-        Inquiry inquiry = request.toEntity();
-        inqRepository.save(inquiry);
+    public InquiryResponseDTO createInquiry(InquiryRequestDTO request) throws IOException {
 
+        // Inquiry Entity 변환 및 저장
+        Inquiry inquiry = Inquiry.builder()
+                .userId(request.getUserId())
+                .inquiryTitle(request.getInquiryTitle())
+                .inquiryContents(request.getInquiryContents())
+                .build();
+        Inquiry savedInquiry =  inqRepository.save(inquiry);
 
         List<InquiryImageDTO> imagesToSave = new ArrayList<>();
 
-        // 이미지가 있는 경우, 이미지 저장 및 정보 DB 저장
-        if (files != null && !files.isEmpty()) {
-            for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    String savedFileName = FileUtil.saveFile(file);
-                    String imagePath = "/upload/inquiry/" + savedFileName;
-
-                    // 이미지 정보 DB 저장
-                    InquiryImage saveImg = InquiryImage.builder()
-                            .inquiryId(inquiry.getInquiryId())
-                            .imagePath(imagePath)
-                            .build();
-                    imgRepository.save(saveImg);
-
-                    // DTO 리스트에 추가
-                    imagesToSave.add(InquiryImageDTO.fromEntity(saveImg));
-                }
+        // 이미지 정보 저장 (매핑 없이 inquiryId를 통해 이미지와 연결)
+        if (request.getImageUrls() != null) {
+            for (String imageUrl : request.getImageUrls()) {
+                InquiryImage image = InquiryImage.builder()
+                        .inquiryId(savedInquiry.getInquiryId())
+                        .imagePath(imageUrl)
+                        .build();
+                imgRepository.save(image);
+                imagesToSave.add(InquiryImageDTO.fromEntity(image));
             }
         }
         return InquiryResponseDTO.fromEntity(inquiry, imagesToSave);

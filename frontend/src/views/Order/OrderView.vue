@@ -51,53 +51,64 @@
       <!-- Cart에서 저장된 selectedItems 출력 -->
       <div v-if="orderStore.selectedItems.length > 0">
         <div v-for="item in orderStore.selectedItems" :key="item.itemId" class="item-description">
-          <!-- 썸네일 이미지 -->
-          <img class="item-thumbnail" :src="`/images/product/0${item.itemId}/${item.itemId}_thumbnail.webp`" alt="썸네일" />
-
-          <!-- 상품 정보 -->
-          <div class="item-description2">  
-            <div v-if="item.type === 'product' && item.brandName" class="brand-name">
-              {{ item.brandName }}
-            </div>
-            <div class="product-name"> {{ item.itemName }} </div>
+          <img class="item-thumbnail" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="썸네일" />
+          <div class="item-description2">
+     
+           <div v-if="item.type === 'product' && item.brandName" class="brand-name">
+        {{ item.brandName }}
+           </div>
+           <div v-if="item.type === 'product'" class="product-name">{{ item.itemName }}</div>
+    
+           <div v-else-if="item.type === 'codi'" class="product-name">{{ item.itemName }}</div>
+           </div>
+    
+           <div v-if="item.type === 'product'" class="product-variant">
+      {{ item.quantity }}개
+           </div>
+    
+    
+           <div v-else-if="item.type === 'codi'" class="product-variant">
+      대여일 {{ item.startDate }} ~ 반납일 {{ item.endDate }}
+      <div class="rental-period">대여기간 {{ calculateRentalDays(item.startDate, item.endDate) }}일</div>
+           </div>
+           <div class="price">
+           <div class="item-price">{{ formatPrice(item.totalPrice) }}원</div>
+           <div v-if="item.type === 'product' || item.type === 'codi'" class="adjusted-price">
+             {{ formatPrice(calculateAdjustedPrice(item)) }}원
+           </div>
           </div>
-
-          <!-- 수량 또는 대여일 -->
-          <div v-if="item.type === 'product'" class="product-variant">
-            {{ item.quantity }}개
-          </div>
-          <div v-else-if="item.type === 'codi'" class="product-variant">
-            대여일 {{ item.startDate }} ~ 반납일 {{ item.endDate }}
-          </div>
-
-          <!-- 가격 -->
-          <div class="item-price">{{ formatPrice(item.totalPrice) }}원</div>
         </div>
       </div>
 
 
       <!-- 단일 상품 정보 출력 -->
       <div v-else-if="orderItem">
-      <div v-if="orderItem.quantity">
       <!-- Product 정보 -->
+      <div v-if="orderItem.type === 'product'">
         <div class="item-description">    
-         <img class="item-thumbnail" :src="`/images/product/0${orderItem.itemId}/${orderItem.itemId}_thumbnail.webp`" alt="썸네일" />
+          <img class="item-thumbnail" :src="orderItem.thumbnailUrl || '/images/placeholder.png'" alt="썸네일" />
          <div class="item-description2">  
            <div class="brand-name"> {{ orderItem.brandName }}</div>
            <div class="product-name"> {{ orderItem.itemName }}</div>
          </div>
          <div class="product-variant"> {{ orderItem.quantity }}개</div>
-         <div class="item-price"> {{ orderItem.totalPrice }}원</div>
+         <div class="price">
+         <div class="item-price"> {{ formatPrice(orderItem.price) }}원</div>
+         <div class="adjusted-price"> {{ formatPrice(orderItem.totalPrice) }}원</div>
+         </div>
         </div>
       </div>  
-      <div v-else>
       <!-- Codi 정보 -->
+      <div v-else-if="orderItem.type === 'codi'">
         <div class="item-description">
-          <img class="item-thumbnail" :src="`/images/codi/0${orderItem.itemId}/${orderItem.itemId}_thumbnail.webp`" alt="썸네일" />
+          <img class="item-thumbnail" :src="orderItem.thumbnailUrl || '/images/placeholder.png'" alt="썸네일" />
           <div class="product-name"> {{ orderItem.itemName }}</div>
           <div class="product-variant">대여일 {{ orderItem.startDate }} ~반납일 {{ orderItem.endDate }}</div>
           <div class="product-variant2">대여기간 {{ rentalDays }}일</div>
-          <div class="item-price"> {{ orderItem.price }}원</div>
+          <div class="price">
+          <div class="item-price"> {{ formatPrice(orderItem.price) }}원</div>
+          <div class="adjusted-price"> {{ formatPrice(orderItem.totalprice) }}원</div>
+          </div>
         </div>
       </div>
     </div>
@@ -136,14 +147,99 @@
 </template>
 
 <script setup>
-
 import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import "@/assets/styles/order.css";
-import { useOrderStore } from '@/store/orderStore';
+import { useOrderStore } from '@/stores/orderStore';
 import AddAddressView from '@/views/Order/AddAddressView.vue';
+import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
+import { storage } from "@/firebase/firebaseConfig";
+import { useAuthStore } from "@/stores/authStore";
+
+const authStore = useAuthStore();
+const userId = authStore.user?.userId;
+
+const orderStore = useOrderStore();
+const orderItem = ref(null);
+const route = useRoute();
+
+  // Firebase에서 이미지 불러오기
+  const fetchImageForItem = async (item) => {
+  let storagePath;
+  if (item.type === 'codi') {
+    storagePath = `lookkit/codi/0${item.itemId}/${item.itemId}_thumbnail.webp`;
+  } else if (item.type === 'product') {
+    storagePath = `lookkit/products/0${item.itemId}/${item.itemId}_thumbnail.webp`;
+  }
+
+  console.log('이미지 경로 확인:', storagePath);
+  try {
+    const imageRef = firebaseRef(storage, storagePath);
+    const url = await getDownloadURL(imageRef);
+    item.thumbnailUrl = url;
+  } catch (error) {
+    console.error(`이미지 가져오기 실패: ${storagePath}`, error);
+    item.thumbnailUrl = '/images/placeholder.png';
+  }
+};
 
 
+
+// 주문 페이지로 넘어온 단일 상품 정보 (URL에서 가져온 파라미터로 설정)
+onMounted(async () => {
+  const params = route.query;
+  if (params.itemId) {
+    orderItem.value = {
+      itemId: params.itemId,
+      itemName: params.itemName,
+      brandName: params.brandName,
+      quantity: parseInt(params.quantity, 10) || 1,
+      startDate: params.startDate,
+      endDate: params.endDate,
+      price: parseInt(params.price, 10),
+      totalPrice: parseInt(params.totalPrice, 10),
+      type: params.itemType || 'product',
+    };
+    // 이미지 URL 설정
+    await fetchImageForItem(orderItem.value);
+  }
+
+  // Firebase에서 이미지 불러오기 (Cart에서 가져온 selectedItems)
+  for (const item of orderStore.selectedItems) {
+    await fetchImageForItem(item);
+  }
+});
+
+// 최종 가격을 계산하는 함수
+const calculateAdjustedPrice = (item) => {
+  if (item.type === 'product') {
+    // product 타입일 경우 수량에 따른 가격 계산
+    return item.totalPrice * (item.quantity || 1);
+  } else if (item.type === 'codi') {
+    // codi 타입일 경우 대여 기간에 따른 가격 계산
+    const rentalDays = calculateRentalDays(item.startDate, item.endDate);
+    const basePrice = item.totalPrice;
+
+    // 기본 대여 기간(예: 3일)을 초과하는 경우 추가 요금 계산
+    const additionalDays = rentalDays > 3 ? rentalDays - 3 : 0;
+    const additionalFee = additionalDays * 10000; // 예를 들어 추가 요금이 하루에 10000원이라고 가정
+    return basePrice + additionalFee;
+  }
+  return item.totalPrice;
+};
+
+// 대여기간을 계산하는 함수
+const calculateRentalDays = (startDate, endDate) => {
+  if (!startDate || !endDate) return 0;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  // 대여일 계산: 밀리초 단위의 차이를 일 수로 변환
+  const diffTime = end - start;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays > 0 ? diffDays : 0; // 음수일 경우 0으로 반환
+};
 const buyerAddressName = ref('');
 const buyerRecipientName = ref('');
 const buyerPhoneNumber = ref('');
@@ -165,7 +261,6 @@ const agreements = ref([
   { text: '위 주문 내용을 확인하였으며, 결제에 모두 동의합니다', checked: false }
 ]);
 
-const orderStore = useOrderStore();
 
 onMounted(async () => {
   await nextTick();
@@ -186,8 +281,7 @@ onBeforeUnmount(() => {99/
   localStorage.removeItem('orderStore'); // 로컬 스토리지에서도 데이터 삭제
 });
 
-const orderItem = ref(null);
-const route = useRoute();
+
 
 //----------------------------------------------------
 // orderItem.value = route.params.orderItem;
@@ -338,7 +432,7 @@ onMounted(() => {
 });
 
 
-
+const router = useRouter();
 const processPayment = () => {
   if (!selectedPaymentMethod.value) {
     alert('결제 수단을 선택해주세요.');
@@ -379,25 +473,54 @@ const processPayment = () => {
       alert("결제가 완료되었습니다.\n고유ID: " + rsp.imp_uid);
 
       // 주문 상세 정보 수집
-      const orderDetails = orderStore.selectedItems.map(item => ({
-        productId: item.type === 'product' ? item.itemId : null, // 단일 상품 ID
-        codiId: item.type === 'codi' ? item.itemId : null, // 코디 상품 ID
-        quantity: item.type === 'product' ? item.quantity : 1, // 수량 (상품의 경우 지정, 코디는 1로 설정)
-        rentalStartDate: item.type === 'codi' ? item.startDate : null, // 대여 시작일 (코디에 해당)
-        rentalEndDate: item.type === 'codi' ? item.endDate : null, // 대여 종료일 (코디에 해당)
-        productPrice: item.price // 상품 또는 대여 가격
-      }));
+      // const orderDetails = orderStore.selectedItems.map(item => ({
+      //   productId: item.type === 'product' ? item.itemId : null, // 단일 상품 ID
+      //   codiId: item.type === 'codi' ? item.itemId : null, // 코디 상품 ID
+      //   quantity: item.type === 'product' ? item.quantity : 1, // 수량 (상품의 경우 지정, 코디는 1로 설정)
+      //   rentalStartDate: item.type === 'codi' ? item.startDate : null, // 대여 시작일 (코디에 해당)
+      //   rentalEndDate: item.type === 'codi' ? item.endDate : null, // 대여 종료일 (코디에 해당)
+      //   productPrice: item.price // 상품 또는 대여 가격
+      // }));
 
-      const paymentData = {
-        userId: 1, // 실제 유저 ID를 사용해야 합니다.
-        totalAmount: totalPrice.value,
-        orderAddress: buyerAddr,
-        orderAddressee: buyerName,
-        orderPhone: buyerTel,
-        orderComment: selectedMemo.value,
-        orderStatus: "결제완료",
-        orderDetails: orderDetails
-      };
+// 주문 상세 정보 수집
+let orderDetails = [];
+
+// 장바구니에 있는 상품들 추가
+if (orderStore.selectedItems.length > 0) {
+  orderDetails = orderStore.selectedItems.map(item => ({
+    productId: item.type === 'product' ? item.itemId : null, // 단일 상품 ID
+    codiId: item.type === 'codi' ? item.itemId : null, // 코디 상품 ID
+    quantity: item.type === 'product' ? item.quantity : 1, // 수량 (상품의 경우 지정, 코디는 1로 설정)
+    rentalStartDate: item.type === 'codi' ? item.startDate : null, // 대여 시작일 (코디에 해당)
+    rentalEndDate: item.type === 'codi' ? item.endDate : null, // 대여 종료일 (코디에 해당)
+    productPrice: item.totalPrice // 상품 또는 대여 가격
+  }));
+}
+
+// 단일 주문이 있는 경우 추가
+if (orderItem.value) {
+  orderDetails.push({
+    productId: orderItem.value.type === 'product' ? orderItem.value.itemId : null, // 단일 상품 ID
+    codiId: orderItem.value.type === 'codi' ? orderItem.value.itemId : null, // 코디 상품 ID
+    quantity: orderItem.value.type === 'product' ? orderItem.value.quantity : 1, // 수량 (상품의 경우 지정, 코디는 1로 설정)
+    rentalStartDate: orderItem.value.type === 'codi' ? orderItem.value.startDate : null, // 대여 시작일 (코디에 해당)
+    rentalEndDate: orderItem.value.type === 'codi' ? orderItem.value.endDate : null, // 대여 종료일 (코디에 해당)
+    productPrice: orderItem.value.totalPrice // 상품 또는 대여 가격
+  });
+}
+
+// 최종 paymentData 생성
+const paymentData = {
+  userId: userId, // 실제 유저 ID를 사용해야 합니다.
+  totalAmount: totalPrice.value,
+  orderAddress: buyerAddr,
+  orderAddressee: buyerName,
+  orderPhone: buyerTel,
+  orderComment: selectedMemo.value,
+  orderStatus: "결제완료",
+  orderDetails: orderDetails
+};
+
 
       // 주문 정보를 서버로 전송
 fetch("http://localhost:8081/api/order/complete", {
@@ -414,13 +537,21 @@ fetch("http://localhost:8081/api/order/complete", {
     return;
   }
 
+  
+  console.log("주문 완료 페이지로 이동, orderId:", orderId);
   // Vue 라우터를 사용해 주문 완료 페이지로 이동합니다.
+  if(router) {
   router.push({
     path: '/order/orderComplete',
     query: { orderId: orderId }
   });
+} else {
+  console.error("Router 객체가 정의되지 않았습니다.");
+
+}
 })
-.catch(() => {
+.catch((error) => {
+  console.error("결제 실패 또는 서버 문제:", error);
   alert("결제를 완료하는 데 실패했습니다.");
 });
 
@@ -446,4 +577,40 @@ fetch("http://localhost:8081/api/order/complete", {
   const updateAddress = (newAddress) => {
     address.value = newAddress;
   };
+
+  
+
+// onMounted(async () => {
+//   try {
+//     const jwtToken = authStore.jwt;
+
+//     // JWT 토큰을 이용해 API 요청 보내기
+//     const response = await fetch('http://localhost:8081/api/user/address', {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${jwtToken}` // JWT 토큰을 헤더에 포함
+//       }
+//     });
+
+//     if (!response.ok) {
+//       throw new Error('배송지 정보를 불러오는 데 문제가 발생했습니다.');
+//     }
+
+//     const data = await response.json();
+//     console.error('')
+
+//     // 받은 주소 데이터를 Vue ref에 설정
+//     address.value = {
+//       addressName: data.addressName,
+//       recipientName: data.recipientName,
+//       phoneNumber: data.phoneNumber,
+//       fullAddress: data.fullAddress
+//     };
+
+//   } catch (error) {
+//     console.error('배송지 정보를 불러오는 데 실패했습니다:', error);
+//     alert('배송지 정보를 불러오는 데 실패했습니다.');
+//   }
+// });
 </script>

@@ -66,7 +66,7 @@ position: relative;
 .order-info {
 width: 1000px;
 height: 1284.84px;
-position: absolute;
+
 }
 .order-header {
 width: 100%;
@@ -74,7 +74,7 @@ display: flex;
 flex-direction: column;
 align-items: flex-start;
 justify-content: flex-start;
-position: absolute;
+padding: 10px 0px;
 }
 .heading {
 padding: 100px 300px 19px 400px;
@@ -219,10 +219,7 @@ display: flex;
 flex-direction: column;
 align-items: flex-start;
 justify-content: flex-start;
-position: absolute;
-right: 0px;
-left: 0px;
-top: 356.93px;
+
 }
 .product-header {
 display: flex;
@@ -274,11 +271,11 @@ justify-content: flex-start;
 .product-list {
 margin: 0px 0 0 0;
 border-radius: 0px 0px 3px 3px;
-border-width: 0px 1.5px 1.5px 1.5px;
+border-width: 0px 1.5px 20px 1.5px;
 padding: 0px 1.5px 1.5px 1.5px;
 display: flex;
 flex-direction: column;
-gap: 0px;
+gap: 20px;
 align-items: flex-start;
 justify-content: flex-start;
 align-self: stretch;
@@ -287,21 +284,10 @@ position: relative;
 }
 .product-item {
 align-self: stretch;
-flex-shrink: 0;
-height: 150px;
-position: relative;
+
 }
 .product-price {
-padding: 0px 0px 1.99px 0px;
-display: flex;
-flex-direction: column;
-gap: 0px;
-align-items: flex-start;
-justify-content: flex-start;
-width: 128.99px;
-position: absolute;
-left: 900px;
-top: 63.01px;
+
 }
 .price-amount {
 color: #101010;
@@ -316,15 +302,9 @@ align-items: center;
 justify-content: flex-start;
 }
 .product-details-wrapper {
-display: flex;
-flex-direction: column;
-gap: 0px;
-align-items: flex-start;
-justify-content: flex-start;
-position: absolute;
-right: 171.98px;
-left: 42.97999954223633px;
-top: calc(50% - 51px);
+  display: flex;
+    flex-direction: row;
+    gap: 27%;
 }
 .product-image-wrapper {
 padding: 0px 0.01px 0px 76.99px;
@@ -397,6 +377,19 @@ display: flex;
 align-items: center;
 justify-content: flex-start;
 }
+.product-rental-dates {
+  color: #767676;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 13.5625px;
+  line-height: 20px;
+  font-weight: 400;
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  }
 .product-variant {
 color: #7b7b7b;
 text-align: left;
@@ -418,10 +411,7 @@ flex-direction: column;
 gap: 13.99px;
 align-items: flex-start;
 justify-content: flex-start;
-position: absolute;
-right: 0px;
-left: 0px;
-top: 635.42px;
+padding: 10px 0px;
 }
 
 .shipping-header {
@@ -538,15 +528,22 @@ display: flex;
 flex-direction: row;
 gap: 20%;
 width: 100%;
-position: absolute;
-top: 965.35px;
 justify-content: space-between;
 }
 
 .payment-header {
-  flex-shrink: 0;
-  border-top: 1px solid #101010;
-  padding: 20.5px 5px 21.5px 5px;
+  border-top: 1px solid;
+
+border-width: 1.5px 0px 0px 0px;
+padding: 20.5px 5px 20px 5px;
+display: flex;
+flex-direction: column;
+gap: 0px;
+align-items: flex-start;
+justify-content: flex-start;
+align-self: stretch;
+flex-shrink: 0;
+position: relative;
 }
 
 .payment-info-title {
@@ -629,7 +626,7 @@ position: relative;
 }
 
 .final-payment-header {
-border-style: solid;
+border-top: 1px solid;
 border-color: #101010;
 border-width: 1.5px 0px 0px 0px;
 padding: 20.5px 5px 20px 5px;
@@ -659,10 +656,6 @@ justify-content: flex-start;
 
 .final-payment-border {
 display: flex;
-flex-direction: column;
-gap: 10px;
-flex-shrink: 0;
-position: relative;
 }
 
 .final-payment-table {

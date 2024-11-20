@@ -25,18 +25,24 @@
         </div>
         <div class="product-list">
           <div v-for="item in orderItems" :key="item.orderItemId" class="product-item">
-            <div class="product-price">
-              <div class="price-amount">{{ formatPrice(item.productPrice) }}원</div>
-            </div>
+            
             <div class="product-details-wrapper">
-              <div class="product-image-wrapper">
-                <img class="product-image" :src="getImageUrl(item)" alt="상품 이미지" />
-              </div>
+              
+                <img class="product-image" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="상품 이미지" />
+              
               <div class="product-description">
                 <div class="product-brand-name">{{ item.brandName }}</div>
                 <div class="product-name">{{ item.productName }}</div>
+                <div v-if="item.rentalStartDate && item.rentalEndDate" class="product-rental-dates">
+                  대여일 {{ item.rentalStartDate }} ~ 반납일 {{ item.rentalEndDate }}
+                </div>
                 <div class="product-variant">{{ item.quantity }}개</div>
               </div>
+              <div class="product-price">
+                <div class="price-amount">{{ formatPrice(item.productPrice) }}원</div>
+              </div>
+              
+              
             </div>
           </div>
         </div>
@@ -86,7 +92,12 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import "@/assets/styles/orderComplete.css";
+import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
+import { storage } from "@/firebase/firebaseConfig";
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
+const userId = authStore.user?.userId;
 const route = useRoute();
 const router = useRouter();
 
@@ -104,6 +115,7 @@ const fetchOrderData = async () => {
     return;
   }
 
+  console.log("Order ID from query:", orderIdFromParams);
   orderId.value = orderIdFromParams;
 
   try {
@@ -124,12 +136,16 @@ const fetchOrderData = async () => {
         orderItemId: item.orderItemId,
         productId: item.productId,
         codiId: item.codiId,
-        productName: item.productId ? "상품명 불러오기 필요" : "코디 이름 불러오기 필요", 
+        productName: item.productName, 
+        brandName: item.brandName,
         quantity: item.quantity,
         rentalStartDate: item.rentalStartDate,
         rentalEndDate: item.rentalEndDate,
-        productPrice: item.productPrice || 10000 // 예시용 가격 또는 실제 데이터 사용
+        productPrice: item.productPrice  
       }));
+      for (let i = 0; i < orderItems.value.length; i++) {
+        await fetchImageForItem(orderItems.value[i]);
+      }
     }
 
     shippingInfo.value = {
@@ -148,14 +164,26 @@ const formatPrice = (price) => {
   return price ? price.toLocaleString() : '0';
 };
 
-const getImageUrl = (item) => {
+// Firebase에서 이미지 불러오기
+const fetchImageForItem = async (item) => {
+  let storagePath;
   if (item.productId) {
-    return `/images/products/0${item.productId}/${item.productId}_thumbnail.webp`;
+    storagePath = `lookkit/products/0${item.productId}/${item.productId}_thumbnail.webp`;
   } else if (item.codiId) {
-    return `/images/codis/0${item.codiId}/${item.codiId}_thumbnail.webp`;
+    storagePath = `lookkit/codi/0${item.codiId}/${item.codiId}_thumbnail.webp`;
   }
-  return ''; // 이미지가 없는 경우 빈 문자열 반환
+
+  console.log('이미지 경로 확인:', storagePath);
+  try {
+    const imageRef = firebaseRef(storage, storagePath);
+    const url = await getDownloadURL(imageRef);
+    item.thumbnailUrl = url;
+  } catch (error) {
+    console.error(`이미지 가져오기 실패: ${storagePath}`, error);
+    item.thumbnailUrl = null;
+  }
 };
+
 
 const viewOrder = () => {
   router.push('/mypage/manage');

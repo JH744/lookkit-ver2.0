@@ -106,7 +106,7 @@ const routes = [
     component: () => import("@/views/Mypage/UserInfoView.vue"),
   },
   {
-    path: "/mypage",
+    path: "/Mypage",
 
     children: [
       {
