@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+// import UserInfoView from "@/views/UserInfoView.vue";
 
 const routes = [
   {
@@ -73,11 +74,11 @@ const routes = [
       {
         path: "review",
         component: () => import("@/views/Review/ReviewView.vue"),
-        props: route => ({ codiId: route.params.codiId }), 
+        props: (route) => ({ codiId: route.params.codiId }),
       },
     ],
   },
-  
+
   {
     path: "/product/:productId",
     component: () => import("@/views/Product/ProductView.vue"),
@@ -85,7 +86,7 @@ const routes = [
       {
         path: "review",
         component: () => import("@/views/Review/ReviewView.vue"),
-        props: route => ({ productId: route.params.productId }), 
+        props: (route) => ({ productId: route.params.productId }),
       },
     ],
   },
@@ -102,34 +103,38 @@ const routes = [
     component: () => import("@/views/Cart/CartView.vue"),
   },
   {
-    path: "/updateInfo",
-    component: () => import("@/views/mypage/UserInfoView.vue"),
-  },
-  {
     path: "/mypage",
-
+    component: () => import("@/views/Mypage/Mypage.vue"),
     children: [
       {
         path: "manage",
-        component: () => import("@/views/mypage/OrderManagement.vue"),
+        component: () => import("@/views/Mypage/OrderManagement.vue"),
       },
       {
         path: "inquiry",
-        component: () => import("@/views/mypage/inquiry/UserInquiryList.vue"),
+        component: () => import("@/views/Mypage/inquiry/UserInquiryList.vue"),
       },
       {
         path: "inquiry/create",
-        component: () => import("@/views/mypage/inquiry/InquiryForm.vue"),
+        component: () => import("@/views/Mypage/inquiry/InquiryForm.vue"),
       },
       {
         path: "inquiry/:inquiryId",
         name: "InquiryDetail",
-        component: () => import("@/views/mypage/inquiry/InquiryDetail.vue"),
+        component: () => import("@/views/Mypage/inquiry/InquiryDetail.vue"),
         props: true, // URL의 파라미터를 컴포넌트의 props로 전달할 수 있게 함
       },
       {
         path: "wishlist",
-        component: () => import("@/views/mypage/WishList.vue"),
+        component: () => import("@/views/Mypage/WishList.vue"),
+      },
+      {
+        path: "enter-password",
+        component: () => import("@/components/layouts/PwCheckModal.vue"),
+      },
+      {
+        path: "updateInfo",
+        component: () => import("@/views/Mypage/UserInfoView.vue"),
       },
     ],
   },
