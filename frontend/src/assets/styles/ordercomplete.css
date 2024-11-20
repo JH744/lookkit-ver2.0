@@ -288,6 +288,7 @@ align-self: stretch;
 }
 .product-price {
 
+  padding: 30px 0px;
 }
 .price-amount {
 color: #101010;
@@ -304,7 +305,11 @@ justify-content: flex-start;
 .product-details-wrapper {
   display: flex;
     flex-direction: row;
-    gap: 27%;
+    gap: 20%;
+    border: 1px solid #e6e6e6;
+  border-radius: 5px;
+  width: 100%;
+  padding: 20px;
 }
 .product-image-wrapper {
 padding: 0px 0.01px 0px 76.99px;
@@ -337,10 +342,11 @@ flex-shrink: 0;
 width: 76.99px;
 height: 102px;
 position: relative;
-object-fit: cover;
+padding: auto;
+
 }
 .product-description {
-padding: 0.99px 54px 31.45px 14px;
+padding: 20px 0px;
 display: flex;
 flex-direction: column;
 gap: 3px;
@@ -350,9 +356,10 @@ align-self: stretch;
 flex-shrink: 0;
 min-height: 102px;
 position: relative;
+min-width: 350px;
 }
 .product-brand-name {
-color: #000000;
+color: #767676;
 text-align: left;
 font-family: "Inter-Bold", sans-serif;
 font-size: 13.453125px;
@@ -449,7 +456,7 @@ display: flex;
 flex-direction: column;
 gap: 20px;
 width: 100%;
-height: 240px;
+
 flex-shrink: 0;
 max-width: 1359.98px;
 position: relative;
@@ -486,6 +493,7 @@ position: relative;
 display: flex;
 align-items: center;
 justify-content: flex-start;
+min-width: 150px;
 }
 
 .shipping-data {
@@ -504,6 +512,7 @@ position: relative;
 display: flex;
 align-items: center;
 justify-content: flex-start;
+min-width: 200px;
 }
 
 .shipping-memo {
