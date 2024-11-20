@@ -70,7 +70,7 @@
   <div class="bottom-fixed-bar">
     <div class="product-info">
       <img :src="thumbnailUrl" alt="상품 이미지" />
-      <div class="product-description">{{ codi.codiName }}</div>
+      <div class="product-description">{{ codi.codiDescription }}</div>
     </div>
     <div class="selected-rental-summary2">
       <div>

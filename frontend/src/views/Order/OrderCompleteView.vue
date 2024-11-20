@@ -33,6 +33,9 @@
               <div class="product-description">
                 <div class="product-brand-name">{{ item.brandName }}</div>
                 <div class="product-name">{{ item.productName }}</div>
+                <div v-if="item.rentalStartDate && item.rentalEndDate" class="product-rental-dates">
+                  대여일 {{ item.rentalStartDate }} ~ 반납일 {{ item.rentalEndDate }}
+                </div>
                 <div class="product-variant">{{ item.quantity }}개</div>
               </div>
               <div class="product-price">
@@ -164,7 +167,7 @@ const fetchImageForItem = async (item) => {
   if (item.productId) {
     storagePath = `lookkit/products/0${item.productId}/${item.productId}_thumbnail.webp`;
   } else if (item.codiId) {
-    storagePath = `lookkit/codis/0${item.codiId}/${item.codiId}_thumbnail.webp`;
+    storagePath = `lookkit/codi/0${item.codiId}/${item.codiId}_thumbnail.webp`;
   }
 
   console.log('이미지 경로 확인:', storagePath);
