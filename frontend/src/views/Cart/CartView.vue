@@ -1,94 +1,89 @@
 <template>
   <div class="cart-container">
-      <div class="cart-title">
-        <h2>장바구니</h2>
+    <div class="cart-title">
+      <h2>옷장</h2>
+    </div>
+    <div class="tab-section">
+      <div :class="{ active: activeTab === 'coordinate' }" @click="activeTab = 'coordinate'">코디상품</div>
+      <div :class="{ active: activeTab === 'single' }" @click="activeTab = 'single'">단일상품</div>
+    </div>
+    <div class="cart-header">
+      <h3>상품 정보</h3>
+      <div class="cart-actions">
+        <button class="select-delete-button" @click="deleteSelectedItems">
+          <img class="icon-delete" :src="iconDelete" alt="삭제">
+          <span>선택삭제</span>
+        </button>
       </div>
-      <div class="tab-section">
-        <div :class="{ active: activeTab === 'coordinate' }" @click="activeTab = 'coordinate'">코디상품</div>
-        <div :class="{ active: activeTab === 'single' }" @click="activeTab = 'single'">단일상품</div>
+    </div>
+    <!-- 코디 상품 탭 -->
+    <div class="cart-item-list" v-if="activeTab === 'coordinate'">
+      <div v-if="coordinateItems.length === 0">
+        <p>코디상품이 없습니다.</p>
       </div>
-      <div class="cart-header">
-        <h3>상품 정보</h3>
-        <div class="cart-actions">
-          <button class="select-delete-button" @click="deleteSelectedItems">
-            <img class="icon-delete" :src="iconDelete" alt="삭제">
-            <span>선택삭제</span>
-          </button>
+      <div v-for="item in coordinateItems" :key="item.cartId" class="cart-item" :data-cart-id="item.cartId">
+        <div class="item-checkbox">
+          <input type="checkbox" v-model="item.selected" class="checkbox-input" />
         </div>
-      </div>
-      <!-- 코디 상품 탭 -->
-      <div class="cart-item-list">
-      <div v-if="activeTab === 'coordinate'">
-        <div v-if="coordinateItems.length === 0">
-          <p>코디상품이 없습니다.</p>
+        <div class="item-thumbnail">
+          <a :href="`/codi/${item.codiId}`">
+            <img class="thumbnail-img" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="코디 이미지" />
+          </a>
         </div>
-        <div v-for="item in coordinateItems" :key="item.cartId" class="cart-item" :data-cart-id="item.cartId">
-          <div class="item-checkbox">
-            <input type="checkbox" v-model="item.selected" class="checkbox-input" />
-          </div>
-          <div class="item-thumbnail">
-            <a :href="`/codi/${item.codiId}`">
-              <img class="thumbnail-img" :src="`/images/codi/0${item.codiId}/${item.codiId}_thumbnail.webp`" alt="코디 이미지" />
-            </a>
-          </div>
-          <div class="item-description">
-            <div class="product-name">{{ item.codiDescription }}</div>
-          </div>
-          <div class="item-description">
-            <div class="product-variant">
-              대여일 
-              <input type="date" v-model="item.rentalStartDate" @change="updateRentalDate(item, 'start')" />
-              ~ 반납일
-              <input type="date" v-model="item.rentalEndDate" @change="updateRentalDate(item, 'end')" />
-            </div>
-          </div>
-          <div class="item-price-box">
-            <div class="item-price">
-              <strong>{{ formatPrice(getCodiTotalPrice(item)) }}원</strong>
-            </div>
-          </div>
-          <button class="delete-button" @click="deleteItem(item)"><span>삭제</span></button>
+        <div class="item-description">
+          <div class="product-name">{{ item.codiDescription }}</div>
         </div>
-      </div>
-      </div>
-      <!-- 단일 상품 탭 -->
-      <div class="cart-item-list2">
-      <div v-if="activeTab === 'single'">
-        <div v-if="singleItems.length === 0">
-          <p>단일상품이 없습니다.</p>
+        <div class="item-description">
+          <div class="product-variant">
+            대여일 
+            <input type="date" v-model="item.rentalStartDate" @change="updateRentalDate(item, 'start')" />
+            ~ 반납일
+            <input type="date" v-model="item.rentalEndDate" @change="updateRentalDate(item, 'end')" />
+          </div>
         </div>
-        <div v-for="item in singleItems" :key="item.cartId" class="cart-item" :data-cart-id="item.cartId">
-          <div class="item-checkbox">
-            <input type="checkbox" v-model="item.selected" class="checkbox-input" />
+        <div class="item-price-box">
+          <div class="item-price">
+            <strong>{{ formatPrice(getCodiTotalPrice(item)) }}원</strong>
           </div>
-          <div class="item-thumbnail">
-            <a :href="`/product/${item.productId}`">
-              <img class="thumbnail-img" :src="`/images/products/0${item.productId}/${item.productId}_thumbnail.webp`" alt="썸네일" />
-            </a>
-          </div>
-          <div class="item-description">
-            <div class="brand">{{ item.brandName }}</div>
-            <div class="product-name">{{ item.productName }}</div>
-          </div>
-          <div class="item-description">
+        </div>
+        <button class="delete-button" @click="deleteItem(item)"><span>삭제</span></button>
+      </div>
+    </div>
+    <!-- 단일 상품 탭 -->
+    <div class="cart-item-list2" v-if="activeTab === 'single'">
+      <div v-if="singleItems.length === 0">
+        <p>단일상품이 없습니다.</p>
+      </div>
+      <div v-for="item in singleItems" :key="item.cartId" class="cart-item" :data-cart-id="item.cartId">
+        <div class="item-checkbox">
+          <input type="checkbox" v-model="item.selected" class="checkbox-input" />
+        </div>
+        <div class="item-thumbnail">
+          <a :href="`/product/${item.productId}`">
+            <img class="thumbnail-img" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="썸네일" />
+          </a>
+        </div>
+        <div class="item-description">
+          <div class="brand">{{ item.brandName }}</div>
+          <div class="product-name">{{ item.productName }}</div>
+        </div>
+        <div class="item-description">
           <div class="product-variant">
             <select v-model.number="item.quantity" @change="updateItemQuantity(item)" id="quantity" class="quantity-input">
-             <option v-for="n in 10" :key="n" :value="n-1">{{ n-1 }}</option>
+              <option v-for="n in 10" :key="n" :value="n-1">{{ n-1 }}</option>
             </select>
           </div>
-          </div>
-          <div class="item-price-box">
-            <div class="item-price">
-              <strong>{{ formatPrice(getProductTotalPrice(item)) }}원</strong>
-            </div>
-          </div>
-          <button class="delete-button" @click="deleteItem(item)"><span>삭제</span></button>
         </div>
+        <div class="item-price-box">
+          <div class="item-price">
+            <strong>{{ formatPrice(getProductTotalPrice(item)) }}원</strong>
+          </div>
+        </div>
+        <button class="delete-button" @click="deleteItem(item)"><span>삭제</span></button>
       </div>
-      </div>
-
-      <!-- 선택된 상품 섹션 -->
-      <div class="cart-header">
+    </div>
+    <!-- 선택된 상품 섹션 -->
+    <div class="cart-header">
       <h3>선택된 상품</h3>
       </div>
       <div class="selected-items-section">
@@ -98,65 +93,85 @@
     <div v-else v-for="item in selectedItems" :key="item.cartId" class="cart-item selected-item">
       <div class="item-thumbnail">
         <a :href="item.productId ? `/product/${item.productId}` : `/codi/${item.codiId}`">
-          <img class="thumbnail-img"
-               :src="item.productId
-                     ? `/images/products/${item.productId}/${item.productId}_thumbnail.webp`
-                     : `/images/codi/${item.codiId}/${item.codiId}_thumbnail.webp`"
-               alt="상품 이미지" />
+          <img class="thumbnail-img" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="상품 이미지" />
         </a>
       </div>
       <div class="item-description">
         <div class="product-name">{{ item.productName || item.codiDescription }}</div>
       </div>
       <div class="item-description">
-        <div v-if="item.quantity !== null" class="product-variant">{{ item.quantity }}개</div>
-        <div v-else class="product-variant">
-          대여일 {{ item.rentalStartDate }} ~ 반납일 {{ item.rentalEndDate }}
-        </div>
+        <div class="item-description">
+      <div v-if="item.type === 'single'" class="product-variant">
+        <span>{{ item.quantity }}개</span>
       </div>
-      <div class="item-price-box">
-        <div class="item-price">
-          <strong>{{ formatPrice(item.productPrice || item.codiPrice) }}원</strong>
-        </div>
+      <div v-else-if="item.type === 'coordinate'" class="product-variant">
+        대여일: {{ item.rentalStartDate }} ~ 반납일: {{ item.rentalEndDate }}
       </div>
     </div>
-      </div>
-  
-      <!-- 장바구니 요약 및 결제 -->
-      <div class="cart-summary">
-        <div class="summary-header">
-          <h3>최종 결제 예상 금액</h3>
-        </div>
-        <div class="summary-details">
-          <div class="summary-item">
-            <span>최종 결제 예상 금액</span>
-            <strong>{{ formatPrice(totalFinalPrice) }}원</strong>
-          </div>
-        </div>
-        <div class="checkout-button-container">
-          <button class="checkout-button" @click="checkout">
-            <span>총 {{ totalQuantity }}개 / {{ formatPrice(totalFinalPrice) }}원 주문하기</span>
-          </button>
-        </div>
+    <div class="item-price-box">
+      <div class="item-price">
+        <strong>{{ formatPrice(item.type === 'coordinate' ? getCodiTotalPrice(item) : getProductTotalPrice(item)) }}원</strong>
       </div>
     </div>
-  </template>
+    </div>    
+    </div>
+      </div>
+
+    <!-- 장바구니 요약 및 결제 -->
+    <div class="cart-summary">
+      <div class="summary-header">
+        <h3>최종 결제 예상 금액</h3>
+      </div>
+      <div class="summary-details">
+        <div class="summary-item">
+          <span>최종 결제 예상 금액</span>
+          <strong>{{ formatPrice(totalFinalPrice) }}원</strong>
+        </div>
+      </div>
+      <div class="checkout-button-container">
+        <button class="checkout-button" @click="checkout">
+          <span>총 {{ totalQuantity }}개 / {{ formatPrice(totalFinalPrice) }}원 주문하기</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
   
   <script setup>
-  import { ref, computed } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
   import axios from 'axios';
+  import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
+  import { storage } from "@/firebase/firebaseConfig";
   import "@/assets/styles/cart.css";
   import iconDelete from '@/assets/icons/icon-delete.svg';
   import { useOrderStore } from '@/store/orderStore';
   import { useRouter } from 'vue-router';
-  
-
   
   const activeTab = ref('coordinate');
   const coordinateItems = ref([]);
   const singleItems = ref([]);
   const orderStore = useOrderStore();
   
+  // Firebase에서 이미지 불러오기
+const fetchImageForItem = async (item) => {
+  let storagePath;
+  if (item.codiId) {
+    storagePath = `lookkit/codi/0${item.codiId}/${item.codiId}_thumbnail.webp`;
+  } else if (item.productId) {
+    storagePath = `lookkit/products/0${item.productId}/${item.productId}_thumbnail.webp`;
+  }
+
+  console.log('이미지 경로 확인:', storagePath);
+  try {
+    const imageRef = firebaseRef(storage, storagePath);
+    const url = await getDownloadURL(imageRef);
+    item.thumbnailUrl = url;
+  } catch (error) {
+    console.error(`이미지 가져오기 실패: ${storagePath}`, error);
+    item.thumbnailUrl = null;
+  }
+};
+
   // 장바구니 데이터 불러오기
 const fetchCartItems = async () => {
   try {
@@ -164,13 +179,17 @@ const fetchCartItems = async () => {
     const API_BASE_URL = 'http://localhost:8081/api/cart';
     const response = await axios.get(`${API_BASE_URL}/items?userId=${userId}`);
     const items = response.data;
-    items.forEach(item => {
+    for (const item of items) {
       if (item.codiId) {
-        coordinateItems.value.push({ ...item, selected: true, type: 'coordinate' });
-      } else {
-        singleItems.value.push({ ...item, selected: true, type: 'single' });
-      } 
-    });
+        item.type = 'coordinate';
+        await fetchImageForItem(item);
+        coordinateItems.value.push({ ...item, selected: true });
+      } else if (item.productId) {
+        item.type = 'single';
+        await fetchImageForItem(item);
+        singleItems.value.push({ ...item, selected: true });
+      }
+    }
   } catch (error) {
     console.error('장바구니 데이터를 불러오는 데 실패했습니다.', error);
   }
@@ -277,7 +296,8 @@ const fetchCartItems = async () => {
   }
   try {
     const userId = 1; // 실제 userId 사용
-    await axios.post(`/api/cart/update?userId=${userId}`, {
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
+    await axios.post(`${API_BASE_URL}/update?userId=${userId}`, {
       cartId: item.cartId,
       quantity: item.quantity,
     });
@@ -291,7 +311,8 @@ const fetchCartItems = async () => {
   const updateRentalDate = async (item, dateType) => {
   try {
     const userId = 1; // 실제 userId 사용
-    await axios.post(`/api/cart/update?userId=${userId}`, {
+    const API_BASE_URL = 'http://localhost:8081/api/cart';
+    await axios.post(`${API_BASE_URL}/update?userId=${userId}`, {
       cartId: item.cartId,
       rentalStartDate: dateType === 'start' ? item.rentalStartDate : undefined,
       rentalEndDate: dateType === 'end' ? item.rentalEndDate : undefined,
@@ -315,7 +336,7 @@ const fetchCartItems = async () => {
   orderStore.$patch({
   selectedItems: selectedItems.value.map(item => ({
     itemId: item.productId || item.codiId,
-    itemName: item.productName || item.codiName,
+    itemName: item.productName || item.codiDescription,
     brandName: item.brandName || '',
     type: item.type,
     quantity: item.quantity || 1,
