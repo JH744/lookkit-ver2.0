@@ -50,7 +50,7 @@
 
         <div class="navIcon">
           <!-- 비로그인시 로그인버튼 노출-->
-          <div id="LoginBtn" class="iconBtn">
+          <div id="LoginBtn" class="iconBtn" v-if="!authStore.isLoggedIn">
             <router-link to="/auth/login" class="btn-a">
               <img
                 src="@/assets/icons/login.png"
@@ -62,17 +62,16 @@
             </router-link>
           </div>
           <!-- 로그인시 로그아웃버튼 노출-->
-          <!-- <div id="LogoutBtn" class="iconBtn" sec:authorize="isAuthenticated()">
-            <a th:href="@{/logout}" class="btn-a">
+          <div id="LogoutBtn" class="iconBtn" v-if="authStore.isLoggedIn">
+            <div class="btn-a logout-btn" @click="logout">
               <img
                 src="@/assets/icons/logout.png"
                 class="simptip-position-top"
-                data-tooltip="Logout"
                 width="26px"
               />
               <p class="btn-text">LOG OUT</p>
-            </a>
-          </div> -->
+            </div>
+          </div>
           <div class="iconBtn">
             <router-link to="/mypage/manage" class="btn-a">
               <img
@@ -103,9 +102,12 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import axios from "axios";
+
+const authStore = useAuthStore();
 const router = useRouter();
 const inputKeyword = ref("");
-
 
 const goToSearch = () => {
   let keyword = inputKeyword.value;
@@ -113,6 +115,23 @@ const goToSearch = () => {
   router.push(`/main/search?keyword=${keyword}`);
 };
 
+const logout = async () => {
+  try {
+    //로그아웃-서버
+    await axios.post("http://localhost:8081/api/auth/logout", null, {
+      withCredentials: true, // 쿠키 전송 허용
+    });
+
+    //로그아웃-프론트
+    // document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";프론트단에서 세션 무효화
+    authStore.clearAuthData();
+    localStorage.removeItem("auth");
+    // 로그아웃 후 리다이렉트
+    router.push("/auth/login");
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
+  }
+};
 </script>
 
 <style scoped>
@@ -212,7 +231,7 @@ const goToSearch = () => {
   width: fit-content;
 }
 
-.LogoutBtn {
+#LogoutBtn {
   cursor: pointer;
 }
 

@@ -7,7 +7,7 @@
 
   <div class="formContainer2">
     <input class="formInput" placeholder="인증번호 입력" v-model="inputCode" />
-    <div style="margin: 15px">
+    <div style="margin: 15px" class="verificationNotice-box">
       <span class="verificationNotice"
         >*3분 이내로 인증번호 6자리를 입력해주세요.</span
       >
@@ -55,7 +55,7 @@ const verifyCode = () => {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   align-self: stretch;
   flex-shrink: 0;
@@ -152,5 +152,9 @@ const verifyCode = () => {
 .error-text {
   color: #ff294f;
   font-size: 14px;
+}
+
+.verificationNotice-box {
+  text-align: end !important;
 }
 </style>
