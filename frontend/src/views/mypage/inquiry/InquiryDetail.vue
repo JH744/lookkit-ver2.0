@@ -13,7 +13,7 @@
                   {{ formatDateTime(inquiry.inquiryCreatedAt) }}
                 </span>
               </div>
-              <span class="answer-state">{{ answer ? '✔ 답변 완료' : '' }}</span>
+              <span class="answer-state" v-if="answer && answer.answerContents">{{ answer ? '✔ 답변 완료' : '' }}</span>
             </div>
             <div class="inquiry-content">
               <p class="inquiry-text">{{ inquiry.inquiryContents }}</p>
@@ -25,7 +25,7 @@
             </div>
           </div>
   
-          <div class="reply" v-if="answer">
+          <div class="reply" v-if="Object.keys(answer).length > 0">
             <div class="inquiry-meta">
               <img class="meta-icon question" src="/images/answer.png" alt="" />
               <div>
@@ -55,10 +55,7 @@ const route = router.currentRoute.value;
 const inquiry = ref({});
 
 //추후 답변 작업(관리자)
-const answer = ref({
-    answerCreatedAt: '2024-11-15T16:00:00',
-    answerContents: '문의에 대한 답변 내용'
-});
+const answer = ref({});
 
 const loadDetailInquiry = async () => {
     try {
@@ -94,7 +91,7 @@ onMounted(() => {
 
   return `${year}.${month}.${day} ${hour}:${minute}`;
 };
-  </script>
+</script>
 
 <style scoped>
 .section-inquiries {

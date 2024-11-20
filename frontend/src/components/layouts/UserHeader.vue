@@ -1,6 +1,6 @@
 <template>
     <div class="welcome-header">
-        <span class="welcome-message">User님 환영합니다</span>
+        <span class="welcome-message">{{ username }}님 환영합니다</span>
         <div class="profile-options">
         <a href="@{/mypage/enter-password}">
             <img class="icon-settings" src="/images/setting.png" alt="설정 아이콘"/>
@@ -11,7 +11,13 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/authStore';
+import { computed } from 'vue';
 
+const authStore = useAuthStore();
+const username = computed(() => authStore.user.username);
+// const isAuthenticated = computed(() => authStore.isAuthenticated);
+// const authorities = computed(() => authStore.authorities);
 </script>
 
 <style scoped>

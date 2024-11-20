@@ -29,6 +29,7 @@ public class InquiryService {
     private final InquiryRepository inqRepository;
     private final InquiryImageRepository imgRepository;
 
+
     // 사용자의 문의 리스트
     @Transactional(readOnly = true)
     public List<InquiryResponseDTO> getUserInquiries(Long userId) {
@@ -42,7 +43,7 @@ public class InquiryService {
     @Transactional(readOnly = true)
     public InquiryResponseDTO getInquiryDetail(Long inquiryId) {
         Inquiry inquiry = inqRepository.findById(inquiryId)
-                .orElseThrow(() -> new RuntimeException("Inquiry not found"));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.INQUIRY_NOT_FOUNT));
 
         List<InquiryImageDTO> inquiryImages = imgRepository.findInquiryByIdWithImage(inquiryId)
                 .stream()
