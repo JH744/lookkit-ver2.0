@@ -15,11 +15,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.user.CustomUser;
-import synerjs.lookkit2nd.user.User;
-
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {

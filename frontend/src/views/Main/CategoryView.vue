@@ -1,83 +1,66 @@
 <template>
   <div class="page-container">
-    <div class="page-container">
-      <div class="title-section">
-        <h1 th:text="${type}">아우터</h1>
-        <div class="filter-section">
-          <div class="filter-btn">
-            <img src="@/assets/icons/filterIcon.svg" alt="" />
-            필터검색
-            <img src="@/assets/icons/dropDownIcon.svg" alt="" width="10px" />
-          </div>
-        </div>
-        <div class="sort-section">
-          <div
-            class="item-count"
-            th:text="'상품갯수: '+${productsList.size()}+'개'"
-          >
-            2,120개
-          </div>
-          <div class="sort-box">
-            <ul>
-              <li>추천순</li>
-              <li>최신순</li>
-              <li>낮은 가격순</li>
-              <li>높은 가격순</li>
-              <li>판매순</li>
-              <li>리뷰 많은순</li>
-            </ul>
-          </div>
+    <div class="title-section">
+      <h1>{{ categoryType }}</h1>
+      <div class="filter-section">
+        <div class="filter-btn">
+          <img src="@/assets/icons/filterIcon.svg" alt="" />
+          필터검색
+          <img src="@/assets/icons/dropDownIcon.svg" alt="" width="10px" />
         </div>
       </div>
-      <div class="main-content">
-        <div class="product-list">
-          <div th:each="product :${productsList}" class="product-item">
-            <img
-              th:src="@{'/images/products/0'+${product.productId}+'/'+${product.productId}+'_detail_1.webp'}"
-              alt="상품썸네일"
-            />
-            <!--좋아요버튼(로그인시에만 표시)-->
-            <img
-              th:src="@{/images/icon/heart2.svg}"
-              class="like-btn"
-              alt="좋아요버튼"
-              sec:authorize="isAuthenticated()"
-            />
-            <div class="product-info">
-              <a th:href="@{|/product/${product.productId}|}">
-                <div class="brand-name" th:text="${product.brandName}">
-                  브랜드
-                </div>
-                <div class="product-name" th:text="${product.productName}">
-                  아우터
-                </div>
-              </a>
-              <div class="product-price-box">
-                <div
-                  class="product-price"
-                  th:text="${product.productPrice}+'원'"
-                >
-                  120,000원
-                </div>
-                <div class="product-price-discount">20%</div>
-                <div class="hidden-id" th:text="${product.productId}">
-                  상품ID
-                </div>
-              </div>
-              <div class="like-box">
-                <img
-                  src="@/assets/icons/heart0.svg"
-                  alt=""
-                  width="20px"
-                  height="20px"
-                />
-                <span>120</span>
-              </div>
-              <div class="product-event">
-                <div class="product-event-box">
-                  <div>쿠폰</div>
-                  <div>대여가능</div>
-                </div>
+      <div class="sort-section">
+        <div class="item-count">상품 갯수: {{ products.length }}개</div>
+        <div class="sort-box">
+          <ul>
+            <li>추천순</li>
+            <li>최신순</li>
+            <li>낮은 가격순</li>
+            <li>높은 가격순</li>
+            <li>판매순</li>
+            <li>리뷰 많은순</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!--반복문시작  -->
+      <div class="product-list">
+        <div
+          v-for="product in products"
+          :key="product.productId"
+          class="product-item"
+        >
+          <img
+            class="product-img"
+            :src="encodedProductImageUrl(product.productId)"
+            alt="상품썸네일"
+            @error="handleImageError"
+          />
+
+          <div class="product-info">
+            <a :href="`/product/${product.productId}`">
+              <div class="brand-name">{{ product.brandName }}</div>
+              <div class="product-name">{{ product.productName }}</div>
+            </a>
+            <div class="product-price-box">
+              <div class="product-price">{{ product.productPrice }}원</div>
+              <div class="product-price-discount">20%</div>
+            </div>
+            <div class="like-box">
+              <img
+                src="@/assets/icons/heart0.svg"
+                alt=""
+                width="20px"
+                height="20px"
+              />
+              <span>120</span>
+            </div>
+            <div class="product-event">
+              <div class="product-event-box">
+                <div>쿠폰</div>
+                <div>대여가능</div>
               </div>
             </div>
           </div>
@@ -87,21 +70,65 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
+import axios from "axios";
+import defaultImage from "@/assets/img_none.png";
+const products = ref([]); // 상품 리스트
+const route = useRoute(); // 현재 라우트 정보를 가져옴
+const categoryType = computed(() => route.query.type);
+const imageBaseUrl = ref(
+  "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
+);
 
-export default {
-  setup() {
-    const route = useRoute();
-
-    // 쿼리 스트링 값
-    const query = route.query;
-
-    return {
-      query,
-    };
-  },
+const handleImageError = (event) => {
+  event.target.src = defaultImage; // 이미지 로드 실패 시 기본 이미지로 대체
 };
+
+// 쿼리스트링이 변경될 때마다 categoryType을 업데이트
+watch(
+  () => route.query.type,
+  (newType) => {
+    categoryType.value = newType; // categoryType 업데이트
+    fetchProducts(); // 새로운 쿼리스트링에 따라 상품 데이터 다시 가져오기
+  }
+);
+
+// 상품 데이터를 가져오는 함수
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8081/api/main/category",
+      {
+        params: {
+          type: categoryType.value,
+        },
+      }
+    );
+    products.value = response.data;
+    console.log("상품 리스트:", products.value);
+  } catch (error) {
+    console.error("상품 데이터 조회 오류 발생:", error);
+  }
+};
+
+// 초기 데이터 로드
+onMounted(() => {
+  fetchProducts();
+});
+
+//스토리지 이미지url 인코딩
+const encodedProductImageUrl = computed(() => {
+  return (productId) => {
+    const folderPath = `/products/0${productId}`;
+    const fileName = `/${productId}_thumbnail.webp`;
+    const encodedPath = `${encodeURIComponent(folderPath)}${encodeURIComponent(
+      fileName
+    )}`;
+    return `${imageBaseUrl.value}${encodedPath}?alt=media`;
+  };
+});
 </script>
 
 <style scoped>
@@ -181,11 +208,11 @@ export default {
   height: 40px;
 }
 .brand-name {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 400;
   color: #000000;
   width: 240px;
-  height: 40px;
+  height: 30px;
 }
 .product-name:hover {
   text-decoration: underline;
@@ -240,5 +267,9 @@ export default {
 }
 .hidden-id {
   display: none;
+}
+.product-img {
+  width: 200px;
+  height: 270px;
 }
 </style>

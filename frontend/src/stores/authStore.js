@@ -2,29 +2,7 @@ import { defineStore } from "pinia";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    userId: null,
-    username: null,
-    authorities: null,
+    token: null, // JWT 토큰
+    user: null, // 사용자 정보
   }),
-  actions: {
-    setAuthData(decodedToken) {
-      this.userId = decodedToken.userId;
-      this.username = decodedToken.username;
-      this.authorities = decodedToken.authorities;
-    },
-    clearAuthData() {
-      this.userId = null;
-      this.username = null;
-      this.authorities = null;
-    },
-  },
-  persist: {
-    enabled: true,
-    strategies: [
-      {
-        key: "auth",
-        storage: localStorage,
-      },
-    ],
-  },
 });

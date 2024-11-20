@@ -96,6 +96,7 @@
 
 <script setup>
 import { ref, watch, onMounted, reactive } from "vue";
+import { useAuthStore } from "@/stores/authStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
@@ -108,6 +109,14 @@ const isPasswordVisible = ref(false);
 const inputPwdType = ref("password");
 const loginError = ref(false);
 const isRememberId = ref(false);
+const authStore = useAuthStore();
+
+const setToken = (jwt) => {
+  authStore.token = jwt; // 스토어의 token 설정
+};
+const setUser = (userInfo) => {
+  authStore.user = userInfo; // 스토어의 user 설정
+};
 
 onMounted(() => {
   const savedId = localStorage.getItem("savedId");
@@ -126,34 +135,33 @@ watch(
 
 const handleLogin = async () => {
   try {
-    const response = await axios.post(
-      "http://localhost:8081/api/auth/login",
-      {
-        username: username.value,
-        password: password.value,
-      },
-      { withCredentials: true }
-    );
-
-    const jwt = response.data; // 백엔드에서 리턴한 JWT 추출
-    console.log("jwt", jwt);
-
-    // JWT 디코딩
-    const decodedToken = jwtDecode(jwt);
-    console.log("디코드 토큰 확인>>>>>", decodedToken);
-
-    const authStore = useAuthStore();
-    // 피니아 스토어에 인증 데이터 저장
-    authStore.setAuthData(decodedToken);
-
-    // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
-    if (isRememberId.value) {
-      localStorage.setItem("savedId", username.value);
-    } else {
-      localStorage.removeItem("savedId");
-    }
-
-    // 메인 페이지로 이동
+    const response = await axios
+      .post(
+        "http://localhost:8081/api/auth/login",
+        // "/api/auth/login",
+        {
+          username: username.value,
+          password: password.value,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log("res", res.data);
+        let userInfo = {
+          username: res.data.username,
+          userId: res.data.userId,
+          role: res.data.roles[0].authority,
+        };
+        setToken(res.data.jwt); // 토큰 저장
+        setUser(userInfo); //사용자 정보 저장
+        // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
+        if (isRememberId.value) {
+          localStorage.setItem("savedId", username.value);
+        } else {
+          // 미체크시 기존저장된 아이디를 삭제
+          localStorage.removeItem("savedId");
+        }
+      });
     router.push("/main");
   } catch (error) {
     loginError.value = true; // 에러 메시지 출력
