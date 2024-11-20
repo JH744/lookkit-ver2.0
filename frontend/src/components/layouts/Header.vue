@@ -101,16 +101,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const inputKeyword = ref("");
+
 
 const goToSearch = () => {
   let keyword = inputKeyword.value;
   inputKeyword.value = "";
   router.push(`/main/search?keyword=${keyword}`);
 };
+
 </script>
 
 <style scoped>

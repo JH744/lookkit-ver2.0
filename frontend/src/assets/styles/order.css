@@ -38,6 +38,7 @@
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid #101010;
+  padding: 20px 0px;
 }
 .section-header2 {
   padding: 20px 0;
@@ -142,13 +143,17 @@
   display: flex;
   flex-direction: row;
 }
+.price {
+  display: flex;
+  flex-direction: column;
+}
 .adjusted-price {
   font-size: 16px;
   font-weight: bold;
   color: #101010;
 }
 .item-price {
-  font-size: 16px;
+  font-size: 14px;
   color: #8b8989;
 }
 .payment-frame {
