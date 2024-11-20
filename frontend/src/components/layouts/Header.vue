@@ -38,8 +38,12 @@
       </div>
       <div class="navBox2">
         <div class="searchBox">
-          <input id="searchInputEl" class="searchInput" />
-          <span class="searchBtn">
+          <input
+            id="searchInputEl"
+            class="searchInput"
+            v-model="inputKeyword"
+          />
+          <span class="searchBtn" @click="goToSearch">
             <img src="@/assets/icons/search.png" />
           </span>
         </div>
@@ -96,8 +100,17 @@
   </div>
 </template>
 
-<script>
-export default {};
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const inputKeyword = ref("");
+
+const goToSearch = () => {
+  let keyword = inputKeyword.value;
+  inputKeyword.value = "";
+  router.push(`/main/search?keyword=${keyword}`);
+};
 </script>
 
 <style scoped>

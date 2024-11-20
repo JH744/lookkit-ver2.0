@@ -96,6 +96,7 @@
 
 <script setup>
 import { ref, watch, onMounted, reactive } from "vue";
+import { useAuthStore } from "@/stores/authStore";
 import axios from "axios";
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -105,6 +106,14 @@ const isPasswordVisible = ref(false);
 const inputPwdType = ref("password");
 const loginError = ref(false);
 const isRememberId = ref(false);
+const authStore = useAuthStore();
+
+const setToken = (jwt) => {
+  authStore.token = jwt; // 스토어의 token 설정
+};
+const setUser = (userInfo) => {
+  authStore.user = userInfo; // 스토어의 user 설정
+};
 
 onMounted(() => {
   const savedId = localStorage.getItem("savedId");
@@ -133,9 +142,15 @@ const handleLogin = async () => {
         },
         { withCredentials: true }
       )
-      .then((jwt) => {
-        // console.log("jwt", jwt);
-
+      .then((res) => {
+        console.log("res", res.data);
+        let userInfo = {
+          username: res.data.username,
+          userId: res.data.userId,
+          role: res.data.roles[0].authority,
+        };
+        setToken(res.data.jwt); // 토큰 저장
+        setUser(userInfo); //사용자 정보 저장
         // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
         if (isRememberId.value) {
           localStorage.setItem("savedId", username.value);

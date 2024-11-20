@@ -8,13 +8,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Map;
 import java.util.Random;
 
-@Controller
+@RestController
 @Setter
 public class MailController {
 
@@ -25,7 +26,7 @@ public class MailController {
         this.javaMailSender = javaMailSender;
     }
 
-    @PostMapping("/mailsender")
+    @PostMapping("/api/mailsender")
     @ResponseBody
     public String send(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");

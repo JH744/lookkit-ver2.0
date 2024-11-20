@@ -6,18 +6,48 @@
   </div>
 
   <div class="formContainer2">
-    <input class="formInput" placeholder="인증번호 입력" name="veriCode" />
+    <input class="formInput" placeholder="인증번호 입력" v-model="inputCode" />
     <div style="margin: 15px">
       <span class="verificationNotice"
         >*3분 이내로 인증번호 6자리를 입력해주세요.</span
       >
       <!-- 인증번호를 재입력해주세요. -->
     </div>
-    <div id="authenticationOKBtn" class="buttonContainer">확인</div>
+    <div class="error-text-box">
+      <span v-if="isFail" class="error-text"><slot></slot></span>
+    </div>
+    <div id="authenticationOKBtn" class="buttonContainer" @click="verifyCode">
+      확인
+    </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+
+const props = defineProps({
+  verificationCode: String,
+});
+
+const inputCode = ref(""); //사용자 입력 인증코드
+
+const emit = defineEmits(["completeAuthentication"]);
+const completeAuthentication = () => {
+  console.log("에밋발사전");
+  console.log("verificationCode", props.verificationCode);
+  emit("completeAuthentication");
+};
+
+/**인증코드 일치 확인 매소드 */
+const verifyCode = () => {
+  if (props.verificationCode == inputCode.value) {
+    alert("일치");
+    completeAuthentication(); // emit 메소드 호출
+  } else {
+    alert("불일치합니다.");
+  }
+};
+</script>
 
 <style scoped>
 .formContainer2 {
@@ -112,5 +142,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.error-text-box {
+  margin-top: 14px;
+  height: 14px;
+}
+
+.error-text {
+  color: #ff294f;
+  font-size: 14px;
 }
 </style>
