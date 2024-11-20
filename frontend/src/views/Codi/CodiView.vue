@@ -90,7 +90,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
-import { storage } from "@/firebase/firebaseConfig";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 import axios from 'axios';
 import "@/assets/styles/codi.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
@@ -117,13 +117,13 @@ const detailImageUrls = ref([]); // 여러 상세 이미지 URL을 저장할 배
 const fetchImages = async () => {
   try {
     // 썸네일 이미지 가져오기
-    const thumbnailRef = firebaseRef(storage, `lookkit/codi/0${codiId.value}/${codiId.value}_thumbnail.webp`);
+    const thumbnailRef = firebaseRef(firebaseStorage, `lookkit/codi/0${codiId.value}/${codiId.value}_thumbnail.webp`);
     thumbnailUrl.value = await getDownloadURL(thumbnailRef);
 
     // 상세 이미지 가져오기 (최소 4장, 최대 6장)
     for (let i = 1; i <= 6; i++) {
       try {
-        const detailRef = firebaseRef(storage, `lookkit/codi/0${codiId.value}/${codiId.value}_detail_${i}.webp`);
+        const detailRef = firebaseRef(firebaseStorage, `lookkit/codi/0${codiId.value}/${codiId.value}_detail_${i}.webp`);
         const detailUrl = await getDownloadURL(detailRef);
         detailImageUrls.value.push(detailUrl);
       } catch (error) {
