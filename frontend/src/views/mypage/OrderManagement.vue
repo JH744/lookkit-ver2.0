@@ -59,7 +59,7 @@
           </div>
         </div>
         <div v-for="(product, productIndex) in order.products" :key="product.productId" class="shipment-product">
-          <img class="product-image" :src="`/images/products/0${product.productId}/${product.productThumbnail}`" />
+          <img class="product-image" :src="product.thumbnailUrl || '/images/placeholder.png'" />
           <div class="product-details">
             <div class="product-brand">{{ product.brandName }}</div>
             <div class="product-name">{{ product.productName }}</div>
@@ -91,6 +91,8 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { useModalStore, useConfirmModalStore } from '@/stores/modalStore';
 import { useAuthStore } from '@/stores/authStore';
+import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 
 const products = ref([]);
 const authStore = useAuthStore();
@@ -165,11 +167,34 @@ const confirmRental = async (product) => {
 
 }
 
-// 주문 정보 불러오기
+
+const fetchImageForProduct = async (product) => {
+  
+  const storagePath = `lookkit/products/0${product.productId}/${product.productId}_thumbnail.webp`;
+
+  console.log('이미지 경로 확인:', storagePath);
+  
+  try {
+    const imageRef = firebaseRef(firebaseStorage, storagePath);
+    const url = await getDownloadURL(imageRef);
+    product.thumbnailUrl = url;
+  } catch (error) {
+    console.error(`이미지 가져오기 실패: ${storagePath}`, error);
+    product.thumbnailUrl = '/images/placeholder.png';
+  }
+};
+
+
+// 주문 정보 불러오기 및 이미지 설정
 const loadOrder = async () => {
   try {
     const response = await axios.get(`http://localhost:8081/api/mypage/manage/${authStore.user.userId}`);
     products.value = response.data.data.products;
+
+    // 각 제품에 대해 Firebase 이미지 불러오기 호출
+    for (let product of products.value) {
+      await fetchImageForProduct(product);
+    }
   } catch (error) {
     console.log(error);
   }
@@ -178,7 +203,6 @@ const loadOrder = async () => {
 const formatDate = (dateString) => {
   return format(new Date(dateString), 'yyyy-MM-dd');
 };
-
 
 onMounted(() => {
   loadOrder();
