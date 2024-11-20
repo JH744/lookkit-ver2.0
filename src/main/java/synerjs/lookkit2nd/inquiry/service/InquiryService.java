@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import synerjs.lookkit2nd.common.dto.InquiryUserDTO;
 import synerjs.lookkit2nd.common.exception.BaseException;
 import synerjs.lookkit2nd.common.response.BaseResponseStatus;
 import synerjs.lookkit2nd.common.util.FileUtil;
@@ -17,6 +18,7 @@ import synerjs.lookkit2nd.inquiry.repository.InquiryImageRepository;
 import synerjs.lookkit2nd.inquiry.repository.InquiryRepository;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,8 +83,22 @@ public class InquiryService {
     }
 
     public void deleteInquiry(Long inquiryId) {
-        inqRepository.findById(inquiryId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.INQUIRY_NOT_FOUNT));
-        inqRepository.deleteById(inquiryId);
+
     }
+//
+public List<InquiryUserDTO> getAllInquiries() {
+    List<Object[]> results =  inqRepository.getAllInquiriesWithUserUuid();
+    return results.stream()
+            .map(row -> new InquiryUserDTO(
+                    ((Number) row[0]).longValue(), // inquiryId
+                    (String) row[1],              // userUuid
+                    (String) row[2],              // inquiryTitle
+                    (String) row[3],              // inquiryContents
+                    ((Timestamp) row[4]).toLocalDateTime(), // inquiryCreatedAt
+                    row[5].toString()             // answerState (Character -> String)
+            ))
+            .toList();
+}
+//    public List<InquiryUserDTO> getInquiryAllList() {
+//    }
 }

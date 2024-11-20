@@ -289,7 +289,7 @@
               1:1 문의현황
             </div>
             <div class="card-body">
-              <table id="datatablesSimple">
+              <table>
                 <thead>
                   <tr>
                     <th>문의번호</th>
@@ -302,46 +302,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="list :${inquiryList}">
-                    <td th:text="|${list.inquiryId}|">교환번호</td>
-                    <!-- inquiryTitle 출력 -->
-                    <td>
-                      <a
-                        class="answer-link"
-                        th:text="${list.userUuid}"
-                        th:href="@{/admin/answer/{inquiryId}(inquiryId=${list.inquiryId})}"
-                        >user11</a
-                      >
-                    </td>
-                    <!-- userUuid 출력 -->
-                    <td>
-                      <a
-                        class="answer-link"
-                        th:text="${list.inquiryTitle}"
-                        th:href="@{/admin/answer/{inquiryId}(inquiryId=${list.inquiryId})}"
-                        >교환문의</a
-                      >
-                    </td>
-                    <!-- inquiryTitle 출력 -->
-                    <td>
-                      <a
-                        class="answer-link"
-                        th:text="${list.inquiryContents}"
-                        th:href="@{/admin/answer/{inquiryId}(inquiryId=${list.inquiryId})}"
-                        >교환 가능할까요</a
-                      >
-                    </td>
-                    <!-- inquiryContents 출력 -->
-                    <td
-                      th:text="${#temporals.format(list.inquiryCreatedAt, 'yyyy/MM/dd')}"
-                    >
-                      2024/11/04
-                    </td>
-                    <!-- inquiryCreatedAt 날짜 형식 -->
-                    <td th:text="|${list.answerState}|">N</td>
-                    <!-- answerState 출력 -->
+                  <tr v-for="inquiry in inquiryList" :key="inquiry.inquiryId">
+                    <td>{{ inquiry.inquiryId }}</td>
+                    <td>{{ inquiry.userUuid }}</td>
+                    <td>{{ inquiry.inquiryTitle }}</td>
+                    <td>{{ inquiry.inquiryContents }}</td>
+                    <td>{{ inquiry.inquiryCreatedAt }}</td>
+                    <td>{{ inquiry.answerState }}</td>
                     <td>삭제</td>
-                    <!-- answerState 출력 -->
                   </tr>
                 </tbody>
               </table>
@@ -366,6 +334,7 @@
 </template>
 
 <script setup>
+import axios from "axios";
 import { onMounted, ref } from "vue";
 
 // 스크립트 로드 상태 관리
@@ -377,6 +346,8 @@ const barChart = ref(null);
 
 // DataTable 인스턴스 저장
 const dataTable = ref(null);
+
+const inquiryList = ref([]);
 
 onMounted(async () => {
   try {
@@ -391,15 +362,27 @@ onMounted(async () => {
     );
     initializeCharts();
 
-    // DataTables 로드 및 초기화
-    await loadScript(
-      "https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-    );
-    initializeDataTable();
+    // // DataTables 로드 및 초기화
+    // await loadScript(
+    //   "https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+    // );
+    // initializeDataTable();
 
     scriptsLoaded.value = true;
   } catch (error) {
     console.error("스크립트 로드 중 에러 발생:", error);
+  }
+
+  try {
+    const response = await axios
+      .get("http://localhost:8081/api/admin/dashboard")
+      .then((res) => {
+        console.log(res.data);
+        inquiryList.value = res.data;
+        console.log("리스트", inquiryList.value[0]);
+      });
+  } catch (err) {
+    console.log(err);
   }
 });
 
