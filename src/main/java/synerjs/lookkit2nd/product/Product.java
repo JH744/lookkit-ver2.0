@@ -3,11 +3,15 @@ package synerjs.lookkit2nd.product;
 import jakarta.persistence.*;
 import lombok.*;
 import synerjs.lookkit2nd.codi.Codi;
+import synerjs.lookkit2nd.review.Review;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Getter
@@ -27,16 +31,19 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CODI_ID")
     private Codi codi;
 
     private String productName;
     private String brandName;
     private String productDescription;
-
     private Integer productPrice;
 
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Review> reviews = new ArrayList<>();
 
     private Integer productStock;
     private String genderTarget;

@@ -536,25 +536,17 @@ justify-content: flex-start;
 .payment-info {
 display: flex;
 flex-direction: row;
-gap: 200px;
+gap: 20%;
+width: 100%;
 position: absolute;
-right: 0px;
-left: 0px;
 top: 965.35px;
 justify-content: space-between;
 }
 
 .payment-header {
-display: flex;
-flex-direction: column;
-gap: 13.99px;
-align-items: flex-start;
-justify-content: flex-start;
-flex-shrink: 0;
-width: 500px;
-position: relative;
-border-top: 1px solid #101010;
-padding: 20.5px 5px 21.5px 5px;
+  flex-shrink: 0;
+  border-top: 1px solid #101010;
+  padding: 20.5px 5px 21.5px 5px;
 }
 
 .payment-info-title {
@@ -593,14 +585,10 @@ position: relative;
 }
 
 .payment-row {
-padding: 0px 0px 0px 22.99px;
-display: flex;
-flex-direction: row;
-gap: 102.07px;
-align-items: flex-start;
-justify-content: flex-start;
-flex-shrink: 0;
-position: relative;
+  padding: 0px 0px 0px 22.99px; 
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
 }
 
 .payment-cell {
@@ -674,7 +662,6 @@ display: flex;
 flex-direction: column;
 gap: 10px;
 flex-shrink: 0;
-width: 500px;
 position: relative;
 }
 

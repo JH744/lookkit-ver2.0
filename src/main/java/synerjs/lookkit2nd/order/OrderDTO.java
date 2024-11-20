@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -30,7 +31,9 @@ public class OrderDTO {
     private Integer price;  
     private Integer totalPrice;
 
-    public OrderDTO(Long orderId, Long userId, BigDecimal totalAmount, String orderStatus, String orderComment, Timestamp orderDate, String orderAddressee, String orderAddress, String orderPhone, Long itemId, String itemName, String brandName, Integer quantity, LocalDate startDate, LocalDate endDate, Integer price, Integer totalPrice) {
+    private List<OrderDetailDTO> orderDetails;
+    
+    public OrderDTO(Long orderId, Long userId, BigDecimal totalAmount, String orderStatus, String orderComment, Timestamp orderDate, String orderAddressee, String orderAddress, String orderPhone, Long itemId, String itemName, String brandName, Integer quantity, LocalDate startDate, LocalDate endDate, Integer price, Integer totalPrice, List<OrderDetailDTO> orderDetails) {
         this.orderId = orderId;
         this.userId = userId;
         this.totalAmount = totalAmount;
@@ -48,5 +51,6 @@ public class OrderDTO {
         this.endDate = endDate;
         this.price = price;
         this.totalPrice = totalPrice;
+        this.orderDetails = orderDetails; 
     }
 }

@@ -45,5 +45,16 @@ public class Cart {
         this.rentalEndDate = rentalEndDate;
         this.quantity = quantity;
     }
-}
 
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "PRODUCT_ID")
+//    private Product product;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "CODI_ID")
+//    private Codi codi;
+
+//    private int quantity;
+
+}
