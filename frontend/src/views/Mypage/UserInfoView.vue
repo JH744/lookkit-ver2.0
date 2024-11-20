@@ -67,8 +67,8 @@
               <span
                 id="email-check-result"
                 :class="{
-                  'error-message': emailCheckResult.isError,
                   'success-message': !emailCheckResult.isError,
+                  'error-message': emailCheckResult.isError,
                 }"
                 >{{ emailCheckResult.message }}
               </span>
@@ -105,20 +105,21 @@
                 :value="userData.address + ' ' + userData.detailAddress"
               />
             </div>
-          </div>
-          <!-- 저장 및 취소 버튼 -->
-          <div class="button-group">
-            <button type="button" class="btn-cancel" @click="cancelUpdate">
-              취소하기
-            </button>
-            <button type="submit" class="btn-save" id="updateBtn">
-              저장하기
-            </button>
-          </div>
-          <div class="withdrawal-group">
-            <button type="button" class="btn-withdrawal" @click="deleteAccount">
-              회원 탈퇴
-            </button>
+            <!-- 저장 및 취소 버튼 -->
+            <div class="button-group">
+              <button type="submit" class="btn-save" id="updateBtn">
+                수정완료
+              </button>
+            </div>
+            <div class="withdrawal-group">
+              <button
+                type="button"
+                class="btn-withdrawal"
+                @click="deleteAccount"
+              >
+                회원 탈퇴
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -130,8 +131,8 @@
       <span class="modal-title">비밀번호 변경</span>
       <span class="modal-subtitle">변경하실 비밀번호를 입력해주세요</span>
       <div class="input-container">
+        <h3 class="modal-current-password"><span>현재 비밀번호</span></h3>
         <div class="input-group">
-          <label for="current-password-change">현재 비밀번호</label>
           <input
             type="password"
             id="current-password-change"
@@ -139,8 +140,8 @@
             placeholder="현재 비밀번호를 입력하세요"
           />
         </div>
+        <h4 class="modal-new-password"><span>새 비밀번호</span></h4>
         <div class="input-group">
-          <label for="new-password">새 비밀번호</label>
           <input
             type="password"
             id="new-password"
@@ -148,8 +149,8 @@
             placeholder="새 비밀번호를 입력하세요"
           />
         </div>
+        <h5 class="modal-confirm-password"><span>새 비밀번호 확인</span></h5>
         <div class="input-group">
-          <label for="confirm-password">새 비밀번호 확인</label>
           <input
             type="password"
             id="confirm-password"
@@ -169,6 +170,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
+
+const authStore = useAuthStore();
+const id = ref(0);
 
 const userData = ref({
   userUuid: "",
@@ -180,20 +185,26 @@ const userData = ref({
   address: "",
   detailAddress: "",
 });
-
-const showModal = ref(false);
-const currentPassword = ref("");
-const newPassword = ref("");
-const confirmPassword = ref("");
-
+// 초기 데이터 로드
 onMounted(async () => {
+  console.log("유저정보", authStore.user);
+  id.value = authStore.user.userId;
+  console.log("유저ID : ", id.value);
+
   try {
-    const response = await axios.get("http://localhost:8081/api/v1/userinfo/6");
+    const response = await axios.get(
+      `http://localhost:8081/api/v1/userinfo/${id.value}`
+    );
     Object.assign(userData.value, response.data);
   } catch (error) {
     console.error("Error loading user data:", error);
   }
 });
+
+const showModal = ref(false);
+const currentPassword = ref("");
+const newPassword = ref("");
+const confirmPassword = ref("");
 
 // 비밀번호 변경 모달 열기
 const showPasswordChangeModal = () => {
@@ -214,11 +225,11 @@ const updatePassword = async () => {
   }
   try {
     await axios.post(
-      "http://localhost:8081/api/v1/userinfo/6/change-password",
+      `http://localhost:8081/api/v1/userinfo/${id.value}/change-password`,
       {
-        userUuid: userData.value.userUuid,
         currentPassword: currentPassword.value,
         newPassword: newPassword.value,
+        confirmNewPassword: confirmPassword.value,
       }
     );
     alert("비밀번호가 성공적으로 변경되었습니다.");
@@ -233,17 +244,17 @@ const updatePassword = async () => {
   }
 };
 
-// 프로필 업데이트 로직
+// 회원정보 업데이트 로직
 const updateProfile = async () => {
   try {
     await axios.put(
-      "http://localhost:8081/api/v1/userinfo/update",
+      `http://localhost:8081/api/v1/userinfo/${id.value}`,
       userData.value
     );
-    alert("프로필이 성공적으로 업데이트되었습니다.");
+    alert("회원정보를 성공적으로 업데이트했습니다.");
   } catch (error) {
     console.error("Error updating profile:", error);
-    alert("프로필 업데이트에 실패했습니다.");
+    alert("회원정보 업데이트에 실패했습니다.");
   }
 };
 
@@ -256,7 +267,7 @@ const emailCheckResult = ref({
 const checkEmailDuplicate = async () => {
   if (!userData.value.email) {
     emailCheckResult.value.message = "이메일을 입력해주세요.";
-    //emailCheckResult.value.isError = false;
+    emailCheckResult.value.isError = true; // 오류 상태로 설정
     return;
   }
 
@@ -274,15 +285,15 @@ const checkEmailDuplicate = async () => {
     console.log(response.data); // 응답 데이터 로그 확인
     if (response.data.exists === true) {
       emailCheckResult.value.message = "이미 사용 중인 이메일입니다.";
-      //emailCheckResult.value.isError = false;
+      emailCheckResult.value.isError = true; //오류 상태로 설정
     } else {
       emailCheckResult.value.message = "사용 가능한 이메일입니다.";
-      //emailCheckResult.value.isError = false;
+      emailCheckResult.value.isError = false; // 성공 상태로 설정
     }
   } catch (error) {
     console.error("Error checking email:", error);
     emailCheckResult.value.message = "이메일 중복 확인에 실패했습니다.";
-    //emailCheckResult.value.isError = false;
+    emailCheckResult.value.isError = true; // 오류 상태로 설정
   }
 };
 
@@ -300,11 +311,10 @@ const cancelUpdate = () => {
 
 // 탈퇴 요청 메서드
 const deleteAccount = async () => {
-  const userId = 6; // 여기에 실제 사용자 ID를 설정하세요
   const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
   if (confirmation) {
     try {
-      await axios.delete(`http://localhost:8081/api/v1/userinfo/${userId}`);
+      await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
       alert("회원 탈퇴가 완료되었습니다.");
       // 탈퇴 후 리다이렉트 동작 등 추가 가능
       window.location.href = "/"; // 홈 페이지로 리다이렉트
@@ -320,16 +330,13 @@ const deleteAccount = async () => {
 @charset "UTF-8";
 .profile-container {
   display: grid;
-  margin-top: 20px;
-  width: 1100px;
+  width: 1000px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 100px;
 }
 
 .second-grid {
   width: 100%;
-  margin-left: 50px;
 }
 
 .welcome-header {
@@ -366,11 +373,13 @@ const deleteAccount = async () => {
 }
 
 .profile-management-content {
-  margin-left: auto;
-  margin-right: auto;
-  width: 380px;
+  margin: auto;
+  margin-left: 20%;
+  /* margin-left: auto;
+  margin-right: auto; */
+  width: 450px;
   flex: 1;
-  padding: 40px;
+  padding: 30px;
   background-color: #fff;
 }
 
@@ -439,6 +448,12 @@ const deleteAccount = async () => {
 
 .button-group {
   text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 75px;
+  gap: 10px; /* 버튼 간 간격 조정 */
+  margin-top: 0px;
 }
 
 .btn-save {
@@ -447,7 +462,7 @@ const deleteAccount = async () => {
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
-  margin-left: 10px;
+  margin-top: 15px;
   border-radius: 25px;
   width: 125px;
 }
@@ -473,6 +488,7 @@ const deleteAccount = async () => {
   cursor: pointer;
   padding: 10px 20px;
   margin-bottom: 10px;
+  white-space: nowrap;
 }
 
 .outer-container {
@@ -486,11 +502,6 @@ const deleteAccount = async () => {
 
 .section-inquiries {
   border-bottom: 2px solid #727272;
-}
-
-.second-grid {
-  width: 100%;
-  margin-left: 50px;
 }
 
 .section-inquiries p:first-of-type {
@@ -526,13 +537,6 @@ const deleteAccount = async () => {
 
 .inquiry-content-title {
   font-size: 17px;
-}
-
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-  margin-top: 75px;
 }
 
 .btn-submit {
@@ -591,14 +595,6 @@ const deleteAccount = async () => {
   resize: none;
   height: 200px;
   width: 100%;
-}
-
-.error-message {
-  color: #f44336;
-  margin: 0px;
-  font-size: 15px;
-  margin-left: 15px;
-  display: none;
 }
 
 .image-upload {
@@ -706,14 +702,6 @@ const deleteAccount = async () => {
   gap: 10px;
 }
 
-.button-group {
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  gap: 10px; /* 버튼 간 간격 조정 */
-  margin-top: 20px;
-}
-
 /* Modal Styles */
 .modal-container {
   position: fixed;
@@ -731,28 +719,34 @@ const deleteAccount = async () => {
 .pw-change-modal {
   display: grid;
   background-color: white;
-  width: 530px;
+  width: 500px;
+  height: 500px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
 }
 
 .modal-title {
-  font-size: 16px;
-  margin-bottom: 50px;
-  margin-left: 3px;
-  padding: 5px;
+  width: 100%;
+  height: 10px;
+  font-size: 17px;
+  padding-right: 52px;
+  padding-left: 17px;
   color: #555353;
+  letter-spacing: 0;
 }
 
 .modal-subtitle {
-  font-size: 21px;
-  margin-bottom: 30px;
+  font-size: 20px;
   text-align: center;
+  border: 0;
+  padding: 30px 0;
+  height: 80px;
+  line-height: 1;
   color: #555;
 }
 
 .input-group {
-  margin-bottom: 20px;
+  margin-bottom: 50px;
 }
 
 .input-group label {
@@ -762,20 +756,62 @@ const deleteAccount = async () => {
 }
 
 .input-group input {
-  width: 350px;
-  padding: 10px;
+  height: 46px;
+  display: block;
+  overflow: hidden;
+  position: absolute;
+  margin-top: 0px;
+  top: 0px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 10px 14px;
+  line-height: 46px;
+  white-space: nowrap;
+  cursor: text;
+  /* width: 350px; */
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
 }
 
+.modal-current-password {
+  padding: 0 0 9px 1px;
+  vertical-align: 0;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+}
+
+.modal-new-password {
+  margin-top: 23px;
+  padding: 0 0 9px 1px;
+  vertical-align: 0;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+}
+
+.modal-confirm-password {
+  margin-top: 23px;
+  padding: 0 0 9px 1px;
+  vertical-align: 0;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+}
+
 .input-container {
+  min-width: 0;
+  padding: 0 22px;
+  width: 470px;
   justify-self: center;
 }
 
 .modal-footer {
-  text-align: center;
-  margin: 20px 0px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .modal-footer button {
@@ -786,8 +822,8 @@ const deleteAccount = async () => {
   border-radius: 30px;
   font-size: 15px;
   cursor: pointer;
-  width: 200px;
-  height: 42px;
+  width: 186px;
+  height: 35px;
 }
 
 .modal-footer button:hover {
@@ -814,16 +850,24 @@ const deleteAccount = async () => {
 }
 
 .btn-withdrawal {
-  background-color: #f44336;
-  color: white;
+  display: inline-block;
   padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 110px;
+  color: #999;
+  font-size: 13px;
+  background-color: transparent;
   border: none;
+  cursor: pointer;
+  text-decoration: underline; /* 밑줄 추가 */
+  width: auto;
 }
 
-.btn-withdrawal:hover {
-  background-color: #d32f2f;
+.pw-change-moda h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  white-space: nowrap;
+  position: static;
+  margin-top: 12px;
+  font-size: 17px;
 }
 </style>
