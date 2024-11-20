@@ -41,7 +41,7 @@ const completeAuthentication = () => {
 /**인증코드 일치 확인 매소드 */
 const verifyCode = () => {
   if (props.verificationCode == inputCode.value) {
-    alert("일치");
+    console.log("일치함");
     completeAuthentication(); // emit 메소드 호출
   } else {
     alert("불일치합니다.");

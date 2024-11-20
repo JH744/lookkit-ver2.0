@@ -42,6 +42,7 @@ import FindPassword from "./components/FindPasswordForm.vue";
 import { ref } from "vue";
 import axios from "axios";
 import FindResultModal from "./components/FindResultModal.vue";
+import { useModalStore, useConfirmModalStore } from "@/stores/modalStore";
 
 const selectBox = ref("box1");
 const verificationCode = ref("");
@@ -92,10 +93,13 @@ const sendEmailVerification = async () => {
     .then((res) => {
       console.log("인증코드", res.data);
       verificationCode.value = String(res.data);
-      isShowConfirmModal.value = true;
-      confirmMessage.value = "입력하신 이메일로 인증번호를 발송했습니다.";
-      alert("입력하신 이메일로 인증번호를 발송했습니다.");
-      alert("인증코드: " + verificationCode.value);
+      //완료 모달창 사용
+      const modalStore = useModalStore(); // 스토어를 가져와 사용
+      modalStore.showModal(
+        "이메일 인증",
+        "입력하신 이메일로 인증번호를 발송했습니다."
+      );
+      console.log("인증코드: ", verificationCode.value);
       selectBox.value = "box2"; // 박스 체인지
     })
     .catch((error) => {
