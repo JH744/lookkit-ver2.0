@@ -60,6 +60,8 @@
 import { ref, reactive } from 'vue';
 import axios from 'axios';
 import router from '@/router';
+import { uploadBytes } from "firebase/storage";
+import { storage } from "@/firebase/firebaseConfig";
 
 const formData = reactive({
   title: '',

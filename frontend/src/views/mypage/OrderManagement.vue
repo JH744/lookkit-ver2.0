@@ -46,18 +46,19 @@
         <p class="shipment-header-item">대여 기간</p>
         <p class="shipment-header-item">구매확정/리뷰</p>
       </div>
-      <div v-for="(product) in products" :key="product.productId">
+      <div v-for="(order, index) in productsGroupedByOrderId" :key="index">
+        <!-- 주문 정보는 해당 주문의 첫 번째 상품일 때만 출력 -->
         <div class="shipment-info">
           <div class="shipment-info-item">
             <span class="shipment-label">주문일자 </span>
-            <span class="shipment-value">{{ formatDate(product.orderDate) }}</span>
+            <span class="shipment-value">{{ formatDate(order.orderDate) }}</span>
           </div>
           <div class="shipment-info-item">
             <span class="shipment-label">주문번호 </span>
-            <span class="shipment-value">{{ product.orderId }}</span>
+            <span class="shipment-value">{{ order.orderId }}</span>
           </div>
         </div>
-        <div class="shipment-product">
+        <div v-for="(product, productIndex) in order.products" :key="product.productId" class="shipment-product">
           <img class="product-image" :src="`/images/products/0${product.productId}/${product.productThumbnail}`" />
           <div class="product-details">
             <div class="product-brand">{{ product.brandName }}</div>
@@ -91,6 +92,29 @@ import { format } from 'date-fns';
 import { useModalStore, useConfirmModalStore } from '@/stores/modalStore';
 
 const products = ref([]);
+
+// 주문을 주문번호별로 그룹화하는 계산 속성
+const productsGroupedByOrderId = computed(() => {
+  const grouped = [];
+  const orderMap = {};
+
+  products.value.forEach((product) => {
+    if (!orderMap[product.orderId]) {
+      orderMap[product.orderId] = {
+        orderDate: product.orderDate,
+        orderId: product.orderId,
+        products: [],
+      };
+    }
+    orderMap[product.orderId].products.push(product);
+  });
+
+  for (let order in orderMap) {
+    grouped.push(orderMap[order]);
+  }
+
+  return grouped;
+});
 
 // 상태별 주문 개수 계산
 const counts = computed(() => {
@@ -132,7 +156,10 @@ const showConfirmModal = (product) => {
 const confirmRental = async (product) => {
   product.purchaseConfirmed = true;
   try {
-    await axios.patch(`http://localhost:8081/api/mypage/manage/${product.orderId}`);
+    await axios.patch('http://localhost:8081/api/mypage/manage', {
+      orderId: product.orderId,
+      productId: product.productId
+    });
     const modalStore = useModalStore();
     modalStore.showModal('대여 확정', '감사합니다. 멋진 소개팅하세요 :)');
   } catch (error) {

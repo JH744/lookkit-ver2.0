@@ -1,15 +1,13 @@
 package synerjs.lookkit2nd.orderManagement.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
-public class OrderManagementDTO {
+public class OrderManagementResponseDTO {
     private Long userId;
     private Long orderId;
     private Timestamp orderDate;
@@ -25,7 +23,7 @@ public class OrderManagementDTO {
     private LocalDate rentalStartDate;
     private LocalDate rentalEndDate;
 
-    public OrderManagementDTO(Long userId, Long orderId, Timestamp orderDate, BigDecimal totalAmount, String orderStatus,
+    public OrderManagementResponseDTO(Long userId, Long orderId, Timestamp orderDate, BigDecimal totalAmount, String orderStatus,
                               Long productId, String productName, Integer productPrice, int quantity,
                               String brandName, String productThumbnail, boolean isPurchaseConfirmed,
                               LocalDate rentalStartDate, LocalDate rentalEndDate) {

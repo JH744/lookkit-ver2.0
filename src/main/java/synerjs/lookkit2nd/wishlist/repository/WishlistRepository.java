@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
     @Query("SELECT new synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO(" +
-            "w.wishlistId, " +
+            "MIN(w.wishlistId), " +
             "p.productId, " +
             "p.productName, " +
             "p.brandName, " +
@@ -27,19 +27,19 @@ public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
             "GROUP BY p.productId, p.productName, p.brandName, p.productPrice, p.productThumbnail")
     List<WishlistResponseDTO> getWishlistByUserId(@Param("userId") Long userId);
 
+
     @Query("SELECT new synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO(" +
-            "w.wishlistId, " +
-            "w.product.productId, " +
-            "w.product.productName, " +
-            "w.product.brandName, " +
-            "w.product.productPrice, " +
-            "w.product.productThumbnail, " +
-            "(SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.product.productId = w.product.productId)" +
+            "MIN(w.wishlistId), " +
+            "p.productId, " +
+            "p.productName, " +
+            "p.brandName, " +
+            "p.productPrice, " +
+            "p.productThumbnail, " +
+            "(SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.product.productId = p.productId)" +
             ") " +
             "FROM Wishlist w " +
             "JOIN w.product p " +
-            "WHERE w.userId = :userId AND w.product.productId = :productId " +
-            "GROUP BY w.product.productId, w.product.productName, w.product.brandName, w.product.productPrice, w.product.productThumbnail")
+            "WHERE w.userId = :userId AND w.product.productId = :productId")
     WishlistResponseDTO getWishByUserId(@Param("userId") Long userId, @Param("productId") Long productId);
 
     Optional<Wishlist> findByUserIdAndProduct_ProductId(Long userId, Long productId);
