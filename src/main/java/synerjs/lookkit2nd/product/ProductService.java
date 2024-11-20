@@ -1,6 +1,8 @@
 package synerjs.lookkit2nd.product;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,37 @@ public class ProductService {
         return productRepository.findById(productId).orElse(null);
     }
 
+
+    public List<ProductDTO> getProductsByCategory(String type) {
+        return productRepository.findByCategoryType(type).stream()
+                .map(product -> ProductDTO.builder()
+                        .productId(product.getProductId())
+                        .categoryId(product.getCategory().getCategoryId())
+                        .productName(product.getProductName())
+                        .brandName(product.getBrandName())
+                        .productPrice(product.getProductPrice())
+                        .genderTarget(product.getGenderTarget())
+                        .productThumbnail(product.getProductThumbnail())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
+
+    public List<ProductDTO> searchProductsByKeyword(String keyword) {
+        List<Product> products = productRepository.searchProductsByKeyword(keyword);
+        return products.stream()
+                .map(product -> ProductDTO.builder()
+                        .productId(product.getProductId())
+                        .categoryId(product.getCategory().getCategoryId())
+                        .productName(product.getProductName())
+                        .brandName(product.getBrandName())
+                        .productPrice(product.getProductPrice())
+                        .genderTarget(product.getGenderTarget())
+                        .productThumbnail(product.getProductThumbnail())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
 }
 

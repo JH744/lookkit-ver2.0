@@ -15,6 +15,7 @@ import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.user.UserDTO;
 import synerjs.lookkit2nd.user.UserService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,40 +29,37 @@ public class AuthController {
 
 
     @PostMapping("/api/auth/login")
-    public String login(@RequestBody  Map<String,String> data, HttpServletResponse response,Authentication authvariable){
-        // body로부터 아이디,비밀번호 가져오기
-        // 사용자 인증을 위한 UsernamePasswordAuthenticationToken 생성
-         var authToken = new UsernamePasswordAuthenticationToken(
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
+        // 아이디와 비밀번호 가져오기
+        var authToken = new UsernamePasswordAuthenticationToken(
                 data.get("username"), data.get("password")
         );
-        // AuthenticationManagerBuilder를 사용하여 인증 수행
+
+        // 인증 수행
         Authentication auth = authenticationManagerBuilder.getObject().authenticate(authToken);
-        // SecurityContextHolder에 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-       String jwt=JwtUtil.createToken(SecurityContextHolder.getContext().getAuthentication());
-        System.out.println("jwt : "+jwt);
+        // JWT 생성
+        String jwt = JwtUtil.createToken(SecurityContextHolder.getContext().getAuthentication());
 
-        // 쿠키 생성 + jwt 보관
-        var cookie = new Cookie("jwt", jwt); //Key:value로 저장가능
-        cookie.setMaxAge(60 * 60 * 24);         // 하루 동안 유효
-        cookie.setHttpOnly(true);             // HttpOnly 설정으로 자바스크립트 접근 방지
-        cookie.setPath("/");                  // 쿠키가 전송될 URL 경로를 모든 경로로 설정
-        response.addCookie(cookie);           // 브라우저에 쿠키 전달
+        // JWT를 쿠키에 저장
+        var cookie = new Cookie("jwt", jwt);
+        cookie.setMaxAge(60 * 60 * 24); // 하루 유효
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
 
+        // 사용자 정보 가져오기(CustomUser 사용)
+        CustomUser user = (CustomUser) auth.getPrincipal();
 
+        // 반환 데이터
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("jwt", jwt); // JWT
+        responseBody.put("userId", user.getUserId());     // 사용자 ID
+        responseBody.put("username", user.getUsername()); // 사용자 이름
+        responseBody.put("roles", user.getAuthorities()); // 권한 정보
 
-        // auth 확인
-        if (authvariable != null) {
-            System.out.println("auth변수확인");
-       CustomUser user =(CustomUser)authvariable.getPrincipal();
-            System.out.println(user);
-            System.out.println(user.getUserId());
-            System.out.println(user.getAuthorities());
-            System.out.println(user.getUsername());
-        }
-
-        return jwt;
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("api/auth/signup")
