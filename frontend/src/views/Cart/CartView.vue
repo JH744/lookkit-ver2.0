@@ -32,7 +32,7 @@
             </a>
           </div>
           <div class="item-description">
-            <div class="product-name">{{ item.codiName }}</div>
+            <div class="product-name">{{ item.codiDescription }}</div>
           </div>
           <div class="item-description">
             <div class="product-variant">
@@ -106,7 +106,7 @@
         </a>
       </div>
       <div class="item-description">
-        <div class="product-name">{{ item.productName || item.codiName }}</div>
+        <div class="product-name">{{ item.productName || item.codiDescription }}</div>
       </div>
       <div class="item-description">
         <div v-if="item.quantity !== null" class="product-variant">{{ item.quantity }}개</div>
@@ -191,15 +191,21 @@ const fetchCartItems = async () => {
 
   // 대여일에 따라 코디 상품의 총 가격 계산
   const getCodiTotalPrice = (item) => {
-    if (item.rentalStartDate && item.rentalEndDate) {
-      const startDate = new Date(item.rentalStartDate);
-      const endDate = new Date(item.rentalEndDate);
-      const diffTime = Math.abs(endDate - startDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return item.codiPrice * (diffDays || 1);
+  if (item.rentalStartDate && item.rentalEndDate) {
+    const startDate = new Date(item.rentalStartDate);
+    const endDate = new Date(item.rentalEndDate);
+    const diffTime = endDate - startDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 기본 3일 가격 + 추가 요금 계산
+    if (diffDays > 3) {
+      return item.codiPrice + (diffDays - 3) * 10000;
     }
-    return item.codiPrice;
-  };
+    return item.codiPrice; // 기본 3일 가격
+  }
+  return item.codiPrice;
+};
+
   
   // 선택된 아이템 삭제
   const deleteSelectedItems = async () => {
@@ -307,17 +313,20 @@ const fetchCartItems = async () => {
 
   // 구매하기 버튼을 클릭한 경우에만 데이터 저장
   orderStore.$patch({
-    selectedItems: selectedItems.value.map(item => ({
-      itemId: item.productId || item.codiId,
-      itemName: item.productName || item.codiName,
-      brandName: item.brandName || '',
-      type: item.type,
-      quantity: item.quantity || 1,
-      startDate: item.rentalStartDate || null,
-      endDate: item.rentalEndDate || null,
-      totalPrice: item.productPrice || item.codiPrice,
-    }))
-  });
+  selectedItems: selectedItems.value.map(item => ({
+    itemId: item.productId || item.codiId,
+    itemName: item.productName || item.codiName,
+    brandName: item.brandName || '',
+    type: item.type,
+    quantity: item.quantity || 1,
+    startDate: item.rentalStartDate || null,
+    endDate: item.rentalEndDate || null,
+    totalPrice: item.productPrice || item.codiPrice,
+  })),
+  totalFinalPrice: totalFinalPrice.value, // Cart에서 계산된 총 금액을 저장
+});
+
+  orderStore.setSelectedItems(selectedItems.value, totalFinalPrice.value);
 
   // 데이터를 로컬 스토리지에 저장
   localStorage.setItem('orderStore', JSON.stringify(orderStore.selectedItems));

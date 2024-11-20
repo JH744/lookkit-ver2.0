@@ -26,4 +26,35 @@ public class UserController {
         User user = userService.getUserInfo(id);
         return ResponseEntity.ok(user);
     }
+
+
+
+    @PostMapping("/find/id")
+    public ResponseEntity findUserId(@RequestBody UserDTO userDTO){
+
+        String result =  userService.findById(userDTO);
+        if (result.equals("결과없음")){
+            return ResponseEntity.status(500).body("일치하는 유저아이디가 없습니다.");
+        }else {
+            return  ResponseEntity.status(200).body(result);
+        }
+
+    }
+
+
+    @PostMapping("/update/password")
+    public ResponseEntity updatePassword(@RequestBody UserDTO userDTO){
+        String result = userService.updatePassword(userDTO);
+        if (result.equals("실패")){
+            return ResponseEntity.status(500).body("비밀번호 변경에 실패했습니다.");
+        }else {
+            return  ResponseEntity.status(200).body(result);
+        }
+    }
+
+
+
+
+
+
 }

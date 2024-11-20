@@ -105,28 +105,27 @@
         </div>
         <div class="codi-main-container">
           <!--코디&상품 반복 시작-->
-          <!-- <div th:each="codi:${coordiList}" class="codi-block">
+          <div v-for="(codi, index) in codiList" class="codi-block">
             <img
               class="codi-sumnail"
-              th:src="@{'/images/coordi/0' + ${codi.codiId} + '/' + ${codi.codiId} + '_thumbnail.webp'}"
+              :src="encodedCodiImageUrl(codi.codiId)"
               alt="코디 썸네일"
             />
-            <div class="codi-product" th:each="product : ${codi.products}">
+
+            <div class="codi-product" v-for="product in codi.products">
               <img
                 class="codi-product-img"
-                th:src="@{'/images/products/0' + ${product.productId} + '/'+ ${product.productThumbnail}}"
-                alt="코디 썸네일"
+                :src="encodedProductImageUrl(product.productId)"
+                alt="상품 썸네일"
               />
-              <a th:href="@{|/product/${product.productId}|}">
+              <a :href="`/product/${product.productId}`">
                 <div class="codi-text">
-                  <p th:text="${product.productName}">DIEMME</p>
-                  <p th:text="${product.productPrice}">
-                    FOUND TIE FRONT PANT (BLACK)
-                  </p>
+                  <p>{{ product.productName }}</p>
+                  <p>{{ product.productPrice }}</p>
                 </div>
               </a>
             </div>
-          </div> -->
+          </div>
           <!--반복 끝-->
         </div>
       </div>
@@ -142,10 +141,48 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "MainView",
-};
+<script setup>
+import { onMounted, ref, computed } from "vue";
+import axios from "axios";
+
+const codiList = ref([]);
+const imageBaseUrl = ref(
+  "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
+);
+
+const encodedCodiImageUrl = computed(() => {
+  return (codiId) => {
+    const folderPath = `/codi/0${codiId}`;
+    const fileName = `/${codiId}_thumbnail.webp`;
+    const encodedPath = `${encodeURIComponent(folderPath)}${encodeURIComponent(
+      fileName
+    )}`;
+    return `${imageBaseUrl.value}${encodedPath}?alt=media`;
+  };
+});
+
+const encodedProductImageUrl = computed(() => {
+  return (productId) => {
+    const folderPath = `/products/0${productId}`;
+    const fileName = `/${productId}_thumbnail.webp`;
+    const encodedPath = `${encodeURIComponent(folderPath)}${encodeURIComponent(
+      fileName
+    )}`;
+    return `${imageBaseUrl.value}${encodedPath}?alt=media`;
+  };
+});
+
+onMounted(async () => {
+  try {
+    const response = await axios.get("http://localhost:8081/api/main/codiset");
+    codiList.value = response.data;
+    console.log("코디 리스트:", codiList.value);
+    console.log("코디 데이터0:", codiList.value[0]);
+    console.log("코디 데이터0의 상품리스트:", codiList.value[0].products);
+  } catch (error) {
+    console.error("코디 데이터 조회 실패:", error);
+  }
+});
 </script>
 
 <style scoped>
@@ -268,6 +305,10 @@ export default {
 .codi-text {
   font-size: 16px;
   font-weight: bold;
+
+  p {
+    padding-bottom: 4px;
+  }
 }
 
 .codi-sumnail {
@@ -285,17 +326,19 @@ export default {
 .codi-product {
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 
 .codi-product-img {
   width: 50px;
-  height: 50px;
+  height: 55px;
 }
 
 .codi-block {
   display: flex;
   flex-direction: column;
   justify-items: center;
+  gap: 3px;
 }
 
 .codi-text p {

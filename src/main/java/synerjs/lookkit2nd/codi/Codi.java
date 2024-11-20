@@ -1,7 +1,9 @@
 package synerjs.lookkit2nd.codi;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.review.Review;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +24,25 @@ public class Codi {
     private String codiThumbnail;
     private Integer codiPrice;
 
+    @Column(nullable = false)
+    private Integer quantity = 1; // 기본값으로 1 설정
+
     @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @Builder
-    public Codi(String codiName, String codiDescription, String codiThumbnail, Integer codiPrice) {
+    public Codi(String codiName, String codiDescription, String codiThumbnail, Integer codiPrice, Integer quantity) {
         this.codiName = codiName;
         this.codiDescription = codiDescription;
         this.codiThumbnail = codiThumbnail;
         this.codiPrice = codiPrice;
+        this.quantity = (quantity != null) ? quantity : 1;
     }
+
+//    @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JsonManagedReference // Product와의 순환 참조 방지
+//    private List<Product> products = new ArrayList<>();
+
+
 }
