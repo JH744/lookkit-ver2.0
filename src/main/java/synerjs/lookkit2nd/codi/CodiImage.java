@@ -9,7 +9,6 @@ import lombok.*;
 @Table(name = "codi_images")
 @ToString
 public class CodiImage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codiImgId;

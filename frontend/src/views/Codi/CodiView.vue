@@ -95,8 +95,15 @@ import axios from 'axios';
 import "@/assets/styles/codi.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
 import Datepicker from 'vue3-datepicker';
+import { useAuthStore } from "@/stores/authStore";
 
 const API_BASE_URL = 'http://localhost:8081/api/codi';
+const authStore = useAuthStore();
+const jwtToken = authStore.token;
+const userId = authStore.user?.userId;
+
+console.log("JWT Token:", jwtToken);
+console.log("User ID from AuthStore:", userId); 
 
 const activeTab = ref('details');
 const codi = ref({});
@@ -216,14 +223,20 @@ const getFormattedDate = (date) => {
 
 const addToCart = async () => {
   try {
-    const userId = 1;
+    
     const API_BASE_URL = 'http://localhost:8081/api/cart';
     const formattedStartDate = getFormattedDate(new Date(rentalStartDate.value));
     const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
 
     const response = await axios.post(
-      `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${formattedStartDate}&rentalEndDate=${formattedEndDate}&userId=${userId}`
-    );
+  `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${formattedStartDate}&rentalEndDate=${formattedEndDate}&userId=${userId}`,
+  {},
+  {
+    headers: {
+      Authorization: `Bearer ${authStore.token}`
+    }
+  }
+);
     alert('옷장에 추가되었습니다.');
     window.location.href = '/cart';
   } catch (error) {

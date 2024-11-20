@@ -71,11 +71,12 @@
       대여일 {{ item.startDate }} ~ 반납일 {{ item.endDate }}
       <div class="rental-period">대여기간 {{ calculateRentalDays(item.startDate, item.endDate) }}일</div>
            </div>
-         
+           <div class="price">
            <div class="item-price">{{ formatPrice(item.totalPrice) }}원</div>
            <div v-if="item.type === 'product' || item.type === 'codi'" class="adjusted-price">
              {{ formatPrice(calculateAdjustedPrice(item)) }}원
            </div>
+          </div>
         </div>
       </div>
 
@@ -91,7 +92,10 @@
            <div class="product-name"> {{ orderItem.itemName }}</div>
          </div>
          <div class="product-variant"> {{ orderItem.quantity }}개</div>
-         <div class="item-price"> {{ formatPrice(orderItem.totalPrice) }}원</div>
+         <div class="price">
+         <div class="item-price"> {{ formatPrice(orderItem.price) }}원</div>
+         <div class="adjusted-price"> {{ formatPrice(orderItem.totalPrice) }}원</div>
+         </div>
         </div>
       </div>  
       <!-- Codi 정보 -->
@@ -101,7 +105,10 @@
           <div class="product-name"> {{ orderItem.itemName }}</div>
           <div class="product-variant">대여일 {{ orderItem.startDate }} ~반납일 {{ orderItem.endDate }}</div>
           <div class="product-variant2">대여기간 {{ rentalDays }}일</div>
+          <div class="price">
           <div class="item-price"> {{ formatPrice(orderItem.price) }}원</div>
+          <div class="adjusted-price"> {{ formatPrice(orderItem.totalprice) }}원</div>
+          </div>
         </div>
       </div>
     </div>
@@ -143,10 +150,18 @@
 import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import "@/assets/styles/order.css";
-import { useOrderStore } from '@/store/orderStore';
+import { useOrderStore } from '@/stores/orderStore';
 import AddAddressView from '@/views/Order/AddAddressView.vue';
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { storage } from "@/firebase/firebaseConfig";
+import { useAuthStore } from "@/stores/authStore";
+
+const authStore = useAuthStore();
+const userId = authStore.user?.userId;
+
+const orderStore = useOrderStore();
+const orderItem = ref(null);
+const route = useRoute();
 
   // Firebase에서 이미지 불러오기
   const fetchImageForItem = async (item) => {
@@ -162,17 +177,13 @@ import { storage } from "@/firebase/firebaseConfig";
     const imageRef = firebaseRef(storage, storagePath);
     const url = await getDownloadURL(imageRef);
     item.thumbnailUrl = url;
-    orderItem.thumbnailUrl = url;
   } catch (error) {
     console.error(`이미지 가져오기 실패: ${storagePath}`, error);
     item.thumbnailUrl = '/images/placeholder.png';
-    orderItem.thumbnailUrl = '/images/placeholder.png';
   }
 };
 
-const orderStore = useOrderStore();
-const orderItem = ref(null);
-const route = useRoute();
+
 
 // 주문 페이지로 넘어온 단일 상품 정보 (URL에서 가져온 파라미터로 설정)
 onMounted(async () => {
@@ -500,7 +511,7 @@ if (orderItem.value) {
 
 // 최종 paymentData 생성
 const paymentData = {
-  userId: 1, // 실제 유저 ID를 사용해야 합니다.
+  userId: userId, // 실제 유저 ID를 사용해야 합니다.
   totalAmount: totalPrice.value,
   orderAddress: buyerAddr,
   orderAddressee: buyerName,
@@ -566,4 +577,40 @@ fetch("http://localhost:8081/api/order/complete", {
   const updateAddress = (newAddress) => {
     address.value = newAddress;
   };
+
+  
+
+// onMounted(async () => {
+//   try {
+//     const jwtToken = authStore.jwt;
+
+//     // JWT 토큰을 이용해 API 요청 보내기
+//     const response = await fetch('http://localhost:8081/api/user/address', {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${jwtToken}` // JWT 토큰을 헤더에 포함
+//       }
+//     });
+
+//     if (!response.ok) {
+//       throw new Error('배송지 정보를 불러오는 데 문제가 발생했습니다.');
+//     }
+
+//     const data = await response.json();
+//     console.error('')
+
+//     // 받은 주소 데이터를 Vue ref에 설정
+//     address.value = {
+//       addressName: data.addressName,
+//       recipientName: data.recipientName,
+//       phoneNumber: data.phoneNumber,
+//       fullAddress: data.fullAddress
+//     };
+
+//   } catch (error) {
+//     console.error('배송지 정보를 불러오는 데 실패했습니다:', error);
+//     alert('배송지 정보를 불러오는 데 실패했습니다.');
+//   }
+// });
 </script>

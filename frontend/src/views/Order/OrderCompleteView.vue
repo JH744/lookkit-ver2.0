@@ -94,7 +94,10 @@ import { useRoute, useRouter } from 'vue-router';
 import "@/assets/styles/orderComplete.css";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { storage } from "@/firebase/firebaseConfig";
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
+const userId = authStore.user?.userId;
 const route = useRoute();
 const router = useRouter();
 

@@ -73,11 +73,11 @@ const routes = [
       {
         path: "review",
         component: () => import("@/views/Review/ReviewView.vue"),
-        props: route => ({ codiId: route.params.codiId }), 
+        props: (route) => ({ codiId: route.params.codiId }),
       },
     ],
   },
-  
+
   {
     path: "/product/:productId",
     component: () => import("@/views/Product/ProductView.vue"),
@@ -85,7 +85,7 @@ const routes = [
       {
         path: "review",
         component: () => import("@/views/Review/ReviewView.vue"),
-        props: route => ({ productId: route.params.productId }), 
+        props: (route) => ({ productId: route.params.productId }),
       },
     ],
   },

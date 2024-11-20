@@ -532,8 +532,18 @@ justify-content: space-between;
 }
 
 .payment-header {
-  flex-shrink: 0;
-  border-top: 1px solid #101010;
+  border-top: 1px solid;
+
+border-width: 1.5px 0px 0px 0px;
+padding: 20.5px 5px 20px 5px;
+display: flex;
+flex-direction: column;
+gap: 0px;
+align-items: flex-start;
+justify-content: flex-start;
+align-self: stretch;
+flex-shrink: 0;
+position: relative;
 }
 
 .payment-info-title {
@@ -616,7 +626,7 @@ position: relative;
 }
 
 .final-payment-header {
-border-style: solid;
+border-top: 1px solid;
 border-color: #101010;
 border-width: 1.5px 0px 0px 0px;
 padding: 20.5px 5px 20px 5px;

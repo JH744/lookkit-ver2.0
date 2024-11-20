@@ -14,11 +14,8 @@
           </div>
         </div>
         <div class="sort-section">
-          <div
-            class="item-count"
-            th:text="'상품갯수: '+${productsList.size()}+'개'"
-          >
-            2,120개
+          <div class="item-count">
+            {{ products.length + "개" }}
           </div>
           <div class="sort-box">
             <ul>

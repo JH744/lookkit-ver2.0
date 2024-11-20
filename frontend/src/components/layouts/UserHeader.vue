@@ -1,6 +1,6 @@
 <template>
   <div class="welcome-header">
-    <span class="welcome-message">User님 환영합니다</span>
+    <span class="welcome-message">{{ username }}님 환영합니다</span>
     <div class="profile-options">
       <button @click="openPwCheck">
         <img
