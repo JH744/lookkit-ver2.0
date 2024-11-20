@@ -67,7 +67,7 @@ const showDeleteConfirmModal = (inquiryId) => {
   const confirmModalStore = useConfirmModalStore();
   confirmModalStore.showModal(
     '문의 삭제',
-    '정말로 이 문의를 삭제하시겠습니까?',
+    '정말로 문의를 삭제하시겠습니까?',
     '삭제된 문의는 복구할 수 없습니다.',
     '삭제하기',
     () => deleteInquiry(inquiryId) // 확인 버튼 클릭 시 호출할 콜백 함수

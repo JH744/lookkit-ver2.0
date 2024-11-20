@@ -113,10 +113,11 @@ const routes = [
         path: "wishlist",
         component: () => import("@/views/mypage/WishList.vue"),
       },
+      {
+        path: "updateInfo",
+        component: () => import("@/views/mypage/UserInfoView.vue"),
+      },
     ],
-
-    path: "/updateInfo",
-    component: () => import("@/views/mypage/UserInfoView.vue"),
   },
   {
     path: "/vali",

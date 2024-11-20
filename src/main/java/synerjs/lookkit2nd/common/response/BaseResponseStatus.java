@@ -21,7 +21,10 @@ public enum BaseResponseStatus {
 
     /* 위시리스트 */
     WISH_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "선택한 위시리스트의 상품을 찾을 수 없습니다."),
-    WISH_ALREADY_EXISTS(false, HttpStatus.CONFLICT.value(), "이미 찜한 상품입니다.");
+    WISH_ALREADY_EXISTS(false, HttpStatus.CONFLICT.value(),"이미 찜한 상품입니다."),
+
+    /* 주문 */
+    ORDER_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "해당 주문은 존재하지 않습니다.");
 
     private final boolean isSuccess;
     private final int code;

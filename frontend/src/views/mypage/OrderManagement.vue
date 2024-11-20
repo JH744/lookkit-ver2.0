@@ -1,125 +1,168 @@
 <template>
-    <div class="order-container">
-      <div class="status-section">
-        <div class="status-title">진행중인 주문</div>
-        <div class="status-box">
-          <div class="status-icons">
-            <div class="step">
-              <div class="circle-container">
-                <div :class="['step-circle', counts.countPending > 0 ? 'blue-circle' : 'white-circle']"></div>
-                <p :class="['step-number', counts.countPending > 0 ? 'white-text' : 'gray-text']">{{ counts.countPending }}</p>
-              </div>
-              <span class="step-description">결제 완료</span>
+  <div class="order-container">
+    <div class="status-section">
+      <div class="status-title">진행중인 주문</div>
+      <div class="status-box">
+        <div class="status-icons">
+          <div class="step">
+            <div class="circle-container">
+              <div :class="['step-circle', counts.countPending > 0 ? 'blue-circle' : 'white-circle']"></div>
+              <p :class="['step-number', counts.countPending > 0 ? 'white-text' : 'gray-text']">{{ counts.countPending }}</p>
             </div>
-            <img class="status-icon" src="/images/arrow.png" />
-            <div class="step">
-              <div class="circle-container">
-                <div :class="['step-circle', counts.countShipped > 0 ? 'blue-circle' : 'white-circle']"></div>
-                <p :class="['step-number', counts.countShipped > 0 ? 'white-text' : 'gray-text']">{{ counts.countShipped }}</p>
-              </div>
-              <span class="step-description">배송 준비</span>
-            </div>
-            <img class="status-icon" src="/images/arrow.png" />
-            <div class="step">
-              <div class="circle-container">
-                <div :class="['step-circle', counts.countDelivered > 0 ? 'blue-circle' : 'white-circle']"></div>
-                <p :class="['step-number', counts.countDelivered > 0 ? 'white-text' : 'gray-text']">{{ counts.countDelivered }}</p>
-              </div>
-              <span class="step-description">배송중</span>
-            </div>
-            <img class="status-icon" src="/images/arrow.png" />
-            <div class="step">
-              <div class="circle-container">
-                <div :class="['step-circle', counts.countCompleted > 0 ? 'blue-circle' : 'white-circle']"></div>
-                <p :class="['step-number', counts.countCompleted > 0 ? 'white-text' : 'gray-text']">{{ counts.countCompleted }}</p>
-              </div>
-              <span class="step-description">배송 완료</span>
-            </div>
+            <span class="step-description">결제 완료</span>
           </div>
-        </div>
-      </div>
-      <div class="shipment-section">
-        <div class="shipment-title">주문 배송 조회</div>
-        <div class="shipment-header">
-          <p class="shipment-header-item">상품 정보</p>
-          <p class="shipment-header-item">진행 상태</p>
-          <p class="shipment-header-item">구매확정 및 리뷰</p>
-        </div>
-        <div v-for="(product, index) in products" :key="product.productId">
-          <div v-if="isFirstProduct(index)" class="shipment-info">
-            <div class="shipment-info-item">
-              <span class="shipment-label">주문일자</span>
-              <span class="shipment-value">{{ product.orderDate }}</span>
+          <img class="status-icon" src="/images/arrow.png" />
+          <div class="step">
+            <div class="circle-container">
+              <div :class="['step-circle', counts.countShipped > 0 ? 'blue-circle' : 'white-circle']"></div>
+              <p :class="['step-number', counts.countShipped > 0 ? 'white-text' : 'gray-text']">{{ counts.countShipped }}</p>
             </div>
-            <div class="shipment-info-item">
-              <span class="shipment-label">주문번호</span>
-              <span class="shipment-value">{{ product.orderId }}</span>
-            </div>
+            <span class="step-description">배송 준비</span>
           </div>
-          <div class="shipment-product">
-            <img class="product-image" :src="`/images/products/0${product.productId}/${product.productThumbnail}`" />
-            <div class="product-details">
-              <div class="product-brand">{{ product.brandName }}</div>
-              <div class="product-name">{{ product.productName }}</div>
-              <div class="product-price">{{ product.productPrice }}원 / 수량: {{ product.quantity }}</div>
+          <img class="status-icon" src="/images/arrow.png" />
+          <div class="step">
+            <div class="circle-container">
+              <div :class="['step-circle', counts.countDelivered > 0 ? 'blue-circle' : 'white-circle']"></div>
+              <p :class="['step-number', counts.countDelivered > 0 ? 'white-text' : 'gray-text']">{{ counts.countDelivered }}</p>
             </div>
-            <div class="status-section-text">
-              <div class="status-text">{{ getOrderStatusText(product.orderStatus) }}</div>
-              <button class="inquiry-button">1:1 문의하기</button>
+            <span class="step-description">배송중</span>
+          </div>
+          <img class="status-icon" src="/images/arrow.png" />
+          <div class="step">
+            <div class="circle-container">
+              <div :class="['step-circle', counts.countCompleted > 0 ? 'blue-circle' : 'white-circle']"></div>
+              <p :class="['step-number', counts.countCompleted > 0 ? 'white-text' : 'gray-text']">{{ counts.countCompleted }}</p>
             </div>
-            <div class="actions">
-              <button v-if="!product.isPurchaseConfirmed" class="confirm-button" @click="confirmPurchase(product.orderId, product.productId)">구매확정</button>
-              <a v-else class="review-button" href="/mypage/inquiry/new">리뷰 작성</a>
-              <span v-if="product.isPurchaseConfirmed" class="confirmed-text">구매확정</span>
-            </div>
+            <span class="step-description">배송 완료</span>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue';
-  
-  // API 또는 props를 통해 서버에서 받아올 데이터
-  const products = ref([]);
-  
-  // counts는 상태별로 주문의 개수를 의미합니다.
-  const counts = computed(() => {
-    const countPending = products.value.filter(product => product.orderStatus === 'pending').length;
-    const countShipped = products.value.filter(product => product.orderStatus === 'shipped').length;
-    const countDelivered = products.value.filter(product => product.orderStatus === 'delivered').length;
-    const countCompleted = products.value.filter(product => product.orderStatus === 'completed').length;
-    return { countPending, countShipped, countDelivered, countCompleted };
-  });
-  
-  const isFirstProduct = (index) => {
-    return index === 0 || products.value[index].orderId !== products.value[index - 1].orderId;
-  };
-  
-  const getOrderStatusText = (status) => {
-    switch (status) {
-      case 'pending': return '결제 완료';
-      case 'shipped': return '배송 준비중';
-      case 'delivered': return '배송 중';
-      case 'completed': return '배송 완료';
-      default: return '배송 상태 없음';
-    }
-  };
-  
-  const confirmPurchase = (orderId, productId) => {
-    // 구매확정 처리 로직
-    console.log(`구매확정: 주문번호 ${orderId}, 상품번호 ${productId}`);
-  };
-  </script>
+    <div class="shipment-section">
+      <div class="shipment-title">주문 배송 조회</div>
+      <div class="shipment-header">
+        <p class="shipment-header-item" id="space-header">상품 정보</p>
+        <p class="shipment-header-item">진행 상태</p>
+        <p class="shipment-header-item">대여 기간</p>
+        <p class="shipment-header-item">구매확정/리뷰</p>
+      </div>
+      <div v-for="(product) in products" :key="product.productId">
+        <div class="shipment-info">
+          <div class="shipment-info-item">
+            <span class="shipment-label">주문일자 </span>
+            <span class="shipment-value">{{ formatDate(product.orderDate) }}</span>
+          </div>
+          <div class="shipment-info-item">
+            <span class="shipment-label">주문번호 </span>
+            <span class="shipment-value">{{ product.orderId }}</span>
+          </div>
+        </div>
+        <div class="shipment-product">
+          <img class="product-image" :src="`/images/products/0${product.productId}/${product.productThumbnail}`" />
+          <div class="product-details">
+            <div class="product-brand">{{ product.brandName }}</div>
+            <div class="product-name">{{ product.productName }}</div>
+            <div class="product-price">{{ product.productPrice }}원 / 수량: {{ product.quantity }}</div>
+          </div>
+          <div class="status-section-text">
+            <div class="status-text">{{ getOrderStatusText(product.orderStatus) }}</div>
+            <router-link class="inquiry-button" to="/mypage/inquiry/create">1:1 문의하기</router-link>
+          </div>
+          <div class="rental-grid">
+            <p>{{ product.rentalStartDate }}</p>
+            <img width="18px" src="/images/under-arrow.png">
+            <p>{{ product.rentalEndDate }}</p>
+          </div>
+          <div class="actions">
+            <button v-if="!product.purchaseConfirmed" class="confirm-button" @click="showConfirmModal(product)">대여 확정</button>
+            <span v-else class="confirmed-text">대여 확정</span>
+            <a class="review-button" href="/mypage/inquiry/new">리뷰 작성</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import { format } from 'date-fns';
+import { useModalStore, useConfirmModalStore } from '@/stores/modalStore';
+
+const products = ref([]);
+
+// 상태별 주문 개수 계산
+const counts = computed(() => {
+  const countPending = products.value.filter(product => product.orderStatus === 'pending').length;
+  const countShipped = products.value.filter(product => product.orderStatus === 'shipped').length;
+  const countDelivered = products.value.filter(product => product.orderStatus === 'delivered').length;
+  const countCompleted = products.value.filter(product => product.orderStatus === 'completed').length;
+  return { countPending, countShipped, countDelivered, countCompleted };
+});
+
+// 주문 상태 텍스트 반환
+const getOrderStatusText = (status) => {
+  switch (status) {
+    case 'pending': return '결제 완료';
+    case 'shipped': return '배송 준비중';
+    case 'delivered': return '배송 중';
+    case 'completed': return '배송 완료';
+    default: return '배송 상태 없음';
+  }
+};
+
+// 문의하기
+const createInquiry = () => {
+    router.push('/mypage/inquiry/create');
+};
+
+// 대여 확정 처리 함수
+const showConfirmModal = (product) => {
+  const confirmModalStore = useConfirmModalStore();
+  confirmModalStore.showModal(
+    '대여 확정',
+    '대여를 확정 하시겠습니까?',
+    '대여 확정시 대여 취소를 할 수 없습니다',
+    '대여확정',
+    () => confirmRental(product)
+  );
+};
+
+const confirmRental = async (product) => {
+  product.purchaseConfirmed = true;
+  try {
+    await axios.patch(`http://localhost:8081/api/mypage/manage/${product.orderId}`);
+    const modalStore = useModalStore();
+    modalStore.showModal('대여 확정', '감사합니다. 멋진 소개팅하세요 :)');
+  } catch (error) {
+    console.log(error);
+  }
+
+}
+
+// 주문 정보 불러오기
+const loadOrder = async () => {
+  try {
+    const response = await axios.get('http://localhost:8081/api/mypage/manage/5');
+    products.value = response.data.data.products;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const formatDate = (dateString) => {
+  return format(new Date(dateString), 'yyyy-MM-dd');
+};
+
+
+onMounted(() => {
+  loadOrder();
+});
+</script>
+
   
   <style scoped>
-/* .order-container {
-    width: 80%;
-    margin-top: 25px;
-    margin-left: 50px;
-} */
-
 .status-section,
 .status-section * {
     box-sizing: border-box;
@@ -204,7 +247,7 @@
     width: 100%;
     margin: 0 auto;
     font-family: "Inter", sans-serif;
-    color: #363636;
+    color: black;
     padding: 10px 10px 10px 0;
     box-sizing: border-box;
 }
@@ -217,39 +260,32 @@
     margin-bottom: 15px;
 }
 .shipment-header {
-    display: flex;
+  display: flex;
     border-top: 2px solid #000;
     padding: 20px 0px;
     border-bottom: 1px solid #9e9e9e;
 }
-.shipment-header-item {
-    font-size: 16px;
-    font-weight: 500;
-    margin-left: 95px;
-}
 
 .shipment-header p:nth-child(2) {
-    margin-left: 315px;
+    margin-left: 104px;
+}
+.shipment-header p:nth-child(3) {
+    margin-left: 65px;
+}
+.shipment-header p:nth-child(4) {
+    margin-left: 51px;
 }
 
-.shipment-header p:nth-child(3) {
-    margin-left: 106px;
-}
 .shipment-info {
     display: flex;
     gap: 35px;
     padding-left: 23px;
-    padding-top: 20px;
+    padding-top: 17px;
     border-bottom: 1px solid #9e9e9e;
     background: #f3f3f3;
-    padding-bottom: 20px;
-}
-.shipment-info-item {
-    font-size: 16px;
-    font-weight: 400;
-}
-.shipment-label {
-    font-weight: 500;
+    padding-bottom: 17px;
+    color: #404040;
+    font-size: 17px;
 }
 .shipment-value {
     font-weight: 700;
@@ -258,7 +294,8 @@
     display: flex;
     justify-content: space-around;
     border-bottom: 1px solid #9e9e9e;
-    padding: 40px 40px;
+    padding: 40px 5px;
+    align-items: center;
 }
 
 .product-image {
@@ -298,6 +335,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
+    gap : 10px;
 }
 .status-date {
     font-size: 14px;
@@ -305,7 +343,7 @@
     color: #555;
 }
 .status-text {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
 }
 .inquiry-button {
@@ -313,7 +351,7 @@
     border: 1px solid #d4c9c9;
     font-size: 13px;
     font-weight: 400;
-    padding: 7px 15px;
+    padding: 7px 10px;
     cursor: pointer;
 }
 .actions {
@@ -324,7 +362,7 @@
 }
 .confirm-button {
     background-color: #0d1134;
-    width: 130px;
+    width: 115px;
     color: #ffffff;
     font-size: 12px;
     font-weight: 600;
@@ -334,7 +372,7 @@
 }
 .review-button {
     background-color: #ffffff;
-    width: 88px;
+    width: 115px;
     border: 1px solid #d4c9c9;
     font-size: 12px;
     font-weight: 600;
@@ -344,9 +382,21 @@
 }
 .confirmed-text {
     text-align: center;
-    color: #7c7c7c;
+    color: #ff5e00;
     font-size: 14px;
     font-weight: bold;
+}
+
+#space-header {
+  margin-right: 150px;
+  margin-left: 160px;
+}
+
+.rental-grid {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
 }
 
 /*조건에 따라 색 변경*/
