@@ -56,7 +56,7 @@ const verifyPassword = async () => {
       },
       {
         params: {
-          id: props.userId,
+          id: props.id.value,
         },
       }
     );

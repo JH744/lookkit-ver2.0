@@ -48,9 +48,8 @@ public class MyPageApiController {
     }
 
     //  회원 정보 업데이트
-    @PostMapping("/userinfo")
-    public ResponseEntity<User> update(@RequestBody MypageDTO dto) {
-        Long id = 10L; //JWT 토큰에서 받아오는 부분
+    @PutMapping("/userinfo/{id}")
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody MypageDTO dto) {
         // 1. 로그 확인
         log.info("id: {}, user: {}", id, dto.toString());
         // 2. 업데이트
@@ -76,7 +75,6 @@ public class MyPageApiController {
     //  비밀번호 변경
     @PostMapping("/userinfo/{id}/change-password")
     public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody PwChangeDTO pwchangedto){
-        id=10l;
 
         // 1. 로그 확인
         log.info("비밀번호 변경 요청 - ID {}, 현재 비밀번호: {}, 새로운 비밀번호: {}",
@@ -94,7 +92,7 @@ public class MyPageApiController {
             return ResponseEntity.badRequest().body("새로운 비밀번호가 일치하지 않습니다.");
         }
 
-        boolean result =encoder.matches(pwchangedto.getCurrentPassword(), mypageService.getCurrentPassword(8L));
+        boolean result =encoder.matches(pwchangedto.getCurrentPassword(), mypageService.getCurrentPassword(id));
 
         if(!result){
             return ResponseEntity.badRequest().body("현재 비밀번호가 정확하지 않거나 회원 정보를 찾을 수 없습니다.");

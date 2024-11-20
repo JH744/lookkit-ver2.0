@@ -14,13 +14,17 @@
 </template>
 
 <script setup>
-const emit = defineEmits(["open-pw-check"]);
+import { computed } from "vue";
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
+const userUuid = computed(() => authStore.user.userUuid);
+
+const emit = defineEmits(["open-pw-check"]);
 const openPwCheck = () => {
   emit("open-pw-check");
 };
 </script>
-
 <style scoped>
 .welcome-header {
   padding: 18px;

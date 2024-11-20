@@ -105,17 +105,21 @@
                 :value="userData.address + ' ' + userData.detailAddress"
               />
             </div>
-          </div>
-          <!-- 저장 및 취소 버튼 -->
-          <div class="button-group">
-            <button type="submit" class="btn-save" id="updateBtn">
-              수정완료
-            </button>
-          </div>
-          <div class="withdrawal-group">
-            <button type="button" class="btn-withdrawal" @click="deleteAccount">
-              회원 탈퇴
-            </button>
+            <!-- 저장 및 취소 버튼 -->
+            <div class="button-group">
+              <button type="submit" class="btn-save" id="updateBtn">
+                수정완료
+              </button>
+            </div>
+            <div class="withdrawal-group">
+              <button
+                type="button"
+                class="btn-withdrawal"
+                @click="deleteAccount"
+              >
+                회원 탈퇴
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -166,6 +170,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
+
+const authStore = useAuthStore();
+const id = ref(0);
 
 const userData = ref({
   userUuid: "",
@@ -177,22 +185,26 @@ const userData = ref({
   address: "",
   detailAddress: "",
 });
-
-const showModal = ref(false);
-const currentPassword = ref("");
-const newPassword = ref("");
-const confirmPassword = ref("");
-
+// 초기 데이터 로드
 onMounted(async () => {
+  console.log("유저정보", authStore.user);
+  id.value = authStore.user.userId;
+  console.log("유저ID : ", id.value);
+
   try {
     const response = await axios.get(
-      "http://localhost:8081/api/v1/userinfo/10"
+      `http://localhost:8081/api/v1/userinfo/${id.value}`
     );
     Object.assign(userData.value, response.data);
   } catch (error) {
     console.error("Error loading user data:", error);
   }
 });
+
+const showModal = ref(false);
+const currentPassword = ref("");
+const newPassword = ref("");
+const confirmPassword = ref("");
 
 // 비밀번호 변경 모달 열기
 const showPasswordChangeModal = () => {
@@ -213,7 +225,7 @@ const updatePassword = async () => {
   }
   try {
     await axios.post(
-      "http://localhost:8081/api/v1/userinfo/10/change-password",
+      `http://localhost:8081/api/v1/userinfo/${id.value}/change-password`,
       {
         currentPassword: currentPassword.value,
         newPassword: newPassword.value,
@@ -232,17 +244,17 @@ const updatePassword = async () => {
   }
 };
 
-// 프로필 업데이트 로직
+// 회원정보 업데이트 로직
 const updateProfile = async () => {
   try {
     await axios.put(
-      "http://localhost:8081/api/v1/userinfo/update",
+      `http://localhost:8081/api/v1/userinfo/${id.value}`,
       userData.value
     );
-    alert("프로필이 성공적으로 업데이트되었습니다.");
+    alert("회원정보를 성공적으로 업데이트했습니다.");
   } catch (error) {
     console.error("Error updating profile:", error);
-    alert("프로필 업데이트에 실패했습니다.");
+    alert("회원정보 업데이트에 실패했습니다.");
   }
 };
 
@@ -255,7 +267,7 @@ const emailCheckResult = ref({
 const checkEmailDuplicate = async () => {
   if (!userData.value.email) {
     emailCheckResult.value.message = "이메일을 입력해주세요.";
-    //emailCheckResult.value.isError = false;
+    emailCheckResult.value.isError = true; // 오류 상태로 설정
     return;
   }
 
@@ -273,15 +285,15 @@ const checkEmailDuplicate = async () => {
     console.log(response.data); // 응답 데이터 로그 확인
     if (response.data.exists === true) {
       emailCheckResult.value.message = "이미 사용 중인 이메일입니다.";
-      //emailCheckResult.value.isError = false;
+      emailCheckResult.value.isError = true; //오류 상태로 설정
     } else {
       emailCheckResult.value.message = "사용 가능한 이메일입니다.";
-      //emailCheckResult.value.isError = false;
+      emailCheckResult.value.isError = false; // 성공 상태로 설정
     }
   } catch (error) {
     console.error("Error checking email:", error);
     emailCheckResult.value.message = "이메일 중복 확인에 실패했습니다.";
-    //emailCheckResult.value.isError = false;
+    emailCheckResult.value.isError = true; // 오류 상태로 설정
   }
 };
 
@@ -299,11 +311,10 @@ const cancelUpdate = () => {
 
 // 탈퇴 요청 메서드
 const deleteAccount = async () => {
-  const userId = 10; // 여기에 실제 사용자 ID를 설정하세요
   const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
   if (confirmation) {
     try {
-      await axios.delete(`http://localhost:8081/api/v1/userinfo/${userId}`);
+      await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
       alert("회원 탈퇴가 완료되었습니다.");
       // 탈퇴 후 리다이렉트 동작 등 추가 가능
       window.location.href = "/"; // 홈 페이지로 리다이렉트
@@ -319,16 +330,13 @@ const deleteAccount = async () => {
 @charset "UTF-8";
 .profile-container {
   display: grid;
-  margin-top: 20px;
-  width: 1100px;
+  width: 1000px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 100px;
 }
 
 .second-grid {
   width: 100%;
-  margin-left: 50px;
 }
 
 .welcome-header {
@@ -454,7 +462,7 @@ const deleteAccount = async () => {
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
-  margin-left: 10px;
+  margin-top: 15px;
   border-radius: 25px;
   width: 125px;
 }
@@ -480,6 +488,7 @@ const deleteAccount = async () => {
   cursor: pointer;
   padding: 10px 20px;
   margin-bottom: 10px;
+  white-space: nowrap;
 }
 
 .outer-container {
@@ -493,11 +502,6 @@ const deleteAccount = async () => {
 
 .section-inquiries {
   border-bottom: 2px solid #727272;
-}
-
-.second-grid {
-  width: 100%;
-  margin-left: 50px;
 }
 
 .section-inquiries p:first-of-type {
@@ -591,14 +595,6 @@ const deleteAccount = async () => {
   resize: none;
   height: 200px;
   width: 100%;
-}
-
-.error-message {
-  color: #f44336;
-  margin: 0px;
-  font-size: 15px;
-  margin-left: 15px;
-  display: none;
 }
 
 .image-upload {
