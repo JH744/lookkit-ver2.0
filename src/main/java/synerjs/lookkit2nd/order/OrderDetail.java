@@ -43,8 +43,11 @@ public class OrderDetail {
     @Column(name = "rental_end_date", nullable = true)
     private LocalDate rentalEndDate;   
 
+    @Column(name = "product_price", nullable = true)
+    private Integer productPrice;
+
     @Builder
-    public OrderDetail(User user, Order order, Long productId, Long codiId, Integer quantity, Boolean isPurchaseConfirmed, LocalDate rentalStartDate, LocalDate rentalEndDate) {
+    public OrderDetail(User user, Order order, Long productId, Long codiId, Integer quantity, Boolean isPurchaseConfirmed, LocalDate rentalStartDate, LocalDate rentalEndDate, Integer productPrice) {
         this.user = user;
         this.order = order;
         this.productId = productId;
@@ -53,6 +56,7 @@ public class OrderDetail {
         this.isPurchaseConfirmed = isPurchaseConfirmed;
         this.rentalStartDate = rentalStartDate;
         this.rentalEndDate = rentalEndDate;
+        this.productPrice = productPrice;
     }
 
     public void setOrder(Order order) {
