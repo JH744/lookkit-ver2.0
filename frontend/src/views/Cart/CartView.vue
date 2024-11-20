@@ -141,7 +141,7 @@
   import { ref, computed, onMounted } from 'vue';
   import axios from 'axios';
   import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
-  import { storage } from "@/firebase/firebaseConfig";
+  import { firebaseStorage } from "@/firebase/firebaseConfig";
   import "@/assets/styles/cart.css";
   import iconDelete from '@/assets/icons/icon-delete.svg';
   import { useOrderStore } from '@/stores/orderStore';
@@ -172,7 +172,7 @@ const fetchImageForItem = async (item) => {
 
   console.log('이미지 경로 확인:', storagePath);
   try {
-    const imageRef = firebaseRef(storage, storagePath);
+    const imageRef = firebaseRef(firebaseStorage, storagePath);
     const url = await getDownloadURL(imageRef);
     item.thumbnailUrl = url;
   } catch (error) {

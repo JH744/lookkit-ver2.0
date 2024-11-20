@@ -19,10 +19,13 @@
         </div>
         <div v-if="quantity > 0" class="selected-summary-info">
           <div class="selected-summary">
-            <p>선택한 수량 {{ quantity }}개</p>
+            <div class="pick-block">
+              <p>선택한 수량 {{ quantity }}개</p>
+              <!-- <button @click="resetQuantity" class="btn btn-reset">X</button> -->
+              <img src="/images/close-button.png" @click="resetQuantity" class="cancel-button">
+            </div>
             <p><strong style="font-size: 1.5em;">총 구매 금액: {{ formattedTotalPrice }}</strong></p>
           </div>
-          <button @click="resetQuantity" class="btn btn-reset">X</button>
         </div>
       </div>
       
