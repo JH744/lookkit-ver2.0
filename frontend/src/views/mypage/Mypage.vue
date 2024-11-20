@@ -25,6 +25,7 @@ import { useAuthStore } from "@/stores/authStore";
 const authStore = useAuthStore();
 const showPwCheck = ref(false);
 const userId = ref(0); // 예제용, 실제 ID는 동적으로 설정해야 합니다.
+
 // 초기 데이터 로드
 onMounted(() => {
   console.log("유저정보", authStore.user);
