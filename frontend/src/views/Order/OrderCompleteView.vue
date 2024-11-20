@@ -93,7 +93,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import "@/assets/styles/orderComplete.css";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
-import { storage } from "@/firebase/firebaseConfig";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 import { useAuthStore } from "@/stores/authStore";
 
 const authStore = useAuthStore();
@@ -175,7 +175,7 @@ const fetchImageForItem = async (item) => {
 
   console.log('이미지 경로 확인:', storagePath);
   try {
-    const imageRef = firebaseRef(storage, storagePath);
+    const imageRef = firebaseRef(firebaseStorage, storagePath);
     const url = await getDownloadURL(imageRef);
     item.thumbnailUrl = url;
   } catch (error) {
