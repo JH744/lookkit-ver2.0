@@ -149,10 +149,11 @@ const fetchOrderData = async () => {
     }
 
     shippingInfo.value = {
-      '배송지명': orderData.orderAddress,
+      '주소': orderData.orderAddress,
       '받는 사람': orderData.orderAddressee,
       '휴대폰번호': orderData.orderPhone,
-      '주소': orderData.orderAddress,
+      '배송 메모': orderData.orderComment,
+      '배송 상태': orderData.orderStatus,
     };
   } catch (error) {
     console.error('주문 정보를 불러오는 데 실패했습니다:', error);
