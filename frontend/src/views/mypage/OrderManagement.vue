@@ -138,11 +138,6 @@ const getOrderStatusText = (status) => {
   }
 };
 
-// 문의하기
-const createInquiry = () => {
-    router.push('/mypage/inquiry/create');
-};
-
 // 대여 확정 처리 함수
 const showConfirmModal = (product) => {
   const confirmModalStore = useConfirmModalStore();
@@ -173,7 +168,7 @@ const confirmRental = async (product) => {
 // 주문 정보 불러오기
 const loadOrder = async () => {
   try {
-    const response = await axios.get(`http://localhost:8081/api/mypage/manage/${authStore.userId}`);
+    const response = await axios.get(`http://localhost:8081/api/mypage/manage/${authStore.user.userId}`);
     products.value = response.data.data.products;
   } catch (error) {
     console.log(error);

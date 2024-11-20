@@ -139,7 +139,7 @@ const submitForm = async () => {
     const formDataToSend = new FormData();
      // JSON 데이터로 변경
      const requestPayload = {
-      userId: authStore.userId,
+      userId: authStore.user.userId,
       inquiryTitle: formData.title,
       inquiryContents: formData.content
     };

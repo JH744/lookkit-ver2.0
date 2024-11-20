@@ -1,5 +1,7 @@
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
 // 좋아요 버튼 클릭 함수
 export const toggleLike = async (wish) => {
   try {
@@ -11,7 +13,7 @@ export const toggleLike = async (wish) => {
       wish.likeCount--;
     } else {
       const response = await axios.post(
-        "http://localhost:8081/api/mypage/wishlist/5",
+        `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
         {
           productId: wish.productId,
         }

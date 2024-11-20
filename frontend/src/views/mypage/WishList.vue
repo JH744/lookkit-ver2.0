@@ -25,7 +25,9 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { toggleLike } from '../../utils/likeFunction';
+import { useAuthStore } from '@/stores/authStore';
 
+const authStore = useAuthStore();
 const wishlist = ref([]);
 
 // 숫자 포맷 함수
@@ -35,7 +37,7 @@ function formatPrice(price) {
 
 const loadWishlist = async () => {
   try {
-    const response = await axios.get('http://localhost:8081/api/mypage/wishlist/5');
+    const response = await axios.get(`http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`);
     wishlist.value = response.data.data.map(item => ({
       ...item,
       isLiked: true,

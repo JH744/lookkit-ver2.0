@@ -15,7 +15,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { computed } from 'vue';
 
 const authStore = useAuthStore();
-const username = computed(() => authStore.username);
+const username = computed(() => authStore.user.username);
 // const isAuthenticated = computed(() => authStore.isAuthenticated);
 // const authorities = computed(() => authStore.authorities);
 </script>

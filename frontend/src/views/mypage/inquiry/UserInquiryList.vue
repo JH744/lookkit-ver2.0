@@ -46,9 +46,9 @@ const inquiries = ref([]);
 const authStore = useAuthStore();
 
 const loadInquiries = async () => {
-  console.log(">>>>>>>>>>>>>>>>",authStore.userId);
+  console.log(">>>>>>>>>>>>>>>>",authStore.user.userId);
   try {
-    const response = await axios.get(`http://localhost:8081/api/mypage/inquiry/user/${authStore.userId}`);
+    const response = await axios.get(`http://localhost:8081/api/mypage/inquiry/user/${authStore.user.userId}`);
     inquiries.value = response.data.data;
     console.log(response.data.data);
   } catch (error) {
