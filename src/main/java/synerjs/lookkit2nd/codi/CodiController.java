@@ -4,8 +4,6 @@ package synerjs.lookkit2nd.codi;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.order.OrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
