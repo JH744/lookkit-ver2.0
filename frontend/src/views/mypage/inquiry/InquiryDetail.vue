@@ -1,76 +1,88 @@
 <template>
+  <section class="section-inquiries">
+    <p id="section-title">1:1 문의하기</p>
+  </section>
 
-          <section class="section-inquiries">
-            <p id="section-title">1:1 문의하기</p>
-          </section>
-  
-          <div class="inquiry">
-            <div class="inquiry-meta">
-              <img src="/images/question.png" alt="" />
-              <div>
-                <p class="inquiry-subject">{{ inquiry.inquiryTitle }}</p>
-                <span class="inquiry-date">
-                  {{ formatDateTime(inquiry.inquiryCreatedAt) }}
-                </span>
-              </div>
-              <span class="answer-state" v-if="answer && answer.answerContents">{{ answer ? '✔ 답변 완료' : '' }}</span>
-            </div>
-            <div class="inquiry-content">
-              <p class="inquiry-text">{{ inquiry.inquiryContents }}</p>
-              <div v-if="inquiry.inquiryImages && inquiry.inquiryImages.length">
-                <div v-for="(image, index) in inquiry.inquiryImages" :key="index" class="inquiry-image-container">
-                  <img class="inquiry-image" :src="getFullImagePath(image.imagePath)" alt="" />
-                </div>
-              </div>
-            </div>
-          </div>
-  
-          <div class="reply" v-if="Object.keys(answer).length > 0">
-            <div class="inquiry-meta">
-              <img class="meta-icon question" src="/images/answer.png" alt="" />
-              <div>
-                <p class="inquiry-subject">루킷 담당자</p>
-                <span class="inquiry-date">{{ formatDateTime(answer.answerCreatedAt) }}</span>
-              </div>
-            </div>
-            <div class="reply-content">
-              <p class="reply-text">{{ answer.answerContents }}</p>
-            </div>
-          </div>
-  
-          <div class="inquiry-btn-block">
-            <router-link class="back-to-inquiry" to="/mypage/inquiry">문의 페이지로</router-link>
-          </div>
+  <div class="inquiry">
+    <div class="inquiry-meta">
+      <img src="/images/question.png" alt="" />
+      <div>
+        <p class="inquiry-subject">{{ inquiry.inquiryTitle }}</p>
+        <span class="inquiry-date">
+          {{ formatDateTime(inquiry.inquiryCreatedAt) }}
+        </span>
+      </div>
+      <span class="answer-state" v-if="answer && answer.answerContents">{{ answer ? '✔ 답변 완료' : '' }}</span>
+    </div>
+    <div class="inquiry-content">
+      <p class="inquiry-text">{{ inquiry.inquiryContents }}</p>
+      <div v-if="imageUrls.length">
+        <div v-for="(url, index) in imageUrls" :key="index" class="inquiry-image-container">
+          <img class="inquiry-image" :src="url" alt="" />
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <div class="reply" v-if="Object.keys(answer).length > 0">
+    <div class="inquiry-meta">
+      <img class="meta-icon question" src="/images/answer.png" alt="" />
+      <div>
+        <p class="inquiry-subject">루킷 담당자</p>
+        <span class="inquiry-date">{{ formatDateTime(answer.answerCreatedAt) }}</span>
+      </div>
+    </div>
+    <div class="reply-content">
+      <p class="reply-text">{{ answer.answerContents }}</p>
+    </div>
+  </div>
+
+  <div class="inquiry-btn-block">
+    <router-link class="back-to-inquiry" to="/mypage/inquiry">문의 페이지로</router-link>
+  </div>
 </template>
   
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { ref as firebaseRef, getDownloadURL } from "firebase/storage";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 
 const router = useRouter();
 const route = router.currentRoute.value;
-
 const inquiry = ref({});
 
 //추후 답변 작업(관리자)
 const answer = ref({});
+const imageUrls = ref([]); // 다운로드된 이미지 URL 리스트
 
 const loadDetailInquiry = async () => {
-    try {
-        const inquiryId = route.params.inquiryId;
-        const response = await axios.get(`http://localhost:8081/api/mypage/inquiry/${inquiryId}`);
-        inquiry.value = response.data.data;
-    } catch (error) {
-        console.log(error);
+  try {
+    const inquiryId = route.params.inquiryId;
+    const response = await axios.get(`http://localhost:8081/api/mypage/inquiry/${inquiryId}`);
+    inquiry.value = response.data.data;
+
+    // 이미지 경로가 있다면 Firebase에서 다운로드 URL을 가져옴
+    if (inquiry.value.inquiryImages && inquiry.value.inquiryImages.length > 0) {
+      const urls = await Promise.all(inquiry.value.inquiryImages.map(async (image) => {
+        try {
+          const storageRef = firebaseRef(firebaseStorage, image.imagePath); // Firebase Storage 참조 생성
+          const url = await getDownloadURL(storageRef); // 다운로드 URL 얻기
+          return url;
+        } catch (error) {
+          console.error(`이미지 URL을 가져오는 중 오류 발생: ${image.imagePath}`, error);
+          return null; // 실패한 경우 null 반환
+        }
+      }));
+
+      // null이 아닌 URL만 필터링하여 imageUrls에 추가
+      imageUrls.value = urls.filter(url => url !== null);
     }
-}
-
-const getFullImagePath = (imagePath) => {
-  return `http://localhost:8081${imagePath}`; // 서버의 주소를 포함하여 절대 경로로 변경
+  } catch (error) {
+    console.log(error);
+  }
 };
-
 
 onMounted(() => {
     loadDetailInquiry();

@@ -12,5 +12,5 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const storage = getStorage(app); // firebase 파일저장소
-export { app, storage };
+const firebaseStorage = getStorage(app); // firebase 파일저장소
+export { app, firebaseStorage };
