@@ -108,7 +108,6 @@ const routes = [
   {
     path: "/mypage",
     component: () => import("@/views/Mypage/Mypage.vue"),
-
     children: [
       {
         path: "manage",
@@ -135,10 +134,6 @@ const routes = [
       {
         path: "enter-password",
         component: () => import("@/components/layouts/PwCheckModal.vue"),
-      },
-      {
-        path: "updateInfo",
-        component: () => import("@/views/Mypage/UserInfoView.vue"),
       },
     ],
   },

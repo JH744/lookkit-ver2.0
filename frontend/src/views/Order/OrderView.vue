@@ -153,7 +153,7 @@ import "@/assets/styles/order.css";
 import { useOrderStore } from '@/stores/orderStore';
 import AddAddressView from '@/views/Order/AddAddressView.vue';
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
-import { storage } from "@/firebase/firebaseConfig";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 import { useAuthStore } from "@/stores/authStore";
 
 const authStore = useAuthStore();
@@ -174,7 +174,7 @@ const route = useRoute();
 
   console.log('이미지 경로 확인:', storagePath);
   try {
-    const imageRef = firebaseRef(storage, storagePath);
+    const imageRef = firebaseRef(firebaseStorage, storagePath);
     const url = await getDownloadURL(imageRef);
     item.thumbnailUrl = url;
   } catch (error) {
