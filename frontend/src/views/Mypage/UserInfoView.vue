@@ -365,8 +365,10 @@ const deleteAccount = async () => {
 }
 
 .profile-management-content {
-  margin-left: auto;
-  margin-right: auto;
+  margin: auto;
+  margin-left: 20%;
+  /* margin-left: auto;
+  margin-right: auto; */
   width: 450px;
   flex: 1;
   padding: 30px;
@@ -438,6 +440,12 @@ const deleteAccount = async () => {
 
 .button-group {
   text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 75px;
+  gap: 10px; /* 버튼 간 간격 조정 */
+  margin-top: 0px;
 }
 
 .btn-save {
@@ -525,13 +533,6 @@ const deleteAccount = async () => {
 
 .inquiry-content-title {
   font-size: 17px;
-}
-
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 7px;
-  margin-top: 75px;
 }
 
 .btn-submit {
@@ -703,14 +704,6 @@ const deleteAccount = async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.button-group {
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  gap: 10px; /* 버튼 간 간격 조정 */
-  margin-top: 0px;
 }
 
 /* Modal Styles */
