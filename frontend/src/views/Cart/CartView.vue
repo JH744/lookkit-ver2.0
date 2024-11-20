@@ -144,9 +144,18 @@
   import { storage } from "@/firebase/firebaseConfig";
   import "@/assets/styles/cart.css";
   import iconDelete from '@/assets/icons/icon-delete.svg';
-  import { useOrderStore } from '@/store/orderStore';
+  import { useOrderStore } from '@/stores/orderStore';
   import { useRouter } from 'vue-router';
-  
+  import { useAuthStore } from "@/stores/authStore";
+
+
+  const authStore = useAuthStore();
+  const jwtToken = authStore.token;
+  const userId = authStore.user?.userId;
+
+  console.log("JWT Token:", jwtToken);
+  console.log("User ID from AuthStore:", userId); 
+
   const activeTab = ref('coordinate');
   const coordinateItems = ref([]);
   const singleItems = ref([]);
@@ -175,9 +184,14 @@ const fetchImageForItem = async (item) => {
   // 장바구니 데이터 불러오기
 const fetchCartItems = async () => {
   try {
-    const userId = 1; 
+    console.log("Fetching cart items for user ID:", userId); // 추가된 로그
     const API_BASE_URL = 'http://localhost:8081/api/cart';
-    const response = await axios.get(`${API_BASE_URL}/items?userId=${userId}`);
+    const response = await axios.get(`${API_BASE_URL}/items?userId=${userId}`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}` 
+      }
+    });
+    console.log("Fetched cart items response:", response.data); 
     const items = response.data;
     for (const item of items) {
       if (item.codiId) {
@@ -295,7 +309,7 @@ const fetchCartItems = async () => {
     return;
   }
   try {
-    const userId = 1; // 실제 userId 사용
+    
     const API_BASE_URL = 'http://localhost:8081/api/cart';
     await axios.post(`${API_BASE_URL}/update?userId=${userId}`, {
       cartId: item.cartId,
@@ -310,7 +324,7 @@ const fetchCartItems = async () => {
   // 대여일 업데이트
   const updateRentalDate = async (item, dateType) => {
   try {
-    const userId = 1; // 실제 userId 사용
+    
     const API_BASE_URL = 'http://localhost:8081/api/cart';
     await axios.post(`${API_BASE_URL}/update?userId=${userId}`, {
       cartId: item.cartId,

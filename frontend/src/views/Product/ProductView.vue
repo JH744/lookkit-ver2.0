@@ -85,7 +85,10 @@ import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { storage } from "@/firebase/firebaseConfig";
 import "@/assets/styles/product.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
+const userId = authStore.user?.userId;
 const API_BASE_URL = 'http://localhost:8081/api/products';
 
 const activeTab = ref('details');
@@ -144,7 +147,7 @@ const resetQuantity = () => {
 
 const addToCart = async () => {
   try {
-    const userId = 1;
+    
     const API_BASE_URL = 'http://localhost:8081/api/cart';
     const response = await axios.post(
       `${API_BASE_URL}/add/product/${product.value.productId}?quantity=${quantity.value}&userId=${userId}`
