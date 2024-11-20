@@ -16,13 +16,20 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import UserHeader from "@/components/layouts/UserHeader.vue";
 import MypageSidebar from "@/components/layouts/MypageSidebar.vue";
 import PwCheckModal from "@/components/layouts/PwCheckModal.vue";
+import { useAuthStore } from "@/stores/authStore";
 
+const authStore = useAuthStore();
 const showPwCheck = ref(false);
-const userId = ref(10); // 예제용, 실제 ID는 동적으로 설정해야 합니다.
+const userId = ref(0); // 예제용, 실제 ID는 동적으로 설정해야 합니다.
+// 초기 데이터 로드
+onMounted(() => {
+  console.log("유저정보", authStore.user);
+  userId.value = authStore.user.userId;
+});
 </script>
 
 <style scoped>

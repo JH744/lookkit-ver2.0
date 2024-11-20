@@ -289,7 +289,7 @@
               1:1 문의현황
             </div>
             <div class="card-body">
-              <table>
+              <table id="datatablesSimple">
                 <thead>
                   <tr>
                     <th>문의번호</th>
@@ -362,11 +362,11 @@ onMounted(async () => {
     );
     initializeCharts();
 
-    // // DataTables 로드 및 초기화
-    // await loadScript(
-    //   "https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-    // );
-    // initializeDataTable();
+    // DataTables 로드 및 초기화
+    await loadScript(
+      "https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+    );
+    initializeDataTable();
 
     scriptsLoaded.value = true;
   } catch (error) {

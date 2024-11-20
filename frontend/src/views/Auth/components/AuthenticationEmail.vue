@@ -54,9 +54,9 @@ const verifyCode = () => {
   padding: calc(31.5px * 1.2) 20px 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 5px;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
