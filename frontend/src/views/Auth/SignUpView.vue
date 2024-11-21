@@ -970,7 +970,7 @@ const openPostcodePopup = () => {
 .birthdateLabel,
 .emailLabel,
 .addressLabel {
-  min-width: 120px;
+  min-width: 160px;
 }
 .addressCheckLabel,
 .idCheckLabel,
