@@ -290,6 +290,18 @@ align-self: stretch;
 
   padding: 30px 0px;
 }
+.item-price{
+  color: #767676;
+text-align: left;
+font-family: "Inter-Bold", sans-serif;
+font-size: 15px;
+line-height: 20px;
+font-weight: 700;
+position: relative;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+}
 .price-amount {
 color: #101010;
 text-align: left;

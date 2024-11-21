@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
@@ -48,14 +50,49 @@ public class ReviewController {
     }
 
     // 리뷰 작성
-    @PostMapping("/write")
-    public ResponseEntity<String> writeReview(@RequestBody ReviewDTO reviewDTO) {
+    // @PostMapping("/write")
+    // public ResponseEntity<String> writeReview(@RequestBody ReviewDTO reviewDTO) {
+    //     try {
+    //         User user = userService.getUserById(reviewDTO.getUserId());
+    //         reviewService.saveReview(reviewDTO, user);
+    //         return ResponseEntity.status(HttpStatus.CREATED).body("리뷰 작성 완료");
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 작성 실패");
+    //     }
+    // }
+
+    @GetMapping("/list/{userId}")
+    public ResponseEntity<List<ReviewDTO>> getReviewsByUserId(@PathVariable Long userId) {
         try {
-            User user = userService.getUserById(reviewDTO.getUserId());
-            reviewService.saveReview(reviewDTO, user);
-            return ResponseEntity.status(HttpStatus.CREATED).body("리뷰 작성 완료");
+            List<ReviewDTO> reviews = reviewService.getReviewsByUserId(userId);
+            return ResponseEntity.ok(reviews);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 작성 실패");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
+
+    @PostMapping("/write")
+public ResponseEntity<String> writeReview(
+        @RequestPart("reviewDTO") ReviewDTO reviewDTO,
+        @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles) {
+    try {
+        User user = userService.getUserById(reviewDTO.getUserId());
+        reviewService.saveReview(reviewDTO, user, imageFiles);
+        return ResponseEntity.status(HttpStatus.CREATED).body("리뷰 작성 완료");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 작성 실패");
+    }
+}
+@DeleteMapping("/{reviewId}")
+public ResponseEntity<String> deleteReview(@PathVariable Long reviewId) {
+    try {
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok("리뷰 삭제 완료");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 실패");
+    }
+}
+
 }
