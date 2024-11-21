@@ -2,8 +2,10 @@ package synerjs.lookkit2nd.common.controller;
 
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -18,6 +20,7 @@ import synerjs.lookkit2nd.user.UserService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -79,23 +82,29 @@ public class AuthController {
      }
     }
 
-//    @GetMapping("/api/auth/test")
-//    public ResponseEntity test(Authentication auth){
-//        System.out.println("auth test 응답받음");
-//        CustomUser user=(CustomUser)auth.getPrincipal();
-//        System.out.println("auth"+auth);
-//        System.out.println("user"+user);
-//        System.out.println("저장된 유저 유저id : "+user.getUserId());
-//        System.out.println("유저uuid : "+auth.getName());
-//        System.out.println("role : "+auth.getAuthorities());
-//        System.out.println("인증여부: "+auth.isAuthenticated());
-//
-//        if (true){
-//            return    ResponseEntity.status(200).body("테스트 성공");
-//        }else {
-//            return ResponseEntity.status(500).body("테스트 실패");
-//        }
-//    }
+
+    @PostMapping("api/auth/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request , HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies(); // 모든 쿠키가져옴
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                // 이름이 "jwt"인 쿠키를 찾기
+                if ("jwt".equals(cookie.getName())) {
+                    // 쿠키 무효화
+                    cookie.setValue(null);
+                    cookie.setHttpOnly(true);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0); // 즉시 만료
+                    response.addCookie(cookie);
+                    break;
+                }
+            }
+        }
+
+        return ResponseEntity.ok("로그아웃 성공");
+    }
+
 
 
     @GetMapping("/kakao-login")

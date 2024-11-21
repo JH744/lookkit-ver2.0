@@ -289,7 +289,7 @@
               1:1 문의현황
             </div>
             <div class="card-body">
-              <table>
+              <table class="table table-striped">
                 <thead>
                   <tr>
                     <th>문의번호</th>
@@ -303,11 +303,27 @@
                 </thead>
                 <tbody>
                   <tr v-for="inquiry in inquiryList" :key="inquiry.inquiryId">
-                    <td>{{ inquiry.inquiryId }}</td>
+                    <td>
+                      {{ inquiry.inquiryId }}
+                    </td>
                     <td>{{ inquiry.userUuid }}</td>
-                    <td>{{ inquiry.inquiryTitle }}</td>
-                    <td>{{ inquiry.inquiryContents }}</td>
-                    <td>{{ inquiry.inquiryCreatedAt }}</td>
+                    <td>
+                      <RouterLink :to="`/admin/inquiry/${inquiry.inquiryId}`">
+                        {{ inquiry.inquiryTitle }}
+                      </RouterLink>
+                    </td>
+                    <td>
+                      <RouterLink :to="`/admin/inquiry/${inquiry.inquiryId}`">
+                        {{ inquiry.inquiryContents }}
+                      </RouterLink>
+                    </td>
+                    <td>
+                      {{
+                        new Date(inquiry.inquiryCreatedAt).toLocaleDateString(
+                          "ko-KR"
+                        )
+                      }}
+                    </td>
                     <td>{{ inquiry.answerState }}</td>
                     <td>삭제</td>
                   </tr>
@@ -362,11 +378,11 @@ onMounted(async () => {
     );
     initializeCharts();
 
-    // // DataTables 로드 및 초기화
-    // await loadScript(
-    //   "https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-    // );
-    // initializeDataTable();
+    // DataTables 로드 및 초기화
+    await loadScript(
+      "https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+    );
+    initializeDataTable();
 
     scriptsLoaded.value = true;
   } catch (error) {
@@ -472,4 +488,25 @@ const initializeDataTable = () => {
 
 <style scoped>
 @import "@/assets/styles/admin.style.css";
+
+/* RouterLink 텍스트 스타일링 */
+.router-link-active {
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+.router-link-exact-active {
+  color: #0d6efd;
+  font-weight: bold;
+}
+
+a {
+  color: #333;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}
 </style>

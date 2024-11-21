@@ -2,55 +2,54 @@ package synerjs.lookkit2nd.admin;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.common.dto.InquiryUserDTO;
 import synerjs.lookkit2nd.common.response.BaseResponse;
+import synerjs.lookkit2nd.inquiry.entity.Inquiry;
+import synerjs.lookkit2nd.inquiry.entity.InquiryAnswer;
 import synerjs.lookkit2nd.inquiry.service.InquiryService;
+import synerjs.lookkit2nd.order.OrderService;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {
-    private final InquiryService is;
-//
+    private final InquiryService inquiryService;
+    private final OrderService orderService;
+
+    //문의 목록 조회
     @GetMapping("/dashboard")
     public ResponseEntity dashboard(){
-        List<InquiryUserDTO> inquiryList = is.getAllInquiries();
+        List<InquiryUserDTO> inquiryList = inquiryService.getAllInquiries();
         inquiryList.forEach(inquiry -> System.out.println("Inquiry: " + inquiry));
         return    ResponseEntity.status(200).body(inquiryList);
     }
-//
-//
-//    @GetMapping("/inqury")
-//    public void inqury(Model model){
-//    }
-//
-//    @GetMapping("/orderStatus")
-//    public void orderStatus(Model model){
-//        List<UserOrderDTO> orderList =  os.orderAllListWithUserUuid();
-//        orderList.forEach(order -> System.out.println("order: " + order));
-//        model.addAttribute("orderList",orderList);
+
+//    // 주문 현황 조회
+//    @GetMapping("/orders")
+//    public ResponseEntity<List<UserOrderDTO>> getOrderStatus() {
+//        List<UserOrderDTO> orderList = orderService.orderAllListWithUserUuid();
+//        return ResponseEntity.ok(orderList); // HTTP 200
 //    }
 //
 //
-//    @PostMapping("/updateOrderStatus")
-//    @ResponseBody
-//    public Map<String, Object> updateOrderStatus(@RequestBody Map<String, String> requestData){
+//    // 주문 상태 업데이트
+//    @PutMapping("/orders/{orderId}/status")
+//    public Map<String, Object> updateOrderStatus(
+//            @PathVariable int orderId,
+//            @RequestParam String orderStatus
+//    ) {
 //        Map<String, Object> response = new HashMap<>();
 //        try {
-//            int orderId = Integer.parseInt(requestData.get("orderId"));
-//            String orderStatus = requestData.get("orderStatus");
-//
-//            System.out.println("주문번호:" + orderId);
-//            System.out.println("주문상태:" + orderStatus);
-//
-//            int result = os.updateOrderStatus(orderId, orderStatus);
+//            int result = orderService.updateOrderStatus(orderId, orderStatus);
 //            if (result > 0) {
 //                response.put("success", true);
 //                response.put("message", "주문 상태가 성공적으로 업데이트되었습니다.");
@@ -64,26 +63,38 @@ public class AdminController {
 //        }
 //        return response;
 //    }
-//
-//    @GetMapping("/answer/{id}")
-//    public String answer(@PathVariable int id,Model model){
-//        System.out.println("전달받은 문의번호"+id);
-//        model.addAttribute("inquiry" , is.findByInquiryId(id));
-//        InquiryAnswerVO answer =is.getAnswer(id);
-//        if (answer != null) {
-//            model.addAttribute("answer", answer);
-//        } else {
-//            model.addAttribute("answer",null);
-//        }
-//        return "/admin/inquiryAnswer";
-//    }
-//
-//    @PostMapping("/answer")
-//    public String submitAnswer(InquiryAnswerVO answerVO){
-//        int result =   is.insertInquiryAnswer(answerVO);
-//        System.out.println( result>0 ? "답변완료":"답변에러");
-//        return "redirect:/admin/dashboard";
-//    }
-//
+
+
+// 특정 문의 상세 조회
+    @GetMapping("/inquiries/{id}")
+    public ResponseEntity getInquiryDetails(@PathVariable long id) {
+            InquiryUserDTO inquiryDetails = inquiryService.findInquiryById(id);
+            return ResponseEntity.ok(inquiryDetails);
+    }
+
+    // 특정 문의 답변 조회
+    @GetMapping("/inquiries/{id}/answer")
+    public ResponseEntity<InquiryAnswer> getAnswerByInquiryId(@PathVariable Long id) {
+        InquiryAnswer answer = inquiryService.getAnswerByInquiryId(id);
+        return ResponseEntity.ok(answer);
+    }
+
+    // 문의에 답변 저장
+    @PostMapping("/inquiries/{id}/answer")
+    public ResponseEntity<InquiryAnswer> saveAnswer(@PathVariable Long id, @RequestBody InquiryAnswer answer) {
+
+        // Inquiry 객체를 설정
+        InquiryAnswer inquiryAnswer  = InquiryAnswer
+                .builder()
+                .answerContents(answer.getAnswerContents())
+                .inquiry(inquiryService.findInquiryByInquiryId(id))
+                .build();
+
+
+        // Answer 저장
+        InquiryAnswer savedAnswer = inquiryService.saveAnswer(inquiryAnswer,id);
+        return ResponseEntity.ok(savedAnswer);
+    }
+
 
 }

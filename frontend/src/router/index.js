@@ -3,6 +3,10 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
+    path: "/",
+    component: () => import("@/views/Main/MainView.vue"),
+  },
+  {
     path: "/main",
     children: [
       {
@@ -43,7 +47,16 @@ const routes = [
   },
   {
     path: "/admin",
-    component: () => import("@/views/Admin/AdminDashboard.vue"),
+    children: [
+      {
+        path: "dashboard",
+        component: () => import("@/views/Admin/AdminDashboard.vue"),
+      },
+      {
+        path: "inquiry/:inquiryId",
+        component: () => import("@/views/Admin/InquiryAnswer.vue"),
+      },
+    ],
   },
   {
     path: "/storage", // 파이어베이스 테스트 경로

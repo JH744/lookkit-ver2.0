@@ -13,15 +13,19 @@ import synerjs.lookkit2nd.inquiry.dto.InquiryImageDTO;
 import synerjs.lookkit2nd.inquiry.dto.InquiryRequestDTO;
 import synerjs.lookkit2nd.inquiry.dto.InquiryResponseDTO;
 import synerjs.lookkit2nd.inquiry.entity.Inquiry;
+import synerjs.lookkit2nd.inquiry.entity.InquiryAnswer;
 import synerjs.lookkit2nd.inquiry.entity.InquiryImage;
+import synerjs.lookkit2nd.inquiry.repository.InquiryAnswerRepository;
 import synerjs.lookkit2nd.inquiry.repository.InquiryImageRepository;
 import synerjs.lookkit2nd.inquiry.repository.InquiryRepository;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
 public class InquiryService {
     private final InquiryRepository inqRepository;
     private final InquiryImageRepository imgRepository;
-
+    private final InquiryAnswerRepository inquiryAnswerRepository;
 
     // 사용자의 문의 리스트
     @Transactional(readOnly = true)
@@ -95,10 +99,67 @@ public List<InquiryUserDTO> getAllInquiries() {
                     (String) row[2],              // inquiryTitle
                     (String) row[3],              // inquiryContents
                     ((Timestamp) row[4]).toLocalDateTime(), // inquiryCreatedAt
-                    row[5].toString()             // answerState (Character -> String)
+                    row[5].toString()
             ))
             .toList();
 }
-//    public List<InquiryUserDTO> getInquiryAllList() {
-//    }
+
+
+
+    public Inquiry findInquiryByInquiryId(Long inquiryId) {
+        return inqRepository.findById(inquiryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 문의를 찾을 수 없습니다. ID: " + inquiryId));
+    }
+
+    @Transactional(readOnly = true)
+    public InquiryUserDTO findInquiryById(Long inquiryId) {
+        Optional<Object[]> rawData = inqRepository.findInquiryDetailsById(inquiryId);
+
+        if (rawData.isEmpty()) {
+            throw new IllegalArgumentException("해당 ID의 데이터를 찾을 수 없습니다. inquiryId: " + inquiryId);
+        }
+
+        Object[] row = rawData.get();
+
+        // 2차원 배열인 경우 1차원 배열로 변환
+        if (row.length == 1 && row[0] instanceof Object[]) {
+            row = (Object[]) row[0];
+        }
+
+        return mapToInquiryUserDTO(row);
+    }
+
+    private InquiryUserDTO mapToInquiryUserDTO(Object[] row) {
+        if (row == null || row.length < 6) {
+            throw new IllegalArgumentException("결과 데이터가 잘못되었습니다. 예상 필드가 부족합니다.");
+        }
+
+        return InquiryUserDTO.builder()
+                .inquiryId(((Number) row[0]).longValue())         // INQUIRY_ID
+                .userUuid(row[1].toString())                      // USER_UUID
+                .inquiryTitle(row[2].toString())                  // INQUIRY_TITLE
+                .inquiryContents(row[3].toString())               // INQUIRY_CONTENTS
+                .inquiryCreatedAt(((Timestamp) row[4]).toLocalDateTime()) // INQUIRY_CREATED_AT
+                .answerState(row[5].toString())                   // ANSWER_STATE
+                .build();
+    }
+
+
+    // 특정 문의 ID로 답변 데이터 조회
+    public InquiryAnswer getAnswerByInquiryId(Long inquiryId) {
+        return inquiryAnswerRepository.findByInquiry_InquiryId(inquiryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 문의에 대한 답변을 찾을 수 없습니다. ID: " + inquiryId));
+    }
+    // 답변하기
+    @Transactional
+    public InquiryAnswer saveAnswer(InquiryAnswer answer, long inquiryId) {
+         inqRepository.updateAnswerStateToCompleted(inquiryId);
+        return inquiryAnswerRepository.save(answer);
+    }
+
+
+
+
+
 }
+

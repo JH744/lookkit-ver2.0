@@ -28,6 +28,7 @@ public class MyPageApiController {
     public ResponseEntity<Map<String, Object>> verifyPassword(@RequestBody PwVerifyDTO pwverifydto,
                                                               @RequestParam Long id){
         log.info("비밀번호 확인 요청 - Id {}, 입력된 비밀번호: {}", id, pwverifydto.getCurrentPassword());
+
         boolean isCorrect = mypageService.verifyPassword(id, pwverifydto.getCurrentPassword());
         Map<String, Object> response = new HashMap<>();
 

@@ -7,7 +7,7 @@
 
   <div class="formContainer2">
     <input class="formInput" placeholder="인증번호 입력" v-model="inputCode" />
-    <div style="margin: 15px">
+    <div style="margin: 15px" class="verificationNotice-box">
       <span class="verificationNotice"
         >*3분 이내로 인증번호 6자리를 입력해주세요.</span
       >
@@ -41,7 +41,7 @@ const completeAuthentication = () => {
 /**인증코드 일치 확인 매소드 */
 const verifyCode = () => {
   if (props.verificationCode == inputCode.value) {
-    alert("일치");
+    console.log("일치함");
     completeAuthentication(); // emit 메소드 호출
   } else {
     alert("불일치합니다.");
@@ -54,9 +54,9 @@ const verifyCode = () => {
   padding: calc(31.5px * 1.2) 20px 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  align-items: flex-start;
-  justify-content: flex-start;
+  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
@@ -152,5 +152,9 @@ const verifyCode = () => {
 .error-text {
   color: #ff294f;
   font-size: 14px;
+}
+
+.verificationNotice-box {
+  text-align: end !important;
 }
 </style>
