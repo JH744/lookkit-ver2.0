@@ -32,6 +32,7 @@ public class WishlistController {
     @PostMapping("/{userId}")
     public BaseResponse<WishlistResponseDTO> addWishlist(@PathVariable Long userId, @RequestBody WishlistRequestDTO request) {
         WishlistResponseDTO response = wishlistService.addWish(userId, request);
+        System.out.println(">>>>>>>>>>>>>>>>>>>.."+response.getLikeCount());
         return new BaseResponse<>(response);
     }
 
