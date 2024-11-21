@@ -13,34 +13,54 @@ import java.util.Optional;
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
     @Query("SELECT new synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO(" +
-            "MIN(w.wishlistId), " +
+            "w.wishlistId, " +
             "p.productId, " +
             "p.productName, " +
             "p.brandName, " +
             "p.productPrice, " +
             "p.productThumbnail, " +
-            "(SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.product.productId = p.productId)" +
+            "c.codiId, " +
+            "c.codiName, " +
+            "c.codiDescription, " +
+            "c.codiPrice, " +
+            "c.codiThumbnail, " +
+            "(CASE " +
+            "   WHEN p.productId IS NOT NULL THEN (SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.product.productId = p.productId) " +
+            "   WHEN c.codiId IS NOT NULL THEN (SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.codi.codiId = c.codiId) " +
+            "   ELSE 0 END) " +
             ") " +
             "FROM Wishlist w " +
-            "JOIN w.product p " +
-            "WHERE w.userId = :userId " +
-            "GROUP BY p.productId, p.productName, p.brandName, p.productPrice, p.productThumbnail")
+            "LEFT JOIN w.product p " +
+            "LEFT JOIN w.codi c " +
+            "WHERE w.userId = :userId")
     List<WishlistResponseDTO> getWishlistByUserId(@Param("userId") Long userId);
 
 
+
     @Query("SELECT new synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO(" +
-            "MIN(w.wishlistId), " +
+            "w.wishlistId, " +
             "p.productId, " +
             "p.productName, " +
             "p.brandName, " +
             "p.productPrice, " +
             "p.productThumbnail, " +
-            "(SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.product.productId = p.productId)" +
+            "c.codiId, " +
+            "c.codiName, " +
+            "c.codiDescription, " +
+            "c.codiPrice, " +
+            "c.codiThumbnail, " +
+            "(CASE " +
+            "   WHEN p.productId IS NOT NULL THEN (SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.product.productId = p.productId) " +
+            "   WHEN c.codiId IS NOT NULL THEN (SELECT COUNT(w2) FROM Wishlist w2 WHERE w2.codi.codiId = c.codiId) " +
+            "   ELSE 0 END) " +
             ") " +
             "FROM Wishlist w " +
-            "JOIN w.product p " +
-            "WHERE w.userId = :userId AND w.product.productId = :productId")
-    WishlistResponseDTO getWishByUserId(@Param("userId") Long userId, @Param("productId") Long productId);
+            "LEFT JOIN w.product p " +
+            "LEFT JOIN w.codi c " +
+            "WHERE w.userId = :userId " +
+            "AND (:productId IS NULL OR p.productId = :productId) " +
+            "AND (:codiId IS NULL OR c.codiId = :codiId)")
+    WishlistResponseDTO getWishByUserId(@Param("userId") Long userId, @Param("productId") Long productId, @Param("codiId") Long codiId);
 
     Optional<Wishlist> findByUserIdAndProduct_ProductId(Long userId, Long productId);
 }

@@ -38,7 +38,7 @@ const openPwCheck = () => {
 
 .welcome-message {
   font-size: 20px;
-  color: #555;
+  color: #242424;
   margin-left: 15px;
 }
 
