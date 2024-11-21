@@ -2,7 +2,9 @@
   <div class="header">
     <div class="headerWrapper">
       <div class="navBox1">
-        <router-link to="/main" class="logo">LOOK KIT</router-link>
+        <router-link to="/main">
+          <img class="logo" src="/src/assets/logos/Logo1.png">
+        </router-link>
         <ul class="navMenu">
           <li>
             <router-link to="/main/category?type=outer" class="menu"
@@ -121,7 +123,7 @@ const goToSearch = () => {
 .header,
 .header * {
   box-sizing: border-box;
-  width: 100%;
+  /* width: 100%; */
 }
 .header {
   height: 95px;
@@ -138,7 +140,7 @@ const goToSearch = () => {
 }
 .navBox1 {
   display: flex;
-  gap: 100px;
+  gap: 65px;
   align-items: center;
   flex-basis: 60%; /* 헤더의 60% 차지 */
 }
@@ -161,11 +163,12 @@ const goToSearch = () => {
 }
 
 .logo {
-  color: #232b6e;
+  /* color: #232b6e;
   font-size: 28px;
   font-weight: 700;
   min-width: fit-content;
-  max-width: fit-content;
+  max-width: fit-content; */
+  width: 160px;
 }
 .menu {
   color: #000000;
@@ -229,5 +232,9 @@ const goToSearch = () => {
   justify-items: center;
   gap: 6px;
   width: max-content;
+}
+
+.navMenu a:hover {
+  border-bottom: 3px solid rgb(45, 43, 43);
 }
 </style>
