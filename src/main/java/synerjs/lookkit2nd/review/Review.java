@@ -28,6 +28,7 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CODI_ID")
+    @JsonIgnore
     private Codi codi;
 
     @ManyToOne(fetch = FetchType.LAZY)
