@@ -47,7 +47,6 @@
         <p class="shipment-header-item">구매확정/리뷰</p>
       </div>
       <div v-for="(order, index) in productsGroupedByOrderId" :key="index">
-        <!-- 주문 정보는 해당 주문의 첫 번째 상품일 때만 출력 -->
         <div class="shipment-info">
           <div class="shipment-info-item">
             <span class="shipment-label">주문일자 </span>
@@ -58,26 +57,31 @@
             <span class="shipment-value">{{ order.orderId }}</span>
           </div>
         </div>
-        <div v-for="(product, productIndex) in order.products" :key="product.productId" class="shipment-product">
-          <img class="product-image" :src="product.thumbnailUrl || '/images/placeholder.png'" />
+        <div v-for="(product) in order.products" :key="product.orderItemId" class="shipment-product">
+          <img class="product-image" :src="product.thumbnailUrl || '/images/placeholder.png'" alt="상품 이미지" />
           <div class="product-details">
-            <div class="product-brand">{{ product.brandName }}</div>
+            <div class="product-brand">{{ product.brandName || '브랜드 정보 없음' }}</div>
             <div class="product-name">{{ product.productName }}</div>
-            <div class="product-price">{{ product.productPrice }}원 / 수량: {{ product.quantity }}</div>
+            <div class="product-price">{{ formatPrice(product.productPrice) }}원 / 수량: {{ product.quantity }}</div>
           </div>
           <div class="status-section-text">
             <div class="status-text">{{ getOrderStatusText(product.orderStatus) }}</div>
             <router-link class="inquiry-button" to="/mypage/inquiry/create">1:1 문의하기</router-link>
           </div>
           <div class="rental-grid">
-            <p>{{ product.rentalStartDate }}</p>
-            <img width="18px" src="/images/under-arrow.png">
-            <p>{{ product.rentalEndDate }}</p>
+            <p v-show="product.rentalStartDate">{{ product.rentalStartDate }}</p>
+            <img v-show="product.rentalStartDate && product.rentalEndDate" width="18px" src="/images/under-arrow.png" alt="기간 화살표">
+            <p v-show="product.rentalEndDate">{{ product.rentalEndDate }}</p>
           </div>
           <div class="actions">
-            <button v-if="!product.purchaseConfirmed" class="confirm-button" @click="showConfirmModal(product)">대여 확정</button>
-            <span v-else class="confirmed-text">대여 확정</span>
-            <a class="review-button" href="/mypage/inquiry/new">리뷰 작성</a>
+            <template v-if="!product.isPurchaseConfirmed">
+              <button v-if="product.codiId === null" class="confirm-button" @click="showConfirmModal(product)">구매 확정</button>
+              <button v-else class="confirm-button" @click="showConfirmModal(product)">대여 확정</button>
+            </template>
+            <span v-else class="confirmed-text">
+              {{ product.codiId === null ? '구매 확정' : '대여 확정' }}
+            </span>
+            <a :href="product.codiId ? `/mypage/review/create?codiId=${product.codiId}` : `/mypage/review/create?productId=${product.productId}`" class="review-button">리뷰 작성</a>
           </div>
         </div>
       </div>
@@ -99,34 +103,29 @@ const authStore = useAuthStore();
 
 // 주문을 주문번호별로 그룹화하는 계산 속성
 const productsGroupedByOrderId = computed(() => {
-  const grouped = [];
-  const orderMap = {};
-
-  products.value.forEach((product) => {
-    if (!orderMap[product.orderId]) {
-      orderMap[product.orderId] = {
+  return products.value.reduce((acc, product) => {
+    if (!acc[product.orderId]) {
+      acc[product.orderId] = {
         orderDate: product.orderDate,
         orderId: product.orderId,
         products: [],
       };
     }
-    orderMap[product.orderId].products.push(product);
-  });
-
-  for (let order in orderMap) {
-    grouped.push(orderMap[order]);
-  }
-
-  return grouped;
+    acc[product.orderId].products.push(product);
+    return acc;
+  }, {});
 });
+
 
 // 상태별 주문 개수 계산
 const counts = computed(() => {
-  const countPending = products.value.filter(product => product.orderStatus === 'pending').length;
-  const countShipped = products.value.filter(product => product.orderStatus === 'shipped').length;
-  const countDelivered = products.value.filter(product => product.orderStatus === 'delivered').length;
-  const countCompleted = products.value.filter(product => product.orderStatus === 'completed').length;
-  return { countPending, countShipped, countDelivered, countCompleted };
+  return products.value.reduce((acc, product) => {
+    if (product.orderStatus === 'pending') acc.countPending++;
+    if (product.orderStatus === 'shipped') acc.countShipped++;
+    if (product.orderStatus === 'delivered') acc.countDelivered++;
+    if (product.orderStatus === 'completed') acc.countCompleted++;
+    return acc;
+  }, { countPending: 0, countShipped: 0, countDelivered: 0, countCompleted: 0 });
 });
 
 // 주문 상태 텍스트 반환
@@ -143,53 +142,69 @@ const getOrderStatusText = (status) => {
 // 대여 확정 처리 함수
 const showConfirmModal = (product) => {
   const confirmModalStore = useConfirmModalStore();
-  confirmModalStore.showModal(
-    '대여 확정',
-    '대여를 확정 하시겠습니까?',
-    '대여 확정시 대여 취소를 할 수 없습니다',
-    '대여확정',
-    () => confirmRental(product)
-  );
+  if(product.codiId===null){
+    confirmModalStore.showModal(
+      '구매 확정',
+      '구매를 확정 하시겠습니까?',
+      '구매 확정시 반품 할 수 없습니다',
+      '구매 확정',
+      () => confirmRental(product)
+    );
+  } else {
+    confirmModalStore.showModal(
+      '대여 확정',
+      '대여를 확정 하시겠습니까?',
+      '대여 확정시 대여 취소를 할 수 없습니다',
+      '대여확정',
+      () => confirmRental(product)
+    );
+  }
+  
+
 };
 
 const confirmRental = async (product) => {
-  product.purchaseConfirmed = true;
+  product.isPurchaseConfirmed = true;
   try {
     await axios.patch('http://localhost:8081/api/mypage/manage', {
       orderId: product.orderId,
       productId: product.productId
     });
     const modalStore = useModalStore();
-    modalStore.showModal('대여 확정', '감사합니다. 멋진 소개팅하세요 :)');
+    if(product.codiId === null) {
+      modalStore.showModal('구매 확정', '감사합니다. 멋진 소개팅하세요 :)');
+    } else {
+      modalStore.showModal('대여 확정', '감사합니다. 멋진 소개팅하세요 :)');
+    }
+
   } catch (error) {
     console.log(error);
   }
-
-}
-
+};
 
 const fetchImageForProduct = async (product) => {
-  
-  const storagePath = `lookkit/products/0${product.productId}/${product.productId}_thumbnail.webp`;
-
+  const storagePath = product.productId ? `lookkit/products/0${product.productId}/${product.productId}_thumbnail.webp` : `lookkit/codi/0${product.codiId}/${product.codiId}_thumbnail.webp`;
   console.log('이미지 경로 확인:', storagePath);
-  
   try {
     const imageRef = firebaseRef(firebaseStorage, storagePath);
     const url = await getDownloadURL(imageRef);
     product.thumbnailUrl = url;
   } catch (error) {
     console.error(`이미지 가져오기 실패: ${storagePath}`, error);
-    product.thumbnailUrl = '/images/placeholder.png';
+    product.thumbnailUrl = '/assets/img_none.png';
   }
 };
-
 
 // 주문 정보 불러오기 및 이미지 설정
 const loadOrder = async () => {
   try {
     const response = await axios.get(`http://localhost:8081/api/mypage/manage/${authStore.user.userId}`);
-    products.value = response.data.data.products;
+    products.value = response.data.data.products.flatMap(order => order.orderDetails.map(detail => ({
+      ...detail,
+      orderId: order.orderId,
+      orderDate: order.orderDate,
+      orderStatus: order.orderStatus
+    })));
 
     // 각 제품에 대해 Firebase 이미지 불러오기 호출
     for (let product of products.value) {
@@ -202,6 +217,10 @@ const loadOrder = async () => {
 
 const formatDate = (dateString) => {
   return format(new Date(dateString), 'yyyy-MM-dd');
+};
+
+const formatPrice = (price) => {
+  return price ? price.toLocaleString() : '0';
 };
 
 onMounted(() => {
@@ -370,6 +389,10 @@ onMounted(() => {
     font-size: 13px;
     font-weight: 700;
     margin-top: 5px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 150px;
 }
 .product-price {
     font-size: 13px;
@@ -445,6 +468,7 @@ onMounted(() => {
   align-items: center;
   justify-items: center;
   gap: 10px;
+  min-width: 75px;
 }
 
 /*조건에 따라 색 변경*/

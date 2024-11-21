@@ -16,6 +16,7 @@ export const toggleLike = async (wish) => {
         `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
         {
           productId: wish.productId,
+          codiId: wish.codiId,
         }
       );
       wish.isLiked = true;

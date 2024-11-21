@@ -107,7 +107,7 @@
           <div class="product-variant2">대여기간 {{ rentalDays }}일</div>
           <div class="price">
           <div class="item-price"> {{ formatPrice(orderItem.price) }}원</div>
-          <div class="adjusted-price"> {{ formatPrice(orderItem.totalprice) }}원</div>
+          <div class="adjusted-price"> {{ formatPrice(orderItem.totalPrice) }}원</div>
           </div>
         </div>
       </div>
@@ -144,6 +144,17 @@
       총 {{ totalQuantity }}개 / {{ formatPrice(totalPrice) }}원 결제하기
     </button>
   </div>
+
+  <div v-if="confirmModalStore.isModalVisible" class="modal">
+      <div class="modal-content">
+        <h3>{{ confirmModalStore.modalActionMessage }}</h3>
+        <p>{{ confirmModalStore.questionMessage }}</p>
+        <div class="modal-actions">
+          <button @click="confirmModalStore.confirmCallback">확인</button>
+          <button @click="confirmModalStore.closeModal">취소</button>
+        </div>
+      </div>
+  </div>
 </template>
 
 <script setup>
@@ -155,7 +166,9 @@ import AddAddressView from '@/views/Order/AddAddressView.vue';
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
 import { useAuthStore } from "@/stores/authStore";
+import { useConfirmModalStore } from '@/stores/modalStore';
 
+const confirmModalStore = useConfirmModalStore();
 const authStore = useAuthStore();
 const userId = authStore.user?.userId;
 
@@ -177,12 +190,14 @@ const route = useRoute();
     const imageRef = firebaseRef(firebaseStorage, storagePath);
     const url = await getDownloadURL(imageRef);
     item.thumbnailUrl = url;
+    if (item === orderItem.value) {
+      orderItem.value.thumbnailUrl = url; 
+    }
   } catch (error) {
     console.error(`이미지 가져오기 실패: ${storagePath}`, error);
     item.thumbnailUrl = '/images/placeholder.png';
   }
 };
-
 
 
 // 주문 페이지로 넘어온 단일 상품 정보 (URL에서 가져온 파라미터로 설정)
@@ -267,13 +282,13 @@ onMounted(async () => {
   console.log("Selected items in orderStore after mount:", orderStore.selectedItems);
 });
 
-// 주문 완료 후 데이터 초기화
-const completeOrder = () => {
-  alert('주문이 완료되었습니다.');
-  orderStore.clearSelectedItems();
-  localStorage.removeItem('orderStore'); // 로컬 스토리지에서도 데이터 삭제
-  window.location.href = '/order/complete';
-};
+// // 주문 완료 후 데이터 초기화
+// const completeOrder = () => {
+//   alert('주문이 완료되었습니다.');
+//   orderStore.clearSelectedItems();
+//   localStorage.removeItem('orderStore'); 
+//   window.location.href = '/order/complete';
+// };
 
 // 사용자가 페이지를 떠날 때 selectedItems 초기화
 onBeforeUnmount(() => {99/
@@ -347,23 +362,6 @@ onBeforeUnmount(() => {99/
 //   };
 
 //--------------------------------------------------------
-// 주문 페이지로 넘어온 단일 상품 정보 (URL에서 가져온 파라미터로 설정)
-onMounted(() => {
-  const params = route.query;
-  if (params.itemId) {
-    orderItem.value = {
-      itemId: params.itemId,
-      itemName: params.itemName,
-      brandName: params.brandName,
-      quantity: parseInt(params.quantity, 10) || 1,
-      startDate: params.startDate,
-      endDate: params.endDate,
-      price: parseInt(params.price, 10),
-      totalPrice: parseInt(params.totalPrice, 10),
-      type: params.itemType || 'product',
-    };
-  }
-});
 
 // 총 수량 계산
 const totalQuantity = computed(() => {
@@ -470,7 +468,16 @@ const processPayment = () => {
     buyer_addr: buyerAddr,
   }, function (rsp) {
     if (rsp.success) {
-      alert("결제가 완료되었습니다.\n고유ID: " + rsp.imp_uid);
+      confirmModalStore.showModal(
+        '결제 완료',
+        `결제가 완료되었습니다.`,
+        '',
+        '확인',
+        () => {
+          confirmModalStore.closeModal();
+          
+        }
+      );
 
       // 주문 상세 정보 수집
       // const orderDetails = orderStore.selectedItems.map(item => ({
@@ -556,8 +563,14 @@ fetch("http://localhost:8081/api/order/complete", {
 });
 
 
-    } else {
-      alert("결제에 실패했습니다. 실패사유: " + rsp.error_msg);
+} else {
+      confirmModalStore.showModal(
+        '결제 실패',
+        `결제에 실패했습니다. 실패사유: ${rsp.error_msg}`,
+        '',
+        '확인',
+        confirmModalStore.closeModal
+      );
     }
   });
 };

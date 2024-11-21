@@ -3,6 +3,8 @@ package synerjs.lookkit2nd.orderManagement.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.common.response.BaseResponse;
+import synerjs.lookkit2nd.order.OrderDTO;
+import synerjs.lookkit2nd.order.OrderService;
 import synerjs.lookkit2nd.orderManagement.dto.OrderManagementRequestDTO;
 import synerjs.lookkit2nd.orderManagement.dto.OrderManagementResponseDTO;
 import synerjs.lookkit2nd.orderManagement.service.OrderManagementService;
@@ -15,10 +17,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OrderManagementController {
     private final OrderManagementService service;
+    private final OrderService orderService;
 
     @GetMapping("/{userId}")
     public BaseResponse<?> getOrderManagement(@PathVariable Long userId){
-        List<OrderManagementResponseDTO> list =  service.getProductsByOrder(userId);
+        List<OrderDTO> list =  orderService.getOrderDetailsByUserId(userId);
         Map<String, Long> statusCounts = service.getOrderStatusCounts(userId);
 
         Map<String,?> response = Map.of(

@@ -12,6 +12,7 @@ import synerjs.lookkit2nd.codi.CodiRepository;
 import synerjs.lookkit2nd.product.ProductRepository;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -127,4 +128,71 @@ public class OrderService {
                 .orderDetails(orderDetailDTOs)
                 .build();
     }
+
+    public List<OrderDTO> getOrderDetailsByUserId(Long userId) {
+        // userId로 모든 주문(Order)을 조회합니다.
+        List<Order> orders = orderRepository.findByUser_UserId(userId);
+
+        if (orders.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 각 주문을 OrderDTO로 변환하여 반환할 리스트를 생성합니다.
+        return orders.stream()
+                .map(order -> {
+                    // 각 주문에 대한 OrderDetail을 조회합니다.
+                    List<OrderDetail> orderDetails = orderDetailRepository.findByUser_UserId(userId);
+
+                    // OrderDetail을 OrderDetailDTO로 변환합니다.
+                    List<OrderDetailDTO> orderDetailDTOs = orderDetails.stream()
+                            .map(detail -> {
+                                String productName = null;
+                                String brandName = null;
+
+                                if (detail.getProductId() != null) {
+                                    Product product = productRepository.findById(detail.getProductId()).orElse(null);
+                                    if (product != null) {
+                                        productName = product.getProductName();
+                                        brandName = product.getBrandName();
+                                    }
+                                } else if (detail.getCodiId() != null) {
+                                    Codi codi = codiRepository.findById(detail.getCodiId()).orElse(null);
+                                    if (codi != null) {
+                                        productName = codi.getCodiDescription();
+                                    }
+                                }
+
+                                return OrderDetailDTO.builder()
+                                        .orderItemId(detail.getOrderItemId())
+                                        .orderId(detail.getOrder().getOrderId())
+                                        .productId(detail.getProductId())
+                                        .codiId(detail.getCodiId())
+                                        .productName(productName)
+                                        .brandName(brandName)
+                                        .quantity(detail.getQuantity())
+                                        .isPurchaseConfirmed(detail.getIsPurchaseConfirmed())
+                                        .rentalStartDate(detail.getRentalStartDate())
+                                        .rentalEndDate(detail.getRentalEndDate())
+                                        .productPrice(detail.getProductPrice())
+                                        .build();
+                            })
+                            .collect(Collectors.toList());
+
+                    // Order를 OrderDTO로 변환합니다.
+                    return OrderDTO.builder()
+                            .orderId(order.getOrderId())
+                            .userId(order.getUser().getUserId())
+                            .totalAmount(order.getTotalAmount())
+                            .orderStatus(order.getOrderStatus())
+                            .orderComment(order.getOrderComment())
+                            .orderDate(order.getOrderDate())
+                            .orderAddressee(order.getOrderAddressee())
+                            .orderAddress(order.getOrderAddress())
+                            .orderPhone(order.getOrderPhone())
+                            .orderDetails(orderDetailDTOs)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
 }

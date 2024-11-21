@@ -46,8 +46,9 @@ public class WishlistService {
             throw new BaseException(BaseResponseStatus.WISH_ALREADY_EXISTS);
         }
 
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.PRODUCT_NOT_FOUND));
+        Product product = request.getProductId() != null ?
+                productRepository.findById(request.getProductId())
+                        .orElse(null) : null;
 
         Codi codi = request.getCodiId() != null ?
                 codiRepository.findById(request.getCodiId())
@@ -56,6 +57,6 @@ public class WishlistService {
         Wishlist wishlist = request.toEntity(product, codi, userId);
         repository.saveAndFlush(wishlist);
 
-        return repository.getWishByUserId(userId, request.getProductId());
+        return repository.getWishByUserId(userId, request.getProductId(), request.getCodiId());
     }
 }

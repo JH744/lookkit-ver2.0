@@ -25,24 +25,34 @@
         </div>
         <div class="product-list">
           <div v-for="item in orderItems" :key="item.orderItemId" class="product-item">
-            
             <div class="product-details-wrapper">
-              
-                <img class="product-image" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="상품 이미지" />
-              
+              <img class="product-image" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="상품 이미지" />
               <div class="product-description">
                 <div class="product-brand-name">{{ item.brandName }}</div>
                 <div class="product-name">{{ item.productName }}</div>
                 <div v-if="item.rentalStartDate && item.rentalEndDate" class="product-rental-dates">
                   대여일 {{ item.rentalStartDate }} ~ 반납일 {{ item.rentalEndDate }}
                 </div>
-                <div class="product-variant">{{ item.quantity }}개</div>
+                <!-- 상품 수량 및 대여 정보 -->
+                <div v-if="item.type === 'product'">
+                  <div class="product-variant">{{ item.quantity }}개</div>
+                </div>
+                <div v-else-if="item.type === 'codi'" class="product-variant">
+                  대여 기간 {{ calculateRentalDays(item.rentalStartDate, item.rentalEndDate) }}일
+                </div>
               </div>
               <div class="product-price">
-                <div class="price-amount">{{ formatPrice(item.productPrice) }}원</div>
+                <!-- 상품의 경우 -->
+                <div v-if="item.type === 'product'">
+                  <div class="item-price">{{ formatPrice(item.productPrice) }}원</div>
+                  <div class="price-amount">{{ formatPrice(item.totalPrice) }}원</div>
+                </div>
+                <!-- 코디의 경우 -->
+                <div v-else-if="item.type === 'codi'">
+                  <div class="item-price">{{ formatPrice(item.productPrice) }}원</div>
+                  <div class="price-amount">{{ formatPrice(item.totalPrice) }}원</div>
+                </div>
               </div>
-              
-              
             </div>
           </div>
         </div>
@@ -129,20 +139,38 @@ const fetchOrderData = async () => {
     orderId.value = orderData.orderId;
     paymentMethod.value = '카드';  // 현재는 '카드'로 고정
     totalAmount.value = orderData.totalAmount;
-    finalAmount.value = orderData.totalAmount;
+    
 
     if (orderData.orderDetails && Array.isArray(orderData.orderDetails)) {
-      orderItems.value = orderData.orderDetails.map((item) => ({
-        orderItemId: item.orderItemId,
-        productId: item.productId,
-        codiId: item.codiId,
-        productName: item.productName, 
-        brandName: item.brandName,
-        quantity: item.quantity,
-        rentalStartDate: item.rentalStartDate,
-        rentalEndDate: item.rentalEndDate,
-        productPrice: item.productPrice  
-      }));
+      orderItems.value = orderData.orderDetails.map((item) => {
+        let totalPrice = item.productPrice;
+
+        if (item.codiId) {
+          // 대여 기간 계산 및 추가 요금 적용
+          const rentalDays = calculateRentalDays(item.rentalStartDate, item.rentalEndDate);
+          const additionalDays = rentalDays > 3 ? rentalDays - 3 : 0;
+          const additionalFee = additionalDays * 10000; // 하루에 10,000원 추가 요금
+          totalPrice = item.productPrice + additionalFee;
+        } else if (item.quantity > 1) {
+          totalPrice = item.productPrice * item.quantity;
+        }
+
+        return {
+          orderItemId: item.orderItemId,
+          productId: item.productId,
+          codiId: item.codiId,
+          productName: item.productName,
+          brandName: item.brandName,
+          quantity: item.quantity,
+          rentalStartDate: item.rentalStartDate,
+          rentalEndDate: item.rentalEndDate,
+          productPrice: item.productPrice,
+          totalPrice: totalPrice,
+          type: item.codiId ? 'codi' : 'product'
+        };
+      });
+
+      // 이미지 가져오기
       for (let i = 0; i < orderItems.value.length; i++) {
         await fetchImageForItem(orderItems.value[i]);
       }
@@ -153,7 +181,6 @@ const fetchOrderData = async () => {
       '받는 사람': orderData.orderAddressee,
       '휴대폰번호': orderData.orderPhone,
       '배송 메모': orderData.orderComment,
-      '배송 상태': orderData.orderStatus,
     };
   } catch (error) {
     console.error('주문 정보를 불러오는 데 실패했습니다:', error);
@@ -165,7 +192,6 @@ const formatPrice = (price) => {
   return price ? price.toLocaleString() : '0';
 };
 
-// Firebase에서 이미지 불러오기
 const fetchImageForItem = async (item) => {
   let storagePath;
   if (item.productId) {
@@ -185,6 +211,13 @@ const fetchImageForItem = async (item) => {
   }
 };
 
+const calculateRentalDays = (startDate, endDate) => {
+  if (!startDate || !endDate) return 0;
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = end - start;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
 
 const viewOrder = () => {
   router.push('/mypage/manage');
