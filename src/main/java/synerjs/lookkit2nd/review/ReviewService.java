@@ -132,7 +132,7 @@ public List<ReviewDTO> getReviewsByUserId(Long userId) {
 
 private ReviewDTO convertToDTO(Review review) {
     Product product = review.getProduct() != null ? productRepository.findById(review.getProduct().getProductId()).orElse(null) : null;
-
+    Codi codi = review.getCodi() != null ? codiRepository.findById(review.getCodi().getCodiId()).orElse(null) : null;
     return ReviewDTO.builder()
                 .reviewId(review.getReviewId())
                 .productId(review.getProduct() != null ? review.getProduct().getProductId() : null)
@@ -143,6 +143,7 @@ private ReviewDTO convertToDTO(Review review) {
                 .createdAt(review.getCreatedAt())
                 .productName(product != null ? product.getProductName() : null)
                 .brandName(product != null ? product.getBrandName() : null)
+                .codiDescription(codi != null ? codi.getCodiDescription() : null)
                 .build();
 }
 

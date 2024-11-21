@@ -81,7 +81,7 @@
             <span v-else class="confirmed-text">
               {{ product.codiId === null ? '구매 확정' : '대여 확정' }}
             </span>
-            <a :href="`/mypage/review/create?productId=${product.productId}`" class="review-button">리뷰 작성</a>
+            <a :href="product.codiId ? `/mypage/review/create?codiId=${product.codiId}` : `/mypage/review/create?productId=${product.productId}`" class="review-button">리뷰 작성</a>
           </div>
         </div>
       </div>

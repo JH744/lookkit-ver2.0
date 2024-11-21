@@ -17,8 +17,10 @@ public class ReviewDTO {
 
     private String productName;
     private String brandName;
+    private String codiDescription;
+    
 
-    public ReviewDTO(Long reviewId, Long productId, Long codiId, Long userId, Integer rating, String reviewText, Timestamp createdAt, String productName, String brandName) {
+    public ReviewDTO(Long reviewId, Long productId, Long codiId, Long userId, Integer rating, String reviewText, Timestamp createdAt, String productName, String brandName, String codiDescription) {
         this.reviewId = reviewId;
         this.productId = productId;
         this.codiId = codiId;
@@ -28,6 +30,7 @@ public class ReviewDTO {
         this.createdAt = createdAt;
         this.productName = productName;
         this.brandName = brandName;
+        this.codiDescription = codiDescription;
     }
 }
 

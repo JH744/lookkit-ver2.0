@@ -48,7 +48,56 @@
           </div>
         </div>
       </section>
+      <button @click="showConfirmModal" class="submit-button">리뷰 작성 완료</button>
+    </section>
   
+      <section v-if="selectedCodi" class="review-section">
+      <h2 class="subtitle">코디는 마음에 드셨나요?</h2>
+      <div class="product-details">
+        <img :src="selectedCodi.thumbnailUrl || '/images/placeholder.png'" alt="코디 이미지" class="product-image" />
+        <div>
+          <p class="product-name">{{ selectedCodi.codiDescription }}</p>
+          <p class="product-price">코디 ID: {{ selectedCodi.codiName }}</p>
+          <p class="product-price">{{ selectedCodi.codiPrice.toLocaleString() }}원</p>
+        </div>
+      </div>
+      <div class="rating-section">
+          <div class="stars" @click="setRating($event)">
+            <img v-for="n in 5" :key="n" :src="n <= rating ? '/images/full_star.png' : '/images/empty_star.png'" :alt="'별 ' + n" class="star" />
+          </div>
+          <p class="rating-text">{{ ratingText }}</p>
+        </div>
+  
+        <section class="review-input-section">
+          <h2 class="subtitle">대여한 상품의 리뷰를 남겨주세요</h2>
+          <p class="subtitle-detail">본문 입력(필수)</p>
+          <textarea class="review-text" v-model="reviewText" placeholder="리뷰 작성란" minlength="20"></textarea>
+          <div class="text-state">
+            <p class="text-limit">5자 이상</p>
+            <p class="text-count">{{ reviewText.length }} / 500</p>
+          </div>
+        </section>
+  
+        <section class="photo-upload-section">
+        <h2 class="subtitle">사진 첨부</h2>
+        <p class="photo-limit">사진 첨부는 3장까지만 가능합니다.</p>
+        <div class="image-upload">
+          <!-- 각 개별 이미지 업로드 영역 -->
+          <div v-for="(image, index) in imagePreview" :key="index" class="image-placeholder" @click="selectSingleFile(index)">
+            <input :ref="el => fileInputs[index] = el" style="display:none;" type="file" accept="image/*" @change="event => handleSingleFileChange(event, index)" />
+            <div v-if="!image" class="plus-text">+</div>
+            <img v-else :src="image" />
+          </div>
+
+          <!-- 다중 파일 업로드 버튼 -->
+          <div class="upload-button" @click="triggerFileInput">
+            <input type="file" ref="multipleFileInput" style="display:none;" accept="image/*" multiple @change="handleMultipleFileChange" />
+            <img class="upload-icon" src="/images/add_img.png">
+            <span class="upload-text">여러장 선택하기</span>
+          </div>
+        </div>
+      </section>
+
         <button @click="showConfirmModal" class="submit-button">리뷰 작성 완료</button>
       </section>
     </div>
@@ -68,6 +117,7 @@
   const route = useRoute();
   const router = useRouter();
   const selectedProduct = ref(null);
+  const selectedCodi = ref(null);
   const rating = ref(0);
   const reviewText = ref('');
   const imageFiles = ref([]);
@@ -77,14 +127,13 @@
   const imagePreview = ref([null, null, null]);
   
   
-  const fetchImageForItem = async (item) => {
-    let storagePath;
-    const productId = route.query.productId;
-    if (productId) {
-      storagePath = `lookkit/products/0${productId}/${productId}_thumbnail.webp`;
-    } else if (codiId) {
-      storagePath = `lookkit/codi/0${codiId}/${codiId}_thumbnail.webp`;
-    }
+  const fetchImageForItem = async (item, type) => {
+  let storagePath;
+  if (type === 'product') {
+    storagePath = `lookkit/products/0${item.productId}/${item.productId}_thumbnail.webp`;
+  } else if (type === 'codi') {
+    storagePath = `lookkit/codi/0${item.codiId}/${item.codiId}_thumbnail.webp`;
+  }
   
     console.log('이미지 경로 확인:', storagePath);
     try {
@@ -99,12 +148,16 @@
   
   onMounted(() => {
     const productId = route.query.productId;
-    if (!productId) {
-      alert('리뷰를 작성할 상품 정보가 없습니다.');
-      return;
-    }
+    const codiId = route.query.codiId;
+    if (productId) {
     fetchPurchasedProduct(Number(productId), authStore.user.userId);
-  });
+  } else if (codiId) {
+    fetchPurchasedCodi(Number(codiId), authStore.user.userId);
+  } else {
+    alert('리뷰를 작성할 상품 또는 코디 정보가 없습니다.');
+    router.push('/mypage/manage');
+  }
+});
   
   const fetchPurchasedProduct = async (productId, userId) => {
   try {
@@ -136,6 +189,27 @@
   }
 };
   
+const fetchPurchasedCodi = async (codiId, userId) => {
+  try {
+    const reviewResponse = await axios.get(`http://localhost:8081/api/reviews/list/${userId}`);
+    const userReviews = reviewResponse.data;
+
+    const existingReview = userReviews.find(review => review.codiId === codiId);
+    if (existingReview) {
+      const modalStore = useModalStore();
+      modalStore.showModal('리뷰 작성 제한', '이미 해당 코디에 대한 리뷰를 작성하셨습니다.', '주문 관리 페이지로 이동합니다.', '확인');
+      router.push('/mypage/manage');
+      return;
+    }
+
+    const response = await axios.get(`http://localhost:8081/api/codi/${codiId}`);
+    selectedCodi.value = response.data;
+    await fetchImageForItem(selectedCodi.value, 'codi');
+  } catch (error) {
+    console.error('코디 정보를 가져오는 중 오류 발생:', error);
+  }
+};
+
   const setRating = (event) => {
     const clickedStarIndex = Array.from(event.target.parentNode.children).indexOf(event.target) + 1;
     rating.value = clickedStarIndex;
@@ -234,31 +308,41 @@ const uploadImagesToFirebase = async () => {
     }
   
     try {
-      const imageUrls = await uploadImagesToFirebase();
-      const formData = new FormData();
-      formData.append('reviewDTO', new Blob([JSON.stringify({
-        userId: userId,
-        productId: selectedProduct.value.productId,
-        rating: rating.value,
-        reviewText: reviewText.value,
-        imageUrls
-    })], { type: 'application/json' }));
-      
-  
-  
-      await axios.post('http://localhost:8081/api/reviews/write', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      const modalStore = useModalStore();
-      modalStore.showModal('리뷰 작성', '리뷰 작성이 완료되었습니다.');
-      router.push('/mypage/review');
-    } catch (error) {
-      console.error('리뷰 작성 실패:', error);
-      alert('리뷰 작성에 실패했습니다. 다시 시도해주세요.');
+    const imageUrls = await uploadImagesToFirebase();
+    const reviewData = {
+      userId: userId,
+      rating: rating.value,
+      reviewText: reviewText.value,
+      imageUrls,
+    };
+    
+    if (selectedProduct.value) {
+      reviewData.productId = selectedProduct.value.productId;
+    } else if (selectedCodi.value) {
+      reviewData.codiId = selectedCodi.value.codiId;
+    } else {
+      alert('리뷰 작성할 상품이나 코디가 없습니다.');
+      return;
     }
-  };
+
+    // FormData 설정
+    const formData = new FormData();
+    formData.append('reviewDTO', new Blob([JSON.stringify(reviewData)], { type: 'application/json' }));
+
+    await axios.post('http://localhost:8081/api/reviews/write', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    const modalStore = useModalStore();
+    modalStore.showModal('리뷰 작성', '리뷰 작성이 완료되었습니다.');
+    router.push('/mypage/review');
+  } catch (error) {
+    console.error('리뷰 작성 실패:', error);
+    alert('리뷰 작성에 실패했습니다. 다시 시도해주세요.');
+  }
+};
   </script>
   
   
