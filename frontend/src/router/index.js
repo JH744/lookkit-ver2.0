@@ -105,6 +105,7 @@ const routes = [
   {
     path: "/mypage",
     component: () => import("@/views/mypage/Mypage.vue"),
+
     children: [
       {
         path: "manage",

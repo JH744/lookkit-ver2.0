@@ -18,7 +18,7 @@ import { computed } from "vue";
 import { useAuthStore } from "@/stores/authStore";
 
 const authStore = useAuthStore();
-const userUuid = computed(() => authStore.user.userUuid);
+const username = computed(() => authStore.user.username);
 
 const emit = defineEmits(["open-pw-check"]);
 const openPwCheck = () => {
@@ -38,7 +38,7 @@ const openPwCheck = () => {
 
 .welcome-message {
   font-size: 20px;
-  color: #555;
+  color: #242424;
   margin-left: 15px;
 }
 

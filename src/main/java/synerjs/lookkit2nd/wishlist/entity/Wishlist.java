@@ -24,7 +24,7 @@ public class Wishlist {
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "CODI_ID")
     private Codi codi;
 

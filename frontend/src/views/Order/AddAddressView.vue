@@ -4,44 +4,35 @@
       <div class="delete-button">
         <button type="button" class="x-button" @click="closeModal">X</button>
       </div>
-      <div class="new-address-registration">
-        <span>신규 배송지 등록</span>
-      </div>
-      <div class="label label-destination">
-        <span>배송지명</span>
-      </div>
-      <div class="address-input">
-        <input type="text" v-model="addressName" class="span-text" placeholder="배송지명 입력" />
-      </div>
-      <div class="label label-recipient">
-        <span>받는 사람</span>
-      </div>
-      <div class="recipient-input">
-        <input type="text" v-model="recipientName" class="span-text" placeholder="받는 사람 입력" />
-      </div>
-      <div class="label label-phone">
-        <span>휴대폰 번호</span>
-      </div>
-      <div class="phone-input">
-        <input type="text" v-model="phoneNumber" class="span-text" placeholder="휴대폰 번호 입력" />
-      </div>
+        <div class="info-header">
+          <span class="info-title">신규 배송지 등록</span>
+        </div>
+        <div class="info-block">
+          <span>배송지명</span>
+          <input type="text" v-model="addressName" class="span-text" placeholder="배송지명 입력" />
+        </div>
+        <div class="info-block">
+          <span>받는 사람</span>
+          <input type="text" v-model="recipientName" class="span-text" placeholder="받는 사람 입력" />
+        </div>
+        <div class="info-block">
+          <span>휴대폰 번호</span>
+          <input type="text" v-model="phoneNumber" class="span-text" placeholder="휴대폰 번호 입력" />
+        </div>
      <div class="search-address">
       <div class="label-address">
         <span>주소</span>
       </div>
-      <div class="button button-zipcode">
-        <button type="button" @click="searchPostalCode">우편번호 찾기</button>
+      <div class="button-zipcode"  @click="searchPostalCode">우편번호 찾기
       </div>
      </div>
-      <div class="address-input-1">
-        <input type="text" v-model="postalCode" class="span-text" placeholder="우편번호 입력" />
-      </div>
-      <div class="address-input-2">
-        <input type="text" v-model="detailAddress" class="span-text" placeholder="상세 주소 입력" />
-      </div>
-      <div class="button button-register">
-        <button type="button" @click="registerAddress">등록하기</button>
-      </div>
+     <div class="address-block">
+       <input type="text" v-model="postalCode" class="span-text" placeholder="우편번호 입력" />
+       <input type="text" v-model="detailAddress" class="span-text" placeholder="상세 주소 입력" />
+     </div>
+     <div class="button-block">
+       <div class="button-register" @click="registerAddress">등록하기</div>
+     </div>
     </div>
   </div>
 </template>
@@ -95,6 +86,30 @@ const registerAddress = () => {
 </script>
 
 <style scoped>
+.info-title {
+  font-weight: bold;
+}
+
+.button-block {
+  justify-items: center;
+}
+
+.info-header {
+  margin-bottom: 20px;
+}
+
+.info-block {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.address-block {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -148,20 +163,20 @@ const registerAddress = () => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .label {
   margin-bottom: 10px;
   display: block;
 }
-.label-address {
-  
-}
 
 .search-address {
   display: flex;
   align-items: center;
   gap: 5%;
+  margin-bottom: 10px;
+  margin-top: 20px;
 }
 .address-input,
 .recipient-input,
@@ -185,14 +200,18 @@ const registerAddress = () => {
 }
 
 .button-zipcode {
-  width: 30%;
+  border-radius: 20px;
+    padding: 12px 22px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #404040;
+    border: 1px solid gray;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+    text-align: center;
 }
 
 .button-register {
-  width: 30%;
-}
-
-.button {
   border-radius: 54px;
   padding: 14px 24px;
   font-size: 15px;
@@ -200,7 +219,9 @@ const registerAddress = () => {
   color: #fff;
   background-color: #062236;
   transition: background-color 0.3s ease;
+  text-align: center;
 }
+
 
 .button:hover {
   background-color: #1a4d6e;
@@ -211,6 +232,6 @@ const registerAddress = () => {
   color: #101010;
   width: 100%;
   height: 100%;
-  padding: 0px 10px;
+  padding: 10px 10px;
 }
 </style>
