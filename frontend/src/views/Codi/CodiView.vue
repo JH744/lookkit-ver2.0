@@ -36,8 +36,8 @@
         </div>
       </div>
       <div class="buttons">
-        <button @click="addToCart" class="btn btn-cart">옷장담기</button>
-        <button @click="rentNow" class="btn btn-rent">대여하기</button>
+        <button @click="confirmAddToCart" class="btn btn-cart">옷장담기</button>
+        <button @click="confirmRentNow"  class="btn btn-rent">대여하기</button>
       </div>
     </div>
   </div>
@@ -80,8 +80,20 @@
       <p><strong style="font-size: 1.5em;">총 대여 금액 {{ formattedTotalPrice }}</strong></p>
     </div>
     <div class="buttons">
-      <button @click="addToCart" class="btn btn-cart">옷장담기</button>
-      <button @click="rentNow" class="btn btn-rent">대여하기</button>
+      <button @click="confirmAddToCart" class="btn btn-cart">옷장담기</button>
+      <button @click="confirmRentNow"  class="btn btn-rent">대여하기</button>
+    </div>
+  </div>
+  <!-- 모달 컴포넌트 추가 -->
+  <div v-if="confirmModalStore.isModalVisible" class="modal">
+    <div class="modal-content">
+      <h3>{{ confirmModalStore.modalActionMessage }}</h3>
+      <p>{{ confirmModalStore.questionMessage }}</p>
+      <p>{{ confirmModalStore.warningMessage }}</p>
+      <div class="modal-actions">
+        <button @click="confirmModalStore.confirmCallback">확인</button>
+        <button @click="confirmModalStore.closeModal">취소</button>
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +108,7 @@ import "@/assets/styles/codi.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
 import Datepicker from 'vue3-datepicker';
 import { useAuthStore } from "@/stores/authStore";
+import { useConfirmModalStore } from "@/stores/modalStore";
 
 const API_BASE_URL = 'http://localhost:8081/api/codi';
 const authStore = useAuthStore();
@@ -162,13 +175,24 @@ const disabledStartDates = (date) => {
   return date < minStartDate;
 };
 
-// 대여 시작일 검증 함수
+const confirmModalStore = useConfirmModalStore();
+
 const validateRentalStartDate = (value) => {
   if (value && new Date(value) < minStartDate) {
-    alert('대여 시작일은 최소 3일 이후만 가능합니다.');
-    rentalStartDate.value = null; // 잘못된 선택을 초기화
+    
+    confirmModalStore.showModal(
+      "날짜 선택 오류",                 // 모달의 제목
+      "대여 시작일은 최소 3일 이후만 가능합니다.", // 모달의 질문 메시지
+      "",                              // 경고 메시지 (빈 문자열로 전달해도 됨)
+      "확인",                          // 확인 버튼 텍스트
+      () => {
+        rentalStartDate.value = null;  // 모달 확인 시 잘못된 선택 초기화
+      }
+    );
   }
 };
+
+
 
 // 날짜 포맷 함수 정의
 const formatDate = (date) => {
@@ -237,12 +261,25 @@ const addToCart = async () => {
     }
   }
 );
-    alert('옷장에 추가되었습니다.');
+  
     window.location.href = '/cart';
   } catch (error) {
     console.error("옷장에 추가 실패:", error);
     alert('옷장에 추가하는 데 실패했습니다.');
   }
+};
+
+const confirmAddToCart = () => {
+  confirmModalStore.showModal(
+    "옷장담기",
+    "이 상품을 옷장에 담으시겠습니까?",
+    "",
+    "담기",
+    () => {
+      confirmModalStore.closeModal();
+      addToCart();
+    }
+  );
 };
 
 const rentNow = async () => {
@@ -264,11 +301,22 @@ const rentNow = async () => {
       itemType: 'codi'
     });
 
-    alert('대여가 완료되었습니다.');
     window.location.href = `/order?${orderParams.toString()}`;
   } catch (error) {
     alert('대여 페이지로 이동하는 데 실패했습니다.');
     console.error("대여 오류:", error);
   }
+};
+const confirmRentNow = () => {
+  confirmModalStore.showModal(
+    "대여하기",
+    "이 상품을 대여하시겠습니까?",
+    "",
+    "대여",
+    () => {
+      confirmModalStore.closeModal();
+      rentNow();
+    }
+  );
 };
 </script>

@@ -81,7 +81,7 @@
             <span v-else class="confirmed-text">
               {{ product.codiId === null ? '구매 확정' : '대여 확정' }}
             </span>
-            <a class="review-button" href="/mypage/inquiry/new">리뷰 작성</a>
+            <a :href="`/mypage/review/create?productId=${product.productId}`" class="review-button">리뷰 작성</a>
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@ const fetchImageForProduct = async (product) => {
     product.thumbnailUrl = url;
   } catch (error) {
     console.error(`이미지 가져오기 실패: ${storagePath}`, error);
-    product.thumbnailUrl = '/images/placeholder.png';
+    product.thumbnailUrl = '/assets/img_none.png';
   }
 };
 

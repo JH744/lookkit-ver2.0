@@ -10,11 +10,7 @@
             <router-link to="/mypage/inquiry">1:1 문의하기</router-link>
           </li>
           <li>
-            <router-link to="#">리뷰 관리</router-link>
-            <ul>
-              <li><router-link to="#">작성 가능한 리뷰</router-link></li>
-              <li><router-link to="#">작성한 리뷰</router-link></li>
-            </ul>
+            <router-link to="/mypage/review">리뷰 관리</router-link>
           </li>
           <li><router-link to="/mypage/wishlist">찜한 상품</router-link></li>
         </ul>

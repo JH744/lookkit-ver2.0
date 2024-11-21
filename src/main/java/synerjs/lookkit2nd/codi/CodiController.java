@@ -48,7 +48,7 @@ public class CodiController {
 
         return OrderDTO.builder()
                 .itemId(codi.getCodiId())
-                .itemName(codi.getCodiName())
+                .itemName(codi.getCodiDescription())
                 .startDate(rentalStart)
                 .endDate(rentalEnd)
                 .price(basePrice)

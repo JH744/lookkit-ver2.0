@@ -116,6 +116,15 @@ const routes = [
         component: () => import("@/views/mypage/inquiry/UserInquiryList.vue"),
       },
       {
+        path: "review/create",
+        component: () => import("@/views/Review/ReviewWriteView.vue"),
+        props: (route) => ({ productId: route.query.productId }),
+      },
+      {
+        path: "review",
+        component: () => import("@/views/Review/ReviewListView.vue"),
+      },
+      {
         path: "inquiry/create",
         component: () => import("@/views/mypage/inquiry/InquiryForm.vue"),
       },

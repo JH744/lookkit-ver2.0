@@ -30,8 +30,8 @@
       </div>
       
       <div class="buttons">
-        <button @click="addToCart" class="btn btn-cart">장바구니</button>
-        <button @click="buyNow" class="btn btn-buy">구매하기</button>
+        <button @click="confirmAddToCart" :disabled="quantity === 0" class="btn btn-cart">장바구니</button>
+        <button @click="confirmBuyNow" :disabled="quantity === 0" class="btn btn-buy">구매하기</button>
       </div>
     </div>
   </div>
@@ -70,12 +70,24 @@
       </div>  
     </div>
     <div class="quantity-section">
-      <p>선택한 수량: {{ quantity }}개</p>
+      <p>선택한 수량 {{ quantity }}개</p>
     </div>
     <div class="total-price">총 상품 금액 {{ formattedTotalPrice }}</div>
     <div class="buttons">
-      <button @click="addToCart" class="btn btn-cart">장바구니</button>
-      <button @click="buyNow" class="btn btn-buy">구매하기</button>
+      <button @click="confirmAddToCart" :disabled="quantity === 0" class="btn btn-cart">장바구니</button>
+      <button @click="confirmBuyNow" :disabled="quantity === 0" class="btn btn-buy">구매하기</button>
+    </div>
+  </div>
+
+  <div v-if="confirmModalStore.isModalVisible" class="modal">
+    <div class="modal-content">
+      <h3>{{ confirmModalStore.modalActionMessage }}</h3>
+      <p>{{ confirmModalStore.questionMessage }}</p>
+      <p>{{ confirmModalStore.warningMessage }}</p>
+      <div class="modal-actions">
+        <button @click="confirmModalStore.confirmCallback">확인</button>
+        <button @click="confirmModalStore.closeModal">취소</button>
+      </div>
     </div>
   </div>
 </template>
@@ -89,7 +101,9 @@ import { firebaseStorage } from "@/firebase/firebaseConfig";
 import "@/assets/styles/product.css";
 import ReviewView from '@/views/Review/ReviewView.vue'; 
 import { useAuthStore } from "@/stores/authStore";
+import { useConfirmModalStore } from '@/stores/modalStore';
 
+const confirmModalStore = useConfirmModalStore();
 const authStore = useAuthStore();
 const userId = authStore.user?.userId;
 const API_BASE_URL = 'http://localhost:8081/api/products';
@@ -156,12 +170,30 @@ const addToCart = async () => {
       `${API_BASE_URL}/add/product/${product.value.productId}?quantity=${quantity.value}&userId=${userId}`
     );
      
-    alert('장바구니에 추가되었습니다.');
     window.location.href = '/cart';
   } catch (error) {
     console.error("옷장에 추가 실패:", error);
     alert('장바구니에 추가하는 데 실패했습니다.');
   }
+};
+
+
+const confirmAddToCart = () => {
+  if (quantity.value === 0) {
+    alert('수량을 선택해주세요.');
+    return;
+  }
+
+  confirmModalStore.showModal(
+    '장바구니 담기',
+    '이 상품을 장바구니에 담으시겠습니까?',
+    '',
+    '장바구니 담기',
+    () => {
+      confirmModalStore.closeModal();
+      addToCart();
+    }
+  );
 };
 
 const buyNow = async () => { 
@@ -180,11 +212,29 @@ const buyNow = async () => {
       itemType: 'product'
     });
 
-    alert('주문 페이지로 이동합니다.');
     window.location.href = `/order?${orderParams.toString()}`;
   } catch (error) {
     alert('구매 페이지로 이동하는 데 실패했습니다.');
     console.error("주문 오류:", error);
   }
 };
+
+const confirmBuyNow = () => {
+  if (quantity.value === 0) {
+    alert('수량을 선택해주세요.');
+    return;
+  }
+
+  confirmModalStore.showModal(
+    '구매하기',
+    '이 상품을 구매하시겠습니까?',
+    '',
+    '구매',
+    () => {
+      confirmModalStore.closeModal();
+      buyNow();
+    }
+  );
+};
+
 </script>
