@@ -46,16 +46,16 @@ public class MainController {
     @GetMapping("/codiset")
     public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts(Authentication auth) {
         // auth 확인
-        if (auth != null) {
-            System.out.println("auth변수확인");
-            CustomUser user = (CustomUser) auth.getPrincipal();
-            System.out.println(user);
-            System.out.println(user.getUserId());
-            System.out.println(user.getAuthorities());
-            System.out.println(user.getUsername());
-        } else {
-            System.out.println("auth : null");
-        }
+//        if (auth != null) {
+//            System.out.println("auth변수확인");
+//            CustomUser user = (CustomUser) auth.getPrincipal();
+//            System.out.println("user>>>>>>>"+user);
+//            System.out.println(user.getUserId());
+//            System.out.println(user.getAuthorities());
+//            System.out.println(user.getUsername());
+//        } else {
+//            System.out.println("auth : null");
+//        }
         return ResponseEntity.ok(coordisetService.getAllCoordiWithProducts());
     }
 
