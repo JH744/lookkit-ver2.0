@@ -40,25 +40,25 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-     
- 
-     // 특정 주문 완료 화면 정보를 위한 API 추가 (orderComplete에 사용될 데이터 조회)
-     @GetMapping("/orderComplete")
-     public ResponseEntity<OrderDTO> getOrderCompleteInfo(@RequestParam("orderId") Long orderId) {
-         try {
-             OrderDTO orderDTO = orderService.getOrderDetailsByOrderId(orderId);
-             if (orderDTO != null) {
-                 return ResponseEntity.ok(orderDTO);
-             } else {
-                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-             }
-         } catch (IllegalArgumentException e) {
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-         } catch (Exception e) {
-             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-         }
-     }
-     
+
+
+    // 특정 주문 완료 화면 정보를 위한 API 추가 (orderComplete에 사용될 데이터 조회)
+    @GetMapping("/orderComplete")
+    public ResponseEntity<OrderDTO> getOrderCompleteInfo(@RequestParam("orderId") Long orderId) {
+        try {
+            OrderDTO orderDTO = orderService.getOrderDetailsByOrderId(orderId);
+            if (orderDTO != null) {
+                return ResponseEntity.ok(orderDTO);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }
 
 

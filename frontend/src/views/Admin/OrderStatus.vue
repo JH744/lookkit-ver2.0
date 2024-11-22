@@ -97,7 +97,7 @@
                 DataTable Example
               </div>
               <div class="card-body">
-                <table>
+                <table class="table table-striped">
                   <thead>
                     <tr>
                       <th>주문번호</th>
@@ -120,45 +120,28 @@
                     </tr>
                   </tfoot>
                   <tbody>
-                    <tr th:each="list:${orderList}">
-                      <td th:text="${list.orderId}">주문번호</td>
-                      <td th:text="${list.userUuid}">주문자ID</td>
-                      <td th:text="${list.totalAmount}">주문총액</td>
+                    <tr v-for="order in paginatedOrders" :key="order.orderId">
+                      <td>{{ order.orderId }}</td>
+                      <td>{{ order.userUuid }}</td>
+                      <td>{{ order.totalAmount }}</td>
                       <td>
-                        <select>
+                        <select v-model="order.orderStatus">
                           <option
-                            value="pending"
-                            th:selected="${list.orderStatus == 'pending'}"
+                            v-for="option in orderStatusOptions"
+                            :key="option.value"
+                            :value="option.value"
                           >
-                            대기
-                          </option>
-                          <option
-                            value="shipped"
-                            th:selected="${list.orderStatus == 'shipped'}"
-                          >
-                            배송 중
-                          </option>
-                          <option
-                            value="delivered"
-                            th:selected="${list.orderStatus == 'delivered'}"
-                          >
-                            완료
-                          </option>
-                          <option
-                            value="completed"
-                            th:selected="${list.orderStatus == 'completed'}"
-                          >
-                            취소됨
+                            {{ option.label }}
                           </option>
                         </select>
                       </td>
-                      <td th:text="${list.orderDate}">2024/11/04</td>
-                      <td th:text="${list.orderComment}">주문요청사항</td>
+                      <td>{{ order.orderDate }}</td>
+                      <td>{{ order.orderComment }}</td>
                       <td>
                         <button
                           type="button"
                           class="btn btn-primary"
-                          onclick="updateOrderStatus(event)"
+                          @click="updateOrderStatus(order)"
                         >
                           변경
                         </button>
@@ -166,6 +149,47 @@
                     </tr>
                   </tbody>
                 </table>
+                <div class="d-flex justify-content-center mt-3">
+                  <nav>
+                    <ul class="pagination">
+                      <li
+                        class="page-item"
+                        :class="{ disabled: currentPage === 1 }"
+                      >
+                        <a
+                          class="page-link"
+                          href="#"
+                          @click.prevent="changePage(currentPage - 1)"
+                          >이전</a
+                        >
+                      </li>
+                      <li
+                        v-for="page in totalPages"
+                        :key="page"
+                        class="page-item"
+                        :class="{ active: page === currentPage }"
+                      >
+                        <a
+                          class="page-link"
+                          href="#"
+                          @click.prevent="changePage(page)"
+                          >{{ page }}</a
+                        >
+                      </li>
+                      <li
+                        class="page-item"
+                        :class="{ disabled: currentPage === totalPages }"
+                      >
+                        <a
+                          class="page-link"
+                          href="#"
+                          @click.prevent="changePage(currentPage + 1)"
+                          >다음</a
+                        >
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
               </div>
             </div>
           </div>
@@ -190,7 +214,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { useModalStore } from "@/stores/modalStore";
@@ -198,25 +222,67 @@ import { useModalStore } from "@/stores/modalStore";
 const dashboardUrl = "/admin/dashboard"; // 대쉬보드 이동
 const logoutUrl = "/logout"; // 로그아웃 이동
 const router = useRouter();
-const route = useRoute(); // 현재 경로 정보를 가져옵니다.
-const inquiryId = ref(route.params.inquiryId); // 경로 변수에서 inquiryId를 추출합니다.
-const writer = ref("");
-const title = ref("");
-const contents = ref("");
-const answer = ref("");
-const answerState = ref("");
-// 폼 제출 함수
+
+// 주문 목록 상태 추가
+const orderList = ref([]);
+
+// 주문 상태 옵션
+const orderStatusOptions = [
+  { value: "pending", label: "대기" },
+  { value: "shipped", label: "배송 중" },
+  { value: "delivered", label: "배송 완료" },
+  { value: "completed", label: "구매 확정" },
+];
+
+const currentPage = ref(1);
+const itemsPerPage = 10; // 페이지당 표시할 항목 수
+const totalItems = ref(0);
+
+// 계산된 속성 추가
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return orderList.value.slice(start, end);
+});
+
+// 페이지 변경 메서드
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
+// fetchOrderStatus 함수 수정
 const fetchOrderStatus = async () => {
   try {
     const { data } = await axios.get(
       "http://localhost:8081/api/admin/orderStatus"
     );
-    console.log("data", data);
+    orderList.value = data;
+    totalItems.value = data.length;
   } catch (err) {
     console.error("주문목록 가져오는 중 오류 발생:", err);
   }
 };
 
+// 주문 상태 업데이트 함수
+const updateOrderStatus = async (order) => {
+  console.log("orderStatus to be sent:", order.orderStatus); // 로그 추가
+  try {
+    const { data } = await axios.put(
+      `http://localhost:8081/api/admin/orders/${order.orderId}/status`,
+      {
+        orderStatus: order.orderStatus,
+      }
+    );
+    console.log("res", data);
+  } catch (err) {
+    console.error("주문상태 업데이트 중 오류 발생:", err);
+  }
+};
+
+// 마운트시 주문목록 가져오기
 onMounted(() => {
   fetchOrderStatus();
 });
@@ -445,5 +511,30 @@ onMounted(() => {
 .notice-icon-block span {
   color: #818181;
   font-size: 17px;
+}
+
+.table th:nth-child(1) {
+  width: 50px;
+}
+.table th:nth-child(2) {
+  width: 60px;
+}
+.table th:nth-child(3) {
+  width: 50px;
+}
+.table th:nth-child(4) {
+  width: 12%;
+}
+.table th:nth-child(5) {
+  width: 20%;
+}
+.table th:nth-child(6) {
+  width: 40%;
+}
+
+th {
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow: hidden; /* 넘친 내용 숨기기 */
+  text-overflow: ellipsis; /* 생략 부호(...) 표시 */
 }
 </style>

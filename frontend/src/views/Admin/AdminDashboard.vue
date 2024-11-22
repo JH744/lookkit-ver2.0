@@ -178,10 +178,10 @@
               </div>
               Charts
             </a>
-            <a class="nav-link" th:href="@{/admin/orderStatus}">
+            <router-link class="nav-link" to="/admin/order/status">
               <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
               주문현황
-            </a>
+            </router-link>
           </div>
         </div>
         <div class="sb-sidenav-footer">

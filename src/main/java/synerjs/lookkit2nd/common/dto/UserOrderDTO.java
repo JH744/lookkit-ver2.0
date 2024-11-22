@@ -2,6 +2,7 @@ package synerjs.lookkit2nd.common.dto;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Builder
@@ -12,7 +13,7 @@ import java.sql.Timestamp;
 public class UserOrderDTO {
     private Long orderId;
     private String userUuid;
-    private Double totalAmount;
+    private BigDecimal totalAmount;
     private String orderStatus;
     private String orderComment;
     private Timestamp orderDate;

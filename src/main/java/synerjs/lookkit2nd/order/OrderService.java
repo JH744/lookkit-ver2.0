@@ -197,10 +197,15 @@ public class OrderService {
     }
 
 
-
-    // [관리자:주문현황] 모든주문리스트가져오기 (Uid > UserUuid 변경해 가져오기)
+    // [관리자 주문현황] 모든주문리스트가져오기 (Uid > UserUuid 변경해 가져오기)
     public List<UserOrderDTO> getAllOrders() {
         return orderRepository.getAllOrdersWithUserUuid();
+    }
+
+    // [관리자 주문현황] 주문상태 업데이트
+    public int updateOrderStatus(Long orderId, String orderStatus) {
+        System.out.println("orderStatus>>>>>>>>>>>>" + orderStatus);
+        return orderRepository.updateOrderStatus(orderId, orderStatus);
     }
 
 
