@@ -2,7 +2,6 @@ package synerjs.lookkit2nd.wishlist.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import synerjs.lookkit2nd.codi.Codi;
@@ -66,4 +65,13 @@ public class WishlistService {
     public List<Long> getWishlistItemIds(Long userId, List<Long> itemIds) {
         return repository.findAllItemIdsInWishlist(userId, itemIds);
     }
+
+
+    @Transactional
+    public void deleteWishByProductId(Long userId, WishlistRequestDTO request) {
+        long productId =request.getProductId();
+        repository.deleteByUserIdAndProductId(userId, productId);
+    }
 }
+
+
