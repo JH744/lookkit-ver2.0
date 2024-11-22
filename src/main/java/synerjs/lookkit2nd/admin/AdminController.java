@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.common.dto.InquiryUserDTO;
+import synerjs.lookkit2nd.common.dto.UserOrderDTO;
 import synerjs.lookkit2nd.common.response.BaseResponse;
 import synerjs.lookkit2nd.inquiry.entity.Inquiry;
 import synerjs.lookkit2nd.inquiry.entity.InquiryAnswer;
@@ -95,6 +96,15 @@ public class AdminController {
         InquiryAnswer savedAnswer = inquiryService.saveAnswer(inquiryAnswer,id);
         return ResponseEntity.ok(savedAnswer);
     }
+
+
+    // 주문 현황 가져오기
+    @GetMapping("/orderStatus")
+    public ResponseEntity<List<UserOrderDTO>> getAllOrders() {
+        List<UserOrderDTO> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
+    }
+
 
 
 }

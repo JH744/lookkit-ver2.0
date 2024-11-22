@@ -302,7 +302,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="inquiry in inquiryList" :key="inquiry.inquiryId">
+                  <tr
+                    v-for="inquiry in paginatedInquiries"
+                    :key="inquiry.inquiryId"
+                  >
                     <td>
                       {{ inquiry.inquiryId }}
                     </td>
@@ -329,6 +332,50 @@
                   </tr>
                 </tbody>
               </table>
+
+              <!-- 페이지네이션 컴포넌트 추가 -->
+              <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === 1 }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="changePage(currentPage - 1)"
+                    >
+                      이전
+                    </a>
+                  </li>
+                  <li
+                    v-for="page in totalPages"
+                    :key="page"
+                    class="page-item"
+                    :class="{ active: currentPage === page }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="changePage(page)"
+                    >
+                      {{ page }}
+                    </a>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === totalPages }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="changePage(currentPage + 1)"
+                    >
+                      다음
+                    </a>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
@@ -336,7 +383,7 @@
       <footer class="py-4 bg-light mt-auto">
         <div class="container-fluid px-4">
           <div class="d-flex align-items-center justify-content-between small">
-            <div class="text-muted">Copyright &copy; Your Website 2023</div>
+            <div class="text-muted">Copyright &copy; lookkit</div>
             <div>
               <a href="#">Privacy Policy</a>
               &middot;
@@ -351,7 +398,7 @@
 
 <script setup>
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, watchEffect } from "vue";
 
 // 스크립트 로드 상태 관리
 const scriptsLoaded = ref(false);
@@ -364,6 +411,26 @@ const barChart = ref(null);
 const dataTable = ref(null);
 
 const inquiryList = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const totalPages = ref(0);
+
+// 페이지네이션된 데이터 계산
+const paginatedInquiries = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return inquiryList.value.slice(start, end);
+});
+
+// 총 페이지 수 계산
+watchEffect(() => {
+  totalPages.value = Math.ceil(inquiryList.value.length / itemsPerPage.value);
+});
+
+// 페이지 변경 함수
+const changePage = (page) => {
+  currentPage.value = page;
+};
 
 onMounted(async () => {
   try {
@@ -491,12 +558,12 @@ const initializeDataTable = () => {
 
 /* RouterLink 텍스트 스타일링 */
 .router-link-active {
-  color: #0d6efd;
+  color: #0d1134;
   text-decoration: none;
 }
 
 .router-link-exact-active {
-  color: #0d6efd;
+  color: #0d1134;
   font-weight: bold;
 }
 
@@ -506,7 +573,32 @@ a {
 }
 
 a:hover {
-  color: #0d6efd;
+  color: #0d1134;
   text-decoration: underline;
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+.page-item.disabled .page-link {
+  cursor: not-allowed;
+}
+
+.table th:nth-child(3) {
+  width: 150px;
+}
+.table th:nth-child(4) {
+  width: 40%;
+}
+
+th {
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow: hidden; /* 넘친 내용 숨기기 */
+  text-overflow: ellipsis; /* 생략 부호(...) 표시 */
 }
 </style>

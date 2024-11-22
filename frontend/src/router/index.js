@@ -56,6 +56,10 @@ const routes = [
         path: "inquiry/:inquiryId",
         component: () => import("@/views/Admin/InquiryAnswer.vue"),
       },
+      {
+        path: "order/status",
+        component: () => import("@/views/Admin/OrderStatus.vue"),
+      },
     ],
   },
   {
