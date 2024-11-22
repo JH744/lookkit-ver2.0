@@ -11,11 +11,15 @@ import org.springframework.web.bind.annotation.*;
 import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.codi.CodiDTO;
 import synerjs.lookkit2nd.codi.CodiService;
+import synerjs.lookkit2nd.common.response.BaseResponse;
 import synerjs.lookkit2nd.inquiry.dto.CodiProductDTO;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.product.ProductDTO;
 import synerjs.lookkit2nd.product.ProductService;
 import synerjs.lookkit2nd.user.CustomUser;
+import synerjs.lookkit2nd.wishlist.dto.WishlistRequestDTO;
+import synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO;
+import synerjs.lookkit2nd.wishlist.service.WishlistService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +31,7 @@ import java.util.Map;
 public class MainController {
     private final CodiService coordisetService;
     private final ProductService productService;
+    private final WishlistService wishlistService;
 
 
     // 모든 코디 반환
@@ -34,22 +39,21 @@ public class MainController {
     public ResponseEntity<List<CodiDTO>> getLatestEightCodiSets(Authentication auth) {
 
 
-
         return ResponseEntity.ok(coordisetService.getCodiSets());
     }
 
-     // 코디 세트와 연관된 상품 20개 조회 API
+    // 코디 세트와 연관된 상품 20개 조회 API
     @GetMapping("/codiset")
     public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts(Authentication auth) {
         // auth 확인
         if (auth != null) {
             System.out.println("auth변수확인");
-            CustomUser user =(CustomUser)auth.getPrincipal();
+            CustomUser user = (CustomUser) auth.getPrincipal();
             System.out.println(user);
             System.out.println(user.getUserId());
             System.out.println(user.getAuthorities());
             System.out.println(user.getUsername());
-        }else {
+        } else {
             System.out.println("auth : null");
 
         }
@@ -62,7 +66,7 @@ public class MainController {
     @GetMapping("/category")
     public ResponseEntity<List<ProductDTO>> mainCategoryPage(@RequestParam String type) {
         System.out.println("카테고리: " + type);
-      return  ResponseEntity.ok(productService.getProductsByCategory(type));
+        return ResponseEntity.ok(productService.getProductsByCategory(type));
     }
 
     //검색 결과 페이지
@@ -72,6 +76,24 @@ public class MainController {
         List<ProductDTO> productsList = productService.searchProductsByKeyword(keyword);
         return ResponseEntity.ok(productsList);
     }
+
+
+    // 여러 상품의 찜 상태 확인
+    @PostMapping("/checkBatch/{userId}")
+    public ResponseEntity<Map<String, Object>> checkItemsInWishlist(
+            @PathVariable Long userId,
+            @RequestBody List<Long> itemIds) {
+        List<Long> wishlistItemIds = wishlistService.getWishlistItemIds(userId, itemIds);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("wishlistItemIds", wishlistItemIds);
+        return ResponseEntity.ok(response);
+    }
+
+}
+
+
+
 
 
 //    // 좋아요 추가 및 삭제
@@ -120,4 +142,3 @@ public class MainController {
 
 
 
-}

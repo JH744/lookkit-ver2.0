@@ -63,4 +63,13 @@ public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
     WishlistResponseDTO getWishByUserId(@Param("userId") Long userId, @Param("productId") Long productId, @Param("codiId") Long codiId);
 
     Optional<Wishlist> findByUserIdAndProduct_ProductId(Long userId, Long productId);
+
+
+
+
+    @Query(value = "SELECT PRODUCT_ID FROM wishlist " +
+            "WHERE USER_ID = :userId AND PRODUCT_ID IN (:itemIds)", nativeQuery = true)
+    List<Long> findAllItemIdsInWishlist(@Param("userId") Long userId, @Param("itemIds") List<Long> itemIds);
+
+
 }

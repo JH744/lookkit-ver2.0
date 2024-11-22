@@ -38,7 +38,13 @@
             alt="상품썸네일"
             @error="handleImageError"
           />
-
+          <img
+            v-if="authStore.isLoggedIn"
+            :src="product.wishlist ? heartIcon1 : heartIcon2"
+            class="like-btn"
+            alt="좋아요버튼"
+            @click="likeProduct(product.productId)"
+          />
           <div class="product-info">
             <a :href="`/product/${product.productId}`">
               <div class="brand-name">{{ product.brandName }}</div>
@@ -47,6 +53,7 @@
             <div class="product-price-box">
               <div class="product-price">{{ product.productPrice }}원</div>
               <div class="product-price-discount">20%</div>
+              <div class="product-price-discount">{{ product.wishlist }}</div>
             </div>
             <div class="like-box">
               <img
@@ -75,12 +82,21 @@ import { ref, onMounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 import defaultImage from "@/assets/img_none.png";
+import { useAuthStore } from "@/stores/authStore";
+import heart1 from "@/assets/icons/heart1.svg";
+import heart2 from "@/assets/icons/heart2.svg";
+
+const authStore = useAuthStore();
 const products = ref([]); // 상품 리스트
 const route = useRoute(); // 현재 라우트 정보를 가져옴
-const categoryType = computed(() => route.query.type);
+const categoryType = ref(route.query.type);
 const imageBaseUrl = ref(
   "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
 );
+const heartIcon1 = ref(heart1);
+const heartIcon2 = ref(heart2);
+
+const wishlistItemIds = ref([]);
 
 const handleImageError = (event) => {
   event.target.src = defaultImage; // 이미지 로드 실패 시 기본 이미지로 대체
@@ -95,10 +111,14 @@ watch(
   }
 );
 
+const getWishlistIconSrc = (isWishItem) => {
+  return isWishItem ? "@/assets/icons/heart1.svg" : "@/assets/icons/heart2.svg";
+};
+
 // 상품 데이터를 가져오는 함수
 const fetchProducts = async () => {
   try {
-    const response = await axios.get(
+    const { data } = await axios.get(
       "http://localhost:8081/api/main/category",
       {
         params: {
@@ -106,8 +126,26 @@ const fetchProducts = async () => {
         },
       }
     );
-    products.value = response.data;
+    products.value = data;
+    console.log("data", data);
     console.log("상품 리스트:", products.value);
+    // 상품 ID 리스트를 추출
+    const productIds = products.value.map((product) => product.productId);
+    // 위시리스트 상태 확인
+    const wishlistResponse = await axios.post(
+      `http://localhost:8081/api/main/checkBatch/${authStore.user.userId}`,
+      productIds
+    );
+
+    // 위시리스트에 포함된 상품 ID를 가져옵니다.
+    const wishlistItemIds = wishlistResponse.data.wishlistItemIds;
+    console.log("wishlistItemIds", wishlistItemIds);
+
+    // 상품 데이터에 wishlist 상태를 추가
+    products.value = products.value.map((product) => ({
+      ...product,
+      wishlist: wishlistItemIds.includes(product.productId),
+    }));
   } catch (error) {
     console.error("상품 데이터 조회 오류 발생:", error);
   }
@@ -129,6 +167,82 @@ const encodedProductImageUrl = computed(() => {
     return `${imageBaseUrl.value}${encodedPath}?alt=media`;
   };
 });
+
+// 좋아요 토글 함수 수정
+const likeProduct = async (productId) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
+      {
+        productId: productId,
+      }
+    );
+
+    // 위시리스트 상태 업데이트
+    if (wishlistItemIds.value.includes(productId)) {
+      wishlistItemIds.value = wishlistItemIds.value.filter(
+        (id) => id !== productId
+      );
+    } else {
+      wishlistItemIds.value.push(productId);
+    }
+  } catch (error) {
+    console.error("Error toggling like:", error);
+  }
+};
+
+// 상품 데이터와 위시리스트 상태 가져오기
+const fetchWishlistStatus = async () => {
+  try {
+    // 백엔드로부터 상품 데이터를 가져옵니다.
+    const { data } = await axios.get("/api/products"); // API 엔드포인트는 필요에 맞게 수정
+    products.value = data;
+
+    // 상품 ID 리스트를 추출
+    const productIds = products.value.map((product) => product.productId);
+
+    // 위시리스트 상태 확인
+    const wishlistResponse = await axios.post(
+      `/wishlist/checkBatch?userId=${userId}`,
+      productIds
+    );
+
+    // 위시리스트에 포함된 상품 ID를 가져옵니다.
+    const wishlistItemIds = wishlistResponse.data.wishlistItemIds;
+
+    // 상품 데이터에 wishlist 상태를 추가
+    products.value = products.value.map((product) => ({
+      ...product,
+      wishlist: wishlistItemIds.includes(product.id),
+    }));
+  } catch (error) {
+    console.error("위시리스트 상태를 가져오는 중 오류 발생:", error);
+  }
+};
+
+// // 위시리스트 추가/제거 토글
+// const toggleWishlist = async (itemId) => {
+//   try {
+//     // 현재 상품의 상태 확인
+//     const product = products.value.find((p) => p.id === itemId);
+//     if (!product) return;
+
+//     if (product.wishlist) {
+//       // 위시리스트에서 제거
+//       await axios.delete(`/wishlist?userId=${userId}&itemId=${itemId}`);
+//       product.wishlist = false;
+//     } else {
+//       // 위시리스트에 추가
+//       await axios.post(`/wishlist/add`, {
+//         userId,
+//         itemId,
+//       });
+//       product.wishlist = true;
+//     }
+//   } catch (error) {
+//     console.error("위시리스트 상태 변경 중 오류 발생:", error);
+//   }
+// };
 </script>
 
 <style scoped>

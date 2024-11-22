@@ -59,4 +59,11 @@ public class WishlistService {
 
         return repository.getWishByUserId(userId, request.getProductId(), request.getCodiId());
     }
+
+
+
+    // 여러 상품의 찜 상태 확인
+    public List<Long> getWishlistItemIds(Long userId, List<Long> itemIds) {
+        return repository.findAllItemIdsInWishlist(userId, itemIds);
+    }
 }
