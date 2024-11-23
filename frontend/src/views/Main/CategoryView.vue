@@ -95,27 +95,13 @@ const imageBaseUrl = ref(
 );
 const heartIcon1 = ref(heart1);
 const heartIcon2 = ref(heart2);
-
 const wishlistItemIds = ref([]);
 
 const handleImageError = (event) => {
   event.target.src = defaultImage; // 이미지 로드 실패 시 기본 이미지로 대체
 };
 
-// 쿼리스트링이 변경될 때마다 categoryType을 업데이트
-watch(
-  () => route.query.type,
-  (newType) => {
-    categoryType.value = newType; // categoryType 업데이트
-    fetchProducts(); // 새로운 쿼리스트링에 따라 상품 데이터 다시 가져오기
-  }
-);
-
-const getWishlistIconSrc = (isWishItem) => {
-  return isWishItem ? "@/assets/icons/heart1.svg" : "@/assets/icons/heart2.svg";
-};
-
-// 상품 데이터를 가져오는 함수
+// 카테고리별 상품리스트 가져오기
 const fetchProducts = async () => {
   try {
     const { data } = await axios.get(
@@ -129,7 +115,7 @@ const fetchProducts = async () => {
     products.value = data;
     console.log("data", data);
     console.log("상품 리스트:", products.value);
-    // 상품 ID 리스트를 추출
+    // 상품 ID 리스트 추출
     const productIds = products.value.map((product) => product.productId);
     // 위시리스트 상태 확인
     const wishlistResponse = await axios.post(
@@ -137,24 +123,19 @@ const fetchProducts = async () => {
       productIds
     );
 
-    // 위시리스트에 포함된 상품 ID를 가져옵니다.
-    const wishlistItemIds = wishlistResponse.data.wishlistItemIds;
-    console.log("wishlistItemIds", wishlistItemIds);
+    // 위시리스트에 포함된 상품 ID 가져오기
+    wishlistItemIds.value = wishlistResponse.data.wishlistItemIds;
+    console.log("wishlistItemIds", wishlistItemIds.value);
 
     // 상품 데이터에 wishlist 상태를 추가
     products.value = products.value.map((product) => ({
       ...product,
-      wishlist: wishlistItemIds.includes(product.productId),
+      wishlist: wishlistItemIds.value.includes(product.productId),
     }));
   } catch (error) {
     console.error("상품 데이터 조회 오류 발생:", error);
   }
 };
-
-// 초기 데이터 로드
-onMounted(() => {
-  fetchProducts();
-});
 
 //스토리지 이미지url 인코딩
 const encodedProductImageUrl = computed(() => {
@@ -171,52 +152,44 @@ const encodedProductImageUrl = computed(() => {
 // 좋아요 토글 함수 수정
 const likeProduct = async (productId) => {
   try {
-    const response = await axios.post(
-      `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
-      {
-        productId: productId,
-      }
-    );
+    // 위시리스트 상태 업데이트
+    const product = products.value.find((p) => p.productId === productId);
+    if (!product) {
+      console.error("상품을 찾을 수 없습니다:", productId);
+      return;
+    }
 
     // 위시리스트 상태 업데이트
+    // 이미 위시리스트에 포함된 상품은 삭제 ,없는 상품은 새로 추가
     if (wishlistItemIds.value.includes(productId)) {
+      console.log("찜삭제");
+      const response = await axios.post(
+        `http://localhost:8081/api/main/wishlist/delete/${authStore.user.userId}`,
+        {
+          productId: productId,
+        }
+      );
+      // 리스트에서 제외
       wishlistItemIds.value = wishlistItemIds.value.filter(
         (id) => id !== productId
       );
+      product.wishlist = false; // 상태 업데이트
+      console.log("찜리스트:", wishlistItemIds.value);
     } else {
+      console.log("찜하기");
+
+      const response = await axios.post(
+        `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
+        {
+          productId: productId,
+        }
+      );
+      // 위시리스트에 상품Id 추가
       wishlistItemIds.value.push(productId);
+      product.wishlist = true; // 상태 업데이트
     }
   } catch (error) {
     console.error("Error toggling like:", error);
-  }
-};
-
-// 상품 데이터와 위시리스트 상태 가져오기
-const fetchWishlistStatus = async () => {
-  try {
-    // 백엔드로부터 상품 데이터를 가져옵니다.
-    const { data } = await axios.get("/api/products"); // API 엔드포인트는 필요에 맞게 수정
-    products.value = data;
-
-    // 상품 ID 리스트를 추출
-    const productIds = products.value.map((product) => product.productId);
-
-    // 위시리스트 상태 확인
-    const wishlistResponse = await axios.post(
-      `/wishlist/checkBatch?userId=${userId}`,
-      productIds
-    );
-
-    // 위시리스트에 포함된 상품 ID를 가져옵니다.
-    const wishlistItemIds = wishlistResponse.data.wishlistItemIds;
-
-    // 상품 데이터에 wishlist 상태를 추가
-    products.value = products.value.map((product) => ({
-      ...product,
-      wishlist: wishlistItemIds.includes(product.id),
-    }));
-  } catch (error) {
-    console.error("위시리스트 상태를 가져오는 중 오류 발생:", error);
   }
 };
 
@@ -243,6 +216,20 @@ const fetchWishlistStatus = async () => {
 //     console.error("위시리스트 상태 변경 중 오류 발생:", error);
 //   }
 // };
+
+// 쿼리스트링이 변경될 때마다 categoryType을 업데이트
+watch(
+  () => route.query.type,
+  (newType) => {
+    categoryType.value = newType; // categoryType 업데이트
+    fetchProducts(); // 새로운 쿼리스트링에 따라 상품 데이터 다시 가져오기
+  }
+);
+
+// 초기 데이터 로드
+onMounted(() => {
+  fetchProducts();
+});
 </script>
 
 <style scoped>

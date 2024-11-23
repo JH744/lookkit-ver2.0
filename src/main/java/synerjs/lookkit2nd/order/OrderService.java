@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import synerjs.lookkit2nd.codi.Codi;
+import synerjs.lookkit2nd.common.dto.UserOrderDTO;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.user.User;
 import synerjs.lookkit2nd.user.UserService;
@@ -194,5 +195,18 @@ public class OrderService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    // [관리자 주문현황] 모든주문리스트가져오기 (Uid > UserUuid 변경해 가져오기)
+    public List<UserOrderDTO> getAllOrders() {
+        return orderRepository.getAllOrdersWithUserUuid();
+    }
+
+    // [관리자 주문현황] 주문상태 업데이트
+    public int updateOrderStatus(Long orderId, String orderStatus) {
+        System.out.println("orderStatus>>>>>>>>>>>>" + orderStatus);
+        return orderRepository.updateOrderStatus(orderId, orderStatus);
+    }
+
 
 }

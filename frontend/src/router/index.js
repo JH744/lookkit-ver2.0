@@ -56,6 +56,10 @@ const routes = [
         path: "inquiry/:inquiryId",
         component: () => import("@/views/Admin/InquiryAnswer.vue"),
       },
+      {
+        path: "order/status",
+        component: () => import("@/views/Admin/OrderStatus.vue"),
+      },
     ],
   },
   {
@@ -160,6 +164,10 @@ const routes = [
         component: () => import("@/views/mypage/UserInfoView.vue"),
       },
     ],
+  },
+  {
+    path: "/:catchAll(.*)",
+    component: () => import("@/views/Error/Error404.vue"),
   },
 ];
 

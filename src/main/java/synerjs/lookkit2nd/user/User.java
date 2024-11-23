@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@ToString
+@ToString(exclude = "orders")
 @Table(name = "USERS")
 public class User {
 
