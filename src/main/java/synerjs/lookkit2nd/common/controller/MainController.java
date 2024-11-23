@@ -62,9 +62,13 @@ public class MainController {
 
     // 카테고리 별 상품 목록 표시
     @GetMapping("/category")
-    public ResponseEntity<List<ProductDTO>> mainCategoryPage(@RequestParam String type) {
-//        System.out.println("카테고리: " + type);
-        return ResponseEntity.ok(productService.getProductsByCategory(type));
+    public ResponseEntity<List<ProductDTO>> mainCategoryPage(
+            @RequestParam String type,
+            @RequestParam(required = false) String sort) {
+        System.out.println("type: "+type);
+        System.out.println("sort: "+sort);
+        List<ProductDTO> products = productService.getProductsByCategory(type, sort);
+        return ResponseEntity.ok(products);
     }
 
     //검색 결과 페이지

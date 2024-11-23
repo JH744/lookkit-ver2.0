@@ -30,7 +30,6 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
 
-
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
         // 아이디와 비밀번호 가져오기
@@ -66,37 +65,39 @@ public class AuthController {
     }
 
     @PostMapping("api/auth/signup")
-    public ResponseEntity signUp(@RequestBody UserDTO user){
+    public ResponseEntity signUp(@RequestBody UserDTO user) {
         System.out.println("응답받음");
         System.out.println(user.getUserName());
         System.out.println(user.getUserUuid());
         System.out.println(user.getEmail());
         System.out.println(user.getGender());
         System.out.println(user.getAddress());
-     boolean result  = userService.insertUser(user);
-        System.out.println("회원가입결과:"+result);
-     if (result){
-       return    ResponseEntity.status(200).body("회원가입 성공");
-     }else {
-        return ResponseEntity.status(500).body("회원가입 실패");
-     }
+        boolean result = userService.insertUser(user);
+        System.out.println("회원가입결과:" + result);
+        if (result) {
+            return ResponseEntity.status(200).body("회원가입 성공");
+        } else {
+            return ResponseEntity.status(500).body("회원가입 실패");
+        }
     }
 
 
     @PostMapping("api/auth/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request , HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies(); // 모든 쿠키가져옴
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                // 이름이 "jwt"인 쿠키를 찾기
                 if ("jwt".equals(cookie.getName())) {
-                    // 쿠키 무효화
-                    cookie.setValue(null);
-                    cookie.setHttpOnly(true);
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0); // 즉시 만료
-                    response.addCookie(cookie);
+                    // 삭제 아닌 빈 jwt로 변경
+                    Cookie newCookie = new Cookie("jwt", "");
+                    newCookie.setHttpOnly(true);
+                    newCookie.setPath("/");
+                    newCookie.setMaxAge(0);
+                    // newCookie.setSecure(true); // HTTPS를 사용하는 경우 설정
+                    // newCookie.setDomain("yourDomain.com"); // 도메인 설정할 경우 추가
+
+                    response.addCookie(newCookie);
                     break;
                 }
             }
@@ -104,7 +105,6 @@ public class AuthController {
 
         return ResponseEntity.ok("로그아웃 성공");
     }
-
 
 
     @GetMapping("/kakao-login")

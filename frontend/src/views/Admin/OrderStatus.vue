@@ -1,7 +1,9 @@
 <template>
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand -->
-    <a class="navbar-brand ps-3" :href="dashboardUrl">ADMIN PAGE</a>
+    <RouterLink class="navbar-brand ps-3" to="/admin/dashboard"
+      >ADMIN PAGE</RouterLink
+    >
     <!-- Sidebar Toggle -->
     <button
       class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
@@ -59,13 +61,13 @@
       <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
           <div class="nav">
-            <div class="sb-sidenav-menu-heading">Core</div>
-            <a class="nav-link" :href="dashboardUrl">
+            <div class="sb-sidenav-menu-heading">Menu</div>
+            <RouterLink class="nav-link" to="/admin/dashboard">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-tachometer-alt"></i>
               </div>
-              Dashboard
-            </a>
+              대쉬보드
+            </RouterLink>
             <!-- 기타 메뉴 -->
           </div>
         </div>
@@ -75,22 +77,14 @@
       <div id="layoutSidenav_content">
         <main>
           <div class="container-fluid px-4">
-            <h1 class="mt-4">Tables</h1>
+            <h1 class="mt-4">주문현황</h1>
             <ol class="breadcrumb mb-4">
               <li class="breadcrumb-item">
-                <a href="index.html">Dashboard</a>
+                <RouterLink to="/admin/dashboard">Dashboard</RouterLink>
               </li>
-              <li class="breadcrumb-item active">Tables</li>
+              <li class="breadcrumb-item active">Order Status</li>
             </ol>
-            <div class="card mb-4">
-              <div class="card-body">
-                주문현황 조회
-                <a target="_blank" href="https://datatables.net/"
-                  >-> 상세내역확인</a
-                >
-                .
-              </div>
-            </div>
+            <div class="card mb-4"></div>
             <div class="card mb-4">
               <div class="card-header">
                 <i class="fas fa-table me-1"></i>
@@ -109,16 +103,7 @@
                       <th>작업</th>
                     </tr>
                   </thead>
-                  <tfoot>
-                    <tr>
-                      <th>Name</th>
-                      <th>Position</th>
-                      <th>Office</th>
-                      <th>Age</th>
-                      <th>Start date</th>
-                      <th>Salary</th>
-                    </tr>
-                  </tfoot>
+
                   <tbody>
                     <tr v-for="order in paginatedOrders" :key="order.orderId">
                       <td>{{ order.orderId }}</td>
@@ -135,7 +120,11 @@
                           </option>
                         </select>
                       </td>
-                      <td>{{ order.orderDate }}</td>
+                      <td>
+                        {{
+                          new Date(order.orderDate).toLocaleDateString("ko-KR")
+                        }}
+                      </td>
                       <td>{{ order.orderComment }}</td>
                       <td>
                         <button
@@ -217,9 +206,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-import { useModalStore } from "@/stores/modalStore";
 
-const dashboardUrl = "/admin/dashboard"; // 대쉬보드 이동
 const logoutUrl = "/logout"; // 로그아웃 이동
 const router = useRouter();
 
@@ -514,22 +501,22 @@ onMounted(() => {
 }
 
 .table th:nth-child(1) {
-  width: 50px;
+  width: 5%;
 }
 .table th:nth-child(2) {
-  width: 60px;
+  width: 10%;
 }
 .table th:nth-child(3) {
-  width: 50px;
+  width: 10%;
 }
 .table th:nth-child(4) {
-  width: 12%;
+  width: 10%;
 }
 .table th:nth-child(5) {
-  width: 20%;
+  width: 10%;
 }
 .table th:nth-child(6) {
-  width: 40%;
+  width: 45%;
 }
 
 th {

@@ -99,7 +99,7 @@
           <router-link to="/main/category?type=shoes">
             <img
               class="brand-image"
-              src="@/assets/c1_item1.jpg"
+              src="@/assets/category/shoes.jpg"
               alt="브랜드 이미지"
             />
             <div class="brand-name">shoes</div>
