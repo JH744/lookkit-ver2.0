@@ -6,28 +6,8 @@
           <h1>{{ `'  ${keyword}  ' 검색완료` }}</h1>
           <h1>{{ "검색결과수 " + products.length }}</h1>
         </div>
-        <div class="filter-section">
-          <div class="filter-btn">
-            <img src="@/assets/icons/filterIcon.svg" alt="" />
-            필터검색
-            <img src="@/assets/icons/dropDownIcon.svg" alt="" width="10px" />
-          </div>
-        </div>
-        <div class="sort-section">
-          <div class="item-count">
-            {{ products.length + "개" }}
-          </div>
-          <div class="sort-box">
-            <ul>
-              <li>추천순</li>
-              <li>최신순</li>
-              <li>낮은 가격순</li>
-              <li>높은 가격순</li>
-              <li>판매순</li>
-              <li>리뷰 많은순</li>
-            </ul>
-          </div>
-        </div>
+        <div class="filter-section"></div>
+        <div class="sort-section"></div>
       </div>
       <div class="main-content">
         <div class="product-list">
@@ -50,7 +30,7 @@
               </a>
               <div class="product-price-box">
                 <div class="product-price">{{ product.productPrice }}원</div>
-                <div class="product-price-discount">20%</div>
+                <!-- <div class="product-price-discount">20%</div> -->
               </div>
               <div class="like-box">
                 <img
@@ -63,7 +43,7 @@
               </div>
               <div class="product-event">
                 <div class="product-event-box">
-                  <div>쿠폰</div>
+                  <!-- <div>쿠폰</div> -->
                   <div>대여가능</div>
                 </div>
               </div>
@@ -173,7 +153,6 @@ const encodedProductImageUrl = (productId) => {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  margin-top: 47px;
 }
 .sort-section .item-count {
   font-size: 18px;
@@ -191,13 +170,13 @@ const encodedProductImageUrl = (productId) => {
 }
 .product-list {
   width: 100%;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 25px;
   margin: 0 auto;
 }
 .product-item {
-  width: 24%;
+  width: 100%;
   position: relative;
 }
 .product-item > img:nth-child(1) {
@@ -210,16 +189,23 @@ const encodedProductImageUrl = (productId) => {
 .product-name {
   font-size: 18px;
   font-weight: 400;
-  color: #767676;
+  color: #000000;
   width: 240px;
-  height: 40px;
+  height: 38px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .product-name:hover {
   text-decoration: underline;
 }
 .product-price {
-  font-size: 20px;
+  /* font-size: 20px; */
+  font-size: 16px;
   font-weight: 700;
+  padding: 3px 0;
 }
 .product-price-box {
   display: flex;
@@ -284,5 +270,13 @@ const encodedProductImageUrl = (productId) => {
 .product-img {
   width: 200px;
   height: 270px;
+}
+
+.brand-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: #767676;
+  width: 240px;
+  height: 20px;
 }
 </style>

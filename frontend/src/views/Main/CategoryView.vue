@@ -1,26 +1,24 @@
 <template>
   <div class="page-container">
     <div class="title-section">
-      <h1>{{ categoryType }}</h1>
+      <h1>{{ categoryType.toUpperCase() }}</h1>
       <div class="filter-section">
-        <div class="filter-btn">
+        <div class="filter-btn" @click="toggleFilterMenu">
           <img src="@/assets/icons/filterIcon.svg" alt="" />
           필터검색
           <img src="@/assets/icons/dropDownIcon.svg" alt="" width="10px" />
         </div>
+        <div class="filter-dropdown" v-if="isFilterMenuOpen">
+          <ul>
+            <li @click="applySort('latest')">최신순</li>
+            <li @click="applySort('oldest')">오래된순</li>
+            <li @click="applySort('lowPrice')">낮은 가격순</li>
+            <li @click="applySort('highPrice')">높은 가격순</li>
+          </ul>
+        </div>
       </div>
       <div class="sort-section">
         <div class="item-count">상품 갯수: {{ products.length }}개</div>
-        <div class="sort-box">
-          <ul>
-            <li>추천순</li>
-            <li>최신순</li>
-            <li>낮은 가격순</li>
-            <li>높은 가격순</li>
-            <li>판매순</li>
-            <li>리뷰 많은순</li>
-          </ul>
-        </div>
       </div>
     </div>
 
@@ -52,7 +50,7 @@
             </a>
             <div class="product-price-box">
               <div class="product-price">{{ product.productPrice }}원</div>
-              <div class="product-price-discount">20%</div>
+              <!-- <div class="product-price-discount">20%</div> -->
               <div class="product-price-discount">{{ product.wishlist }}</div>
             </div>
             <div class="like-box">
@@ -66,7 +64,7 @@
             </div>
             <div class="product-event">
               <div class="product-event-box">
-                <div>쿠폰</div>
+                <!-- <div>쿠폰</div> -->
                 <div>대여가능</div>
               </div>
             </div>
@@ -96,6 +94,18 @@ const imageBaseUrl = ref(
 const heartIcon1 = ref(heart1);
 const heartIcon2 = ref(heart2);
 const wishlistItemIds = ref([]);
+const sortBy = ref("");
+const isFilterMenuOpen = ref(false);
+
+const toggleFilterMenu = () => {
+  isFilterMenuOpen.value = !isFilterMenuOpen.value;
+};
+
+const applySort = (sort) => {
+  sortBy.value = sort;
+  isFilterMenuOpen.value = false; // 정렬 선택 후 메뉴 닫기
+  fetchProducts();
+};
 
 const handleImageError = (event) => {
   event.target.src = defaultImage; // 이미지 로드 실패 시 기본 이미지로 대체
@@ -109,6 +119,7 @@ const fetchProducts = async () => {
       {
         params: {
           type: categoryType.value,
+          sort: sortBy.value,
         },
       }
     );
@@ -251,6 +262,7 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   border-bottom: 2px solid #000000;
+  position: relative; /* 드롭다운 위치 기준점 */
 }
 .filter-btn {
   display: flex;
@@ -266,13 +278,12 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  margin-top: 47px;
 }
 .sort-section .item-count {
   font-size: 18px;
 }
 .sort-box ul {
-  width: 500px;
+  width: 300px;
   display: flex;
   justify-content: space-between;
   list-style: none;
@@ -304,23 +315,29 @@ onMounted(() => {
 .product-name {
   font-size: 18px;
   font-weight: 400;
-  color: #767676;
+  color: #000000;
   width: 240px;
-  height: 40px;
+  height: 38px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .brand-name {
   font-size: 14px;
   font-weight: 400;
   color: #000000;
   width: 240px;
-  height: 30px;
+  height: 20px;
 }
 .product-name:hover {
   text-decoration: underline;
 }
 .product-price {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
+  padding: 3px 0;
 }
 .product-price-box {
   display: flex;
@@ -372,5 +389,31 @@ onMounted(() => {
 .product-img {
   width: 200px;
   height: 270px;
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.filter-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.filter-dropdown li:hover {
+  background-color: #f5f5f5;
 }
 </style>

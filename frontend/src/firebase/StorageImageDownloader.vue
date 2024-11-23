@@ -15,8 +15,7 @@
 
 <script>
 import { ref, getDownloadURL } from "firebase/storage";
-import { storage } from "@/firebase/firebaseConfig";
-
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 export default {
   data() {
     return {
@@ -26,7 +25,10 @@ export default {
   },
   methods: {
     async fetchImage() {
-      const storageRef = ref(storage, `${this.imageUrl}/${this.fileName}`); //
+      const storageRef = ref(
+        firebaseStorage,
+        `${this.imageUrl}/${this.fileName}`
+      ); //
       // const storageRef = ref(storage, "uploads/outer.png"); 참고
       try {
         // Firebase 스토리지에서 이미지 URL 가져오기
