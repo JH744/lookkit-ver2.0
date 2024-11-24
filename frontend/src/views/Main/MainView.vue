@@ -111,8 +111,10 @@
       <!-- 코디상품리스트 -->
       <div class="codi-container">
         <div class="codi-title">
-          <span class="circle"></span>
-          <span class="codi-text">BEST CODI</span>
+          <div class="codi-title-box">
+            <span class="circle"></span>
+            <span class="codi-text">BEST CODI</span>
+          </div>
           <router-link to="main/coordi">
             <span class="view-more">+ VIEW MORE</span>
           </router-link>
@@ -400,5 +402,9 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   gap: 25px;
+}
+
+.codi-title-box {
+  display: flex;
 }
 </style>
