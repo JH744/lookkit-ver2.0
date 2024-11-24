@@ -12,7 +12,7 @@
         v-if="authStore.isLoggedIn"
         :src="isWishlisted ? heartIcon1 : heartIcon2"
         class="like-btn"
-        @click="$emit('toggle-wishlist', codiId)"
+        @click="likeCodi(codiId)"
         width="20px"
         height="20px"
         alt=""
@@ -22,16 +22,19 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref, onMounted } from "vue";
 import defaultImage from "@/assets/img_none.png";
 import heart1 from "@/assets/icons/heart1.svg";
 import heart2 from "@/assets/icons/heart2.svg";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
+import axios from "axios";
 const authStore = useAuthStore();
 const router = useRouter();
 const heartIcon1 = heart1;
 const heartIcon2 = heart2;
+const isWishlisted = ref(false);
+
 // props 정의
 const props = defineProps({
   codiId: {
@@ -47,17 +50,13 @@ const props = defineProps({
     required: true,
   },
   codiThumbnail: {
-    type: Number,
+    type: String,
     required: true,
   },
   imageBaseUrl: {
     type: String,
     default:
       "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit",
-  },
-  isWishlisted: {
-    type: Boolean,
-    default: false,
   },
 });
 
@@ -85,6 +84,45 @@ const formatPrice = (price) => {
 const handleImageError = (event) => {
   event.target.src = defaultImage;
 };
+
+const likeCodi = async (codiId) => {
+  console.log("코디 좋아요 추가");
+  try {
+    const response = await axios
+      .post("http://localhost:8081/api/main/coordi/wish/add", {
+        userId: authStore.user.userId,
+        codiId: codiId,
+      })
+      .then((data) => {
+        console.log("data", data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    console.log("respnonse", response);
+    isWishlisted.value = true;
+  } catch (error) {}
+};
+
+// 위시리스트 체크 메소드 추가
+const checkWishlist = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8081/api/main/checkBatchCodi/${authStore.user.userId}/${props.codiId}`
+    );
+    isWishlisted.value = response.data;
+    // console.log("Wishlist Response:", response.data);
+  } catch (error) {
+    console.error("위시리스트 체크 중 오류 발생:", error);
+  }
+};
+
+// 컴포넌트 마운트 시 위시리스트 체크
+onMounted(() => {
+  if (authStore.isLoggedIn) {
+    checkWishlist();
+  }
+});
 </script>
 
 <style scoped>

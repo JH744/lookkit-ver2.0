@@ -73,4 +73,16 @@ public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
     @Modifying
     @Query("DELETE FROM Wishlist w WHERE w.userId = :userId AND w.product.id = :productId")
     void deleteByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId);
+
+
+
+    @Query(value = "SELECT * FROM wishlist " +
+            "WHERE USER_ID = :userId AND CODI_ID = :codiId",
+            nativeQuery = true)
+    Optional<Wishlist> findByUserIdAndCodiId(@Param("userId") Long userId, @Param("codiId") Long codiId);
+
+
+    @Modifying
+    @Query(value = "INSERT INTO wishlist (USER_ID, CODI_ID) VALUES (:userId, :codiId)", nativeQuery = true)
+    void addWishlistByUserIdAndCodiId(Long userId, Long codiId);
 }
