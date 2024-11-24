@@ -1,24 +1,18 @@
 package synerjs.lookkit2nd.common.controller;
 
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.codi.CodiDTO;
 import synerjs.lookkit2nd.codi.CodiService;
-import synerjs.lookkit2nd.common.response.BaseResponse;
 import synerjs.lookkit2nd.inquiry.dto.CodiProductDTO;
-import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.product.ProductDTO;
 import synerjs.lookkit2nd.product.ProductService;
-import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.wishlist.dto.WishlistRequestDTO;
 import synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO;
+import synerjs.lookkit2nd.wishlist.entity.Wishlist;
 import synerjs.lookkit2nd.wishlist.service.WishlistService;
 
 import java.util.HashMap;
@@ -37,25 +31,12 @@ public class MainController {
     // 모든 코디 반환
     @GetMapping("/codis/all")
     public ResponseEntity<List<CodiDTO>> getLatestEightCodiSets(Authentication auth) {
-
-
         return ResponseEntity.ok(coordisetService.getCodiSets());
     }
 
-    // 코디 세트와 연관된 상품 20개 조회 API
+    // 코디 세트 & 연관상품 조회
     @GetMapping("/codiset")
-    public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts(Authentication auth) {
-        // auth 확인
-//        if (auth != null) {
-//            System.out.println("auth변수확인");
-//            CustomUser user = (CustomUser) auth.getPrincipal();
-//            System.out.println("user>>>>>>>"+user);
-//            System.out.println(user.getUserId());
-//            System.out.println(user.getAuthorities());
-//            System.out.println(user.getUsername());
-//        } else {
-//            System.out.println("auth : null");
-//        }
+    public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts() {
         return ResponseEntity.ok(coordisetService.getAllCoordiWithProducts());
     }
 
@@ -65,8 +46,8 @@ public class MainController {
     public ResponseEntity<List<ProductDTO>> mainCategoryPage(
             @RequestParam String type,
             @RequestParam(required = false) String sort) {
-        System.out.println("type: "+type);
-        System.out.println("sort: "+sort);
+        System.out.println("type: " + type);
+        System.out.println("sort: " + sort);
         List<ProductDTO> products = productService.getProductsByCategory(type, sort);
         return ResponseEntity.ok(products);
     }
@@ -78,7 +59,6 @@ public class MainController {
         List<ProductDTO> productsList = productService.searchProductsByKeyword(keyword);
         return ResponseEntity.ok(productsList);
     }
-
 
     // 상품 찜 상태 확인
     @PostMapping("/checkBatch/{userId}")
@@ -92,10 +72,35 @@ public class MainController {
         return ResponseEntity.ok(response);
     }
 
+    // 상품 찜 삭제
     @PostMapping("/wishlist/delete/{userId}")
     public ResponseEntity<Void> deleteWishlistByProductId(@PathVariable Long userId, @RequestBody WishlistRequestDTO request) {
         wishlistService.deleteWishByProductId(userId, request);
         return ResponseEntity.noContent().build(); //204 성공으로 응답(반환데이터는 없음)
+    }
+
+    // 코디 찜상태 확인
+    @GetMapping("/checkBatchCodi/{userId}/{codiId}")
+    public ResponseEntity<Boolean> checkWishlistForCodi(
+            @PathVariable Long userId,
+            @PathVariable Long codiId) {
+        boolean isWishlisted = wishlistService.isCodiInWishlist(userId, codiId);
+        return ResponseEntity.ok(isWishlisted);
+
+
+    }
+
+    // 코디 위시리스트 추가
+    @PostMapping("/coordi/wish/add")
+    public ResponseEntity<String> addWishlist(@RequestBody Map<String, Long> request) {
+        Long userId = request.get("userId");
+        Long codiId = request.get("codiId");
+
+        if (userId == null || codiId == null) {
+            throw new IllegalArgumentException("userId and codiId are required");
+        }
+        wishlistService.addWishlist(userId, codiId);
+        return ResponseEntity.ok("Wishlist added successfully");
     }
 }
 

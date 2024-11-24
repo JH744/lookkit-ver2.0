@@ -72,6 +72,20 @@ public class WishlistService {
         long productId =request.getProductId();
         repository.deleteByUserIdAndProductId(userId, productId);
     }
+
+
+    // 위시리스트에 특정 codiId가 있는지 확인
+    public boolean isCodiInWishlist(Long userId, Long codiId) {
+        Optional<Wishlist> wishlistItem = repository.findByUserIdAndCodiId(userId, codiId);
+        return wishlistItem.isPresent();
+    }
+
+    @Transactional
+    public void addWishlist(Long userId, Long codiId) {
+        repository.addWishlistByUserIdAndCodiId(userId, codiId);
+    }
+
+
 }
 
 

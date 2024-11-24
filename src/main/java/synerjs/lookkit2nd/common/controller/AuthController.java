@@ -82,28 +82,48 @@ public class AuthController {
     }
 
 
-    @PostMapping("api/auth/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
+//    @PostMapping("api/auth/logout")
+//    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+//        Cookie[] cookies = request.getCookies();
+//        System.out.println("로그아웃 진행");
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if ("jwt".equals(cookie.getName())) {
+//                    // 삭제 아닌 빈 jwt로 변경
+//                    Cookie newCookie = new Cookie("jwt", "");
+//                    newCookie.setHttpOnly(true);
+//                    newCookie.setPath("/");
+//                    newCookie.setMaxAge(1);
+//                    // newCookie.setSecure(true); // HTTPS를 사용하는 경우 설정
+//                    // newCookie.setDomain("yourDomain.com"); // 도메인 설정할 경우 추가
+//
+//                    response.addCookie(newCookie);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        return ResponseEntity.ok("로그아웃 성공");
+//    }
+    @PostMapping("/api/auth/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
+        // JWT 쿠키를 삭제하기 위한 쿠키 설정
+        System.out.println("로그아웃진행");
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 즉시 만료
+        cookie.setDomain("localhost"); // 기존 쿠키의 Domain 확인 (필요 시 설정)
+        cookie.setSecure(false); // HTTPS 환경이 아니라면 false로 설정
+        // cookie.setDomain("example.com"); // 쿠키의 도메인이 필요할 경우 설정
+        // newCookie.setDomain("yourDomain.com"); // 도메인 설정할 경우 추가
 
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    // 삭제 아닌 빈 jwt로 변경
-                    Cookie newCookie = new Cookie("jwt", "");
-                    newCookie.setHttpOnly(true);
-                    newCookie.setPath("/");
-                    newCookie.setMaxAge(0);
-                    // newCookie.setSecure(true); // HTTPS를 사용하는 경우 설정
-                    // newCookie.setDomain("yourDomain.com"); // 도메인 설정할 경우 추가
+        response.addCookie(cookie);
 
-                    response.addCookie(newCookie);
-                    break;
-                }
-            }
-        }
-
-        return ResponseEntity.ok("로그아웃 성공");
+        // 반환 데이터 (로그아웃 성공 메시지)
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "Logout successful");
+        return ResponseEntity.ok(responseBody);
     }
 
 

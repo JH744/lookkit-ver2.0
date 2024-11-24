@@ -27,7 +27,7 @@ public class ProductService {
     }
 
 
-    public List<ProductDTO> getProductsByCategory(String type ,String sort) {
+    public List<ProductDTO> getProductsByCategory(String type, String sort) {
 
         //초기값설정 기본 정렬은 오래된순
         Sort sorting = Sort.by(Sort.Direction.ASC, "productId");
@@ -52,8 +52,13 @@ public class ProductService {
             }
         }
 
+
         // 정렬된 결과를 가져오기
-        List<Product> products = productRepository.findByCategory_CategoryType(type, sorting);
+        List<Product> products
+                = type.equals("all")
+                ? productRepository.findAll(sorting)
+                : productRepository.findByCategory_CategoryType(type, sorting);
+
         return products.stream()
                 .map(product -> ProductDTO.builder()
                         .productId(product.getProductId())
