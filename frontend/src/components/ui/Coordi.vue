@@ -7,13 +7,24 @@
       <h3 class="codi-name">{{ codiName }}</h3>
       <p class="codi-price">{{ formatPrice(codiPrice) }}원</p>
     </div>
+    <img
+      :src="isWishlisted ? heartIcon1 : heartIcon2"
+      class="like-btn"
+      @click="$emit('toggle-wishlist', codiId)"
+      width="20px"
+      height="20px"
+      alt=""
+    />
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
 import defaultImage from "@/assets/img_none.png";
-
+import heart1 from "@/assets/icons/heart1.svg";
+import heart2 from "@/assets/icons/heart2.svg";
+const heartIcon1 = heart1;
+const heartIcon2 = heart2;
 // props 정의
 const props = defineProps({
   codiId: {
@@ -36,6 +47,10 @@ const props = defineProps({
     type: String,
     default:
       "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit",
+  },
+  isWishlisted: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -102,5 +117,23 @@ const handleImageError = (event) => {
   font-size: 18px;
   font-weight: 700;
   color: #000;
+}
+
+.like-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.1);
+}
+
+.codi-item {
+  position: relative;
 }
 </style>

@@ -124,7 +124,7 @@ const fetchProducts = async () => {
       }
     );
     products.value = data;
-    // console.log("리스트", data);
+    console.log("리스트", data);
     // console.log("상품 리스트:", products.value);
     // 상품 ID 리스트 추출
     const productIds = products.value.map((product) => product.productId);
