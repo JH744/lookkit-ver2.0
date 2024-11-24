@@ -51,7 +51,7 @@
             <div class="product-price-box">
               <div class="product-price">{{ product.productPrice }}원</div>
               <!-- <div class="product-price-discount">20%</div> -->
-              <div class="product-price-discount">{{ product.wishlist }}</div>
+              <!-- <div class="product-price-discount">{{ product.wishlist }}</div> -->
             </div>
             <div class="like-box">
               <img

@@ -24,8 +24,7 @@ const routes = [
       },
       {
         path: "coordi",
-        component: () => import("@/views/Main/SearchView.vue"),
-        props: (route) => ({ keyword: route.query.keyword }),
+        component: () => import("@/views/Main/CoordiView.vue"),
       },
     ],
   },
