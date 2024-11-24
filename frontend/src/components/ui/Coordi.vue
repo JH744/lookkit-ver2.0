@@ -1,20 +1,23 @@
 <template>
   <div class="codi-item">
-    <div class="codi-image">
+    <div class="codi-image" @click="navigateToDetail">
       <img :src="thumbnailUrl" :alt="codiName" @error="handleImageError" />
     </div>
     <div class="codi-info">
       <h3 class="codi-name">{{ codiName }}</h3>
       <p class="codi-price">{{ formatPrice(codiPrice) }}원</p>
     </div>
-    <img
-      :src="isWishlisted ? heartIcon1 : heartIcon2"
-      class="like-btn"
-      @click="$emit('toggle-wishlist', codiId)"
-      width="20px"
-      height="20px"
-      alt=""
-    />
+    <div>
+      <img
+        v-if="authStore.isLoggedIn"
+        :src="isWishlisted ? heartIcon1 : heartIcon2"
+        class="like-btn"
+        @click="$emit('toggle-wishlist', codiId)"
+        width="20px"
+        height="20px"
+        alt=""
+      />
+    </div>
   </div>
 </template>
 
@@ -23,6 +26,10 @@ import { computed } from "vue";
 import defaultImage from "@/assets/img_none.png";
 import heart1 from "@/assets/icons/heart1.svg";
 import heart2 from "@/assets/icons/heart2.svg";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+const authStore = useAuthStore();
+const router = useRouter();
 const heartIcon1 = heart1;
 const heartIcon2 = heart2;
 // props 정의
@@ -64,6 +71,11 @@ const thumbnailUrl = computed(() => {
   return `${props.imageBaseUrl}${encodedPath}?alt=media`;
 });
 
+// 상세 페이지 이동
+const navigateToDetail = () => {
+  router.push(`/codi/${props.codiId}`);
+};
+
 // 가격 포맷팅
 const formatPrice = (price) => {
   return price.toLocaleString("ko-KR");
@@ -94,8 +106,10 @@ const handleImageError = (event) => {
 .codi-image img {
   width: 100%;
   height: 100%;
+  margin-top: 15px;
   object-fit: contain;
   transition: transform 0.3s ease;
+  cursor: pointer;
 }
 
 .codi-image img:hover {

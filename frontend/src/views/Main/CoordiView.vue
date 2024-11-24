@@ -99,40 +99,6 @@ const fetchProducts = async () => {
 //       return;
 //     }
 
-//     // 위시리스트 상태 업데이트
-//     // 이미 위시리스트에 포함된 상품은 삭제 ,없는 상품은 새로 추가
-//     if (wishlistItemIds.value.includes(productId)) {
-//       console.log("찜삭제");
-//       const response = await axios.post(
-//         `http://localhost:8081/api/main/wishlist/delete/${authStore.user.userId}`,
-//         {
-//           productId: productId,
-//         }
-//       );
-//       // 리스트에서 제외
-//       wishlistItemIds.value = wishlistItemIds.value.filter(
-//         (id) => id !== productId
-//       );
-//       product.wishlist = false; // 상태 업데이트
-//       console.log("찜리스트:", wishlistItemIds.value);
-//     } else {
-//       console.log("찜하기");
-
-//       const response = await axios.post(
-//         `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
-//         {
-//           productId: productId,
-//         }
-//       );
-//       // 위시리스트에 상품Id 추가
-//       wishlistItemIds.value.push(productId);
-//       product.wishlist = true; // 상태 업데이트
-//     }
-//   } catch (error) {
-//     console.error("Error toggling like:", error);
-//   }
-// };
-
 // // 위시리스트 추가/제거 토글
 // const toggleWishlist = async (itemId) => {
 //   try {

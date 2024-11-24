@@ -58,7 +58,6 @@ public class MainController {
         return ResponseEntity.ok(productsList);
     }
 
-
     // 상품 찜 상태 확인
     @PostMapping("/checkBatch/{userId}")
     public ResponseEntity<Map<String, Object>> checkItemsInWishlist(
@@ -70,7 +69,7 @@ public class MainController {
         response.put("wishlistItemIds", wishlistItemIds);
         return ResponseEntity.ok(response);
     }
-
+    // 상품 찜 삭제
     @PostMapping("/wishlist/delete/{userId}")
     public ResponseEntity<Void> deleteWishlistByProductId(@PathVariable Long userId, @RequestBody WishlistRequestDTO request) {
         wishlistService.deleteWishByProductId(userId, request);
