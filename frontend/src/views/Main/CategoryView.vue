@@ -124,8 +124,8 @@ const fetchProducts = async () => {
       }
     );
     products.value = data;
-    console.log("data", data);
-    console.log("상품 리스트:", products.value);
+    // console.log("리스트", data);
+    // console.log("상품 리스트:", products.value);
     // 상품 ID 리스트 추출
     const productIds = products.value.map((product) => product.productId);
     // 위시리스트 상태 확인
@@ -239,6 +239,9 @@ watch(
 
 // 초기 데이터 로드
 onMounted(() => {
+  if (route.query.type == "all") {
+    console.log("모든상품조회");
+  }
   fetchProducts();
 });
 </script>

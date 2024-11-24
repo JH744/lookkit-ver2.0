@@ -9,6 +9,7 @@
         >
           <div class="carousel-inner">
             <div class="carousel-item active" data-bs-interval="2000">
+              <!-- 2초 뒤 변경 -->
               <img
                 src="@/assets/banner/main_sumnail1.png"
                 class="d-block w-100"
@@ -112,7 +113,9 @@
         <div class="codi-title">
           <span class="circle"></span>
           <span class="codi-text">BEST CODI</span>
-          <span class="view-more">+ VIEW MORE</span>
+          <router-link to="main/coordi">
+            <span class="view-more">+ VIEW MORE</span>
+          </router-link>
         </div>
         <div class="codi-main-container">
           <!--코디&상품 반복 시작-->
@@ -156,7 +159,9 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const codiList = ref([]);
 const imageBaseUrl = ref(
   "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
@@ -185,6 +190,13 @@ const encodedProductImageUrl = computed(() => {
 });
 
 onMounted(async () => {
+  // 어드민계정 페이지전환
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  if (auth?.user?.role === "ROLE_ADMIN") {
+    console.log("어드민계정");
+    router.push("/admin/dashboard");
+    return;
+  }
   try {
     const response = await axios.get("http://localhost:8081/api/main/codiset");
     codiList.value = response.data;

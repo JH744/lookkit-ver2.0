@@ -1,24 +1,16 @@
 package synerjs.lookkit2nd.common.controller;
 
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import synerjs.lookkit2nd.codi.Codi;
 import synerjs.lookkit2nd.codi.CodiDTO;
 import synerjs.lookkit2nd.codi.CodiService;
-import synerjs.lookkit2nd.common.response.BaseResponse;
 import synerjs.lookkit2nd.inquiry.dto.CodiProductDTO;
-import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.product.ProductDTO;
 import synerjs.lookkit2nd.product.ProductService;
-import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.wishlist.dto.WishlistRequestDTO;
-import synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO;
 import synerjs.lookkit2nd.wishlist.service.WishlistService;
 
 import java.util.HashMap;
@@ -37,25 +29,12 @@ public class MainController {
     // 모든 코디 반환
     @GetMapping("/codis/all")
     public ResponseEntity<List<CodiDTO>> getLatestEightCodiSets(Authentication auth) {
-
-
         return ResponseEntity.ok(coordisetService.getCodiSets());
     }
 
-    // 코디 세트와 연관된 상품 20개 조회 API
+    // 코디 세트 & 연관상품 조회
     @GetMapping("/codiset")
-    public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts(Authentication auth) {
-        // auth 확인
-//        if (auth != null) {
-//            System.out.println("auth변수확인");
-//            CustomUser user = (CustomUser) auth.getPrincipal();
-//            System.out.println("user>>>>>>>"+user);
-//            System.out.println(user.getUserId());
-//            System.out.println(user.getAuthorities());
-//            System.out.println(user.getUsername());
-//        } else {
-//            System.out.println("auth : null");
-//        }
+    public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts() {
         return ResponseEntity.ok(coordisetService.getAllCoordiWithProducts());
     }
 

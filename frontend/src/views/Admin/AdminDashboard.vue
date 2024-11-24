@@ -39,15 +39,6 @@
           aria-expanded="false"
           ><i class="fas fa-user fa-fw"></i
         ></a>
-        <ul
-          class="dropdown-menu dropdown-menu-end"
-          aria-labelledby="navbarDropdown"
-        >
-          <li><a class="dropdown-item" href="#!">Settings</a></li>
-          <li><a class="dropdown-item" href="#!">Activity Log</a></li>
-          <li><hr class="dropdown-divider" /></li>
-          <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
-        </ul>
       </li>
     </ul>
   </nav>
@@ -65,8 +56,13 @@
           </div>
         </div>
         <div class="sb-sidenav-footer">
-          <div class="small">Logged in as:</div>
-          Start Bootstrap
+          <div class="small">관리자로 로그인됨</div>
+          <button
+            class="btn btn-outline-light btn-sm mt-2 w-100"
+            @click="handleLogout"
+          >
+            로그아웃
+          </button>
         </div>
       </nav>
     </div>
@@ -77,7 +73,7 @@
           <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item active">Dashboard</li>
           </ol>
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-xl-3 col-md-6">
               <div class="card bg-primary text-white mb-4">
                 <div class="card-body">Primary Card</div>
@@ -138,13 +134,13 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="row">
             <div class="col-xl-6">
               <div class="card mb-4">
                 <div class="card-header">
                   <i class="fas fa-chart-area me-1"></i>
-                  Area Chart Example
+                  월 매출액
                 </div>
                 <div class="card-body">
                   <canvas id="myAreaChart" width="100%" height="40"></canvas>
@@ -155,7 +151,7 @@
               <div class="card mb-4">
                 <div class="card-header">
                   <i class="fas fa-chart-bar me-1"></i>
-                  Bar Chart Example
+                  월 누적이익
                 </div>
                 <div class="card-body">
                   <canvas id="myBarChart" width="100%" height="40"></canvas>
@@ -279,8 +275,10 @@
 <script setup>
 import axios from "axios";
 import { onMounted, ref, computed, watchEffect } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 
-// 스크립트 로드 상태 관리
+// 스크립트 로드 상태 ��리
 const scriptsLoaded = ref(false);
 
 // Chart.js 인스턴스 저장
@@ -310,6 +308,20 @@ watchEffect(() => {
 // 페이지 변경 함수
 const changePage = (page) => {
   currentPage.value = page;
+};
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+// 로그아웃 처리 함수 추가
+const handleLogout = async () => {
+  try {
+    await axios.post("http://localhost:8081/api/auth/logout");
+    authStore.clearAuthData(); // 로컬 인증 정보 삭제
+    router.push("/auth/login"); // 로그인 페이지로 리다이렉트
+  } catch (error) {
+    console.error("로그아웃 처리 중 오류 발생:", error);
+  }
 };
 
 onMounted(async () => {
