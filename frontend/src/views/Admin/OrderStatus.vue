@@ -207,7 +207,6 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { useModalStore } from "@/stores/modalStore";
-
 const logoutUrl = "/logout"; // 로그아웃 이동
 const router = useRouter();
 

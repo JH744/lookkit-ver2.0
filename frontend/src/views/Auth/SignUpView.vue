@@ -212,7 +212,8 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import { useForm, useField } from "vee-validate";
 import * as yup from "yup";
-
+import { useModalStore } from "@/stores/modalStore";
+import { useConfirmModalStore } from "@/stores/modalStore";
 const router = useRouter();
 
 const gender = ref("M");
@@ -220,7 +221,8 @@ const user_detail_address = ref("");
 const birthDate = ref("");
 const isChecked = ref(false);
 const user_detail_address_input = ref(null);
-
+const modalStore = useModalStore(); // 스토어를 가져와 사용
+const confirmModalStore = useConfirmModalStore();
 const total_address = computed(() => {
   return `${user_address.value} ${user_detail_address.value}`;
 });
@@ -286,7 +288,12 @@ const checkDuplicateID = () => {
   if (!userUuidError.value && userUuid.value != null) {
     fetchDuplicateCheckId(userUuid.value);
   } else {
-    alert("아이디를 올바르게 입력해주세요");
+    confirmModalStore.showModal(
+      "회원가입",
+      "아이디를 올바르게 입력해주세요.",
+      "입력된 아이디가 없습니다.",
+      "확인"
+    );
   }
 };
 
@@ -298,11 +305,17 @@ const fetchDuplicateCheckId = async (Id) => {
       .get(`http://localhost:8081/api/users/check-id?userUuid=${Id}`)
       .then((res) => {
         console.log(res);
-        alert("사용가능한 아이디입니다.");
+        modalStore.showModal("회원가입", "사용가능한 아이디입니다.");
       })
       .catch((error) => {
         console.log(error);
-        alert("중복되는 아이디입니다.");
+        //완료 모달창 사용
+        confirmModalStore.showModal(
+          "회원가입",
+          "아이디를 올바르게 입력해주세요.",
+          "중복된 아이디",
+          "확인"
+        );
       });
   } catch {
     console.error();
@@ -341,7 +354,12 @@ const handleSignUp = async () => {
     router.push("/auth/login");
   } catch {
     console.error();
-    alert("회원가입에 실패하였습니다.");
+    confirmModalStore.showModal(
+      "회원가입",
+      "회원가입에 실패했습니다..",
+      "오류발생",
+      "확인"
+    );
   }
 };
 
