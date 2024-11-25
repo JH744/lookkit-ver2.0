@@ -443,7 +443,7 @@ width: 40%;
   font-size: 2rem;
   color: #d3d3d3; /* 별의 기본 색상 (비어 있는 별) */
   unicode-bidi: bidi-override;
-  direction: rtl;
+  direction: ltr;
 }
 .star-ratings-fill {
   color: #ffc107; /* 채워진 별의 색상 */
