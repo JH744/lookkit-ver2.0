@@ -457,6 +457,10 @@ const deleteUser = async () => {
   margin-bottom: 20px;
 }
 
+.info-group1 input:hover {
+  cursor: pointer;
+}
+
 .info-group2 {
   display: grid;
   gap: 5px;
@@ -495,6 +499,7 @@ const deleteUser = async () => {
   border-radius: 25px;
   cursor: pointer;
   width: 150px;
+  font-size: 15px;
 }
 
 .address-group button {
@@ -504,6 +509,7 @@ const deleteUser = async () => {
   border-radius: 25px;
   cursor: pointer;
   width: 200px;
+  font-size: 15px;
 }
 
 .button-group {
@@ -522,9 +528,9 @@ const deleteUser = async () => {
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: 30px;
   border-radius: 25px;
-  width: 125px;
+  width: 160px;
 }
 
 .btn-cancel {
@@ -929,5 +935,11 @@ const deleteUser = async () => {
   position: static;
   margin-top: 12px;
   font-size: 17px;
+}
+
+.address-group {
+  display: grid
+;
+    gap: 5px;
 }
 </style>

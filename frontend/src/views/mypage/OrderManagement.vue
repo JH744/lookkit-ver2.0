@@ -243,8 +243,7 @@ onMounted(() => {
     color: #363636;
     text-align: left;
     font-family: "Inter-Regular", sans-serif;
-    font-size: 18px;
-    font-weight: 400;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -322,8 +321,7 @@ onMounted(() => {
     color: #363636;
     text-align: left;
     font-family: "Inter-Regular", sans-serif;
-    font-size: 18px;
-    font-weight: 400;
+    font-size: 20px;
     margin-bottom: 15px;
 }
 .shipment-header {

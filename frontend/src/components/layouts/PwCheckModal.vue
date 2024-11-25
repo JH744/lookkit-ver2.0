@@ -2,7 +2,7 @@
   <div class="pw-check-section">
     <div class="section-header">
       <h2>비밀번호 재입력</h2>
-      <button @click="closeSection">X</button>
+      <img src="/images/close-button.png" @click="closeSection" class="close-button">
     </div>
     <form @submit.prevent="verifyPassword" class="password-check-form">
       <span class="section-subtitle">
@@ -167,5 +167,13 @@ const closeSection = () => {
   color: red;
   font-size: 14px;
   margin: auto;
+}
+
+.close-button {
+  width: 18px;
+}
+
+.close-button:hover {
+  cursor: pointer;
 }
 </style>

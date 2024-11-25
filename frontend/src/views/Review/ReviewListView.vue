@@ -174,6 +174,7 @@ onMounted(() => {
     text-align: center;
     border-bottom: 1px solid #ddd;
     font-size: 15px;
+    align-content: center;
   }
   
   th {
