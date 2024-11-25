@@ -16,7 +16,7 @@
 
 <script>
 import { ref, uploadBytes } from "firebase/storage";
-import { storage } from "@/firebase/firebaseConfig";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 
 export default {
   data() {
@@ -90,7 +90,10 @@ export default {
       for (const { file, relativePath } of files) {
         try {
           this.currentFile = `${folderName}/${relativePath}`;
-          const storageRef = ref(storage, `lookkit/products/${relativePath}`);
+          const storageRef = ref(
+            firebaseStorage,
+            `lookkit/products/${relativePath}`
+          );
           await uploadBytes(storageRef, file);
 
           currentFileIndex++;

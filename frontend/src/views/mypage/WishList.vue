@@ -77,7 +77,7 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
-import { toggleLike } from '../../utils/likeFunction';
+import { toggleLike } from "../../utils/likeFunction";
 
 // 탭 상태 관리
 const currentTab = ref("codi"); // 초기 탭은 "codi"
@@ -133,7 +133,6 @@ const loadWishlist = async () => {
     console.error("Error loading wishlist:", error);
   }
 };
-
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(() => {

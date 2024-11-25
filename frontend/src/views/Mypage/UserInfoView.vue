@@ -171,7 +171,10 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useAuthStore } from "@/stores/authStore";
-
+import { useModalStore } from "@/stores/modalStore";
+import { useConfirmModalStore } from "@/stores/modalStore";
+const modalStore = useModalStore(); // 스토어를 가져와 사용
+const confirmModalStore = useConfirmModalStore();
 const authStore = useAuthStore();
 const id = ref(0);
 
@@ -220,7 +223,12 @@ const closeModal = () => {
 // 비밀번호 변경 로직
 const updatePassword = async () => {
   if (newPassword.value !== confirmPassword.value) {
-    alert("새 비밀번호가 일치하지 않습니다.");
+    confirmModalStore.showModal(
+      "개인정보수정",
+      "비밀번호 오류",
+      "새 비밀번호가 일치하지 않습니다.",
+      "확인"
+    );
     return;
   }
   try {
@@ -232,7 +240,10 @@ const updatePassword = async () => {
         confirmNewPassword: confirmPassword.value,
       }
     );
-    alert("비밀번호가 성공적으로 변경되었습니다.");
+    modalStore.showModal(
+      "개인정보수정",
+      "비밀번호가 성공적으로 변경되었습니다."
+    );
     closeModal();
     // 비밀번호 필드 초기화
     currentPassword.value = "";
@@ -240,7 +251,12 @@ const updatePassword = async () => {
     confirmPassword.value = "";
   } catch (error) {
     console.error("Error updating password:", error);
-    alert("비밀번호 변경에 실패했습니다.");
+    confirmModalStore.showModal(
+      "개인정보수정",
+      "비밀번호 오류",
+      "비밀번호 변경에 실패했습니다.",
+      "확인"
+    );
   }
 };
 
@@ -251,10 +267,18 @@ const updateProfile = async () => {
       `http://localhost:8081/api/v1/userinfo/${id.value}`,
       userData.value
     );
-    alert("회원정보를 성공적으로 업데이트했습니다.");
+    modalStore.showModal(
+      "개인정보수정",
+      "회원정보를 성공적으로 업데이트했습니다."
+    );
   } catch (error) {
     console.error("Error updating profile:", error);
-    alert("회원정보 업데이트에 실패했습니다.");
+    confirmModalStore.showModal(
+      "개인정보수정",
+      "개인정보 수정 오류",
+      "회원정보 업데이트에 실패했습니다.",
+      "확인"
+    );
   }
 };
 
@@ -316,11 +340,17 @@ const deleteAccount = async () => {
     try {
       await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
       alert("회원 탈퇴가 완료되었습니다.");
+      modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
       // 탈퇴 후 리다이렉트 동작 등 추가 가능
       window.location.href = "/"; // 홈 페이지로 리다이렉트
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert("회원 탈퇴에 실패했습니다.");
+      confirmModalStore.showModal(
+        "회원탈퇴",
+        "회원정보 업데이트에 실패했습니다. ",
+        "",
+        "확인"
+      );
     }
   }
 };

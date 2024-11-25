@@ -2,7 +2,6 @@ package synerjs.lookkit2nd.wishlist.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import synerjs.lookkit2nd.codi.Codi;
@@ -59,4 +58,34 @@ public class WishlistService {
 
         return repository.getWishByUserId(userId, request.getProductId(), request.getCodiId());
     }
+
+
+
+    // 여러 상품의 찜 상태 확인
+    public List<Long> getWishlistItemIds(Long userId, List<Long> itemIds) {
+        return repository.findAllItemIdsInWishlist(userId, itemIds);
+    }
+
+
+    @Transactional
+    public void deleteWishByProductId(Long userId, WishlistRequestDTO request) {
+        long productId =request.getProductId();
+        repository.deleteByUserIdAndProductId(userId, productId);
+    }
+
+
+    // 위시리스트에 특정 codiId가 있는지 확인
+    public boolean isCodiInWishlist(Long userId, Long codiId) {
+        Optional<Wishlist> wishlistItem = repository.findByUserIdAndCodiId(userId, codiId);
+        return wishlistItem.isPresent();
+    }
+
+    @Transactional
+    public void addWishlist(Long userId, Long codiId) {
+        repository.addWishlistByUserIdAndCodiId(userId, codiId);
+    }
+
+
 }
+
+

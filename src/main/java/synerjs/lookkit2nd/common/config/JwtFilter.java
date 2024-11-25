@@ -42,6 +42,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if(cookies == null){ // 쿠키 null이면 필터 통과
             filterChain.doFilter(request,response);
             return;
+
+
         }
         var jwtCookie = "";
         for (int i = 0; i < cookies.length; i++){ //쿠키들 속 이름이 'jwt'인 쿠키를 변수에 저장
@@ -62,7 +64,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         var arr =  claims.get("authorities").toString().split(",");
-        String username = claims.get("username").toString(); //토큰에서 유저아이디 가져오기
+        String username = claims.get("username") != null ? claims.get("username").toString() : null;
         long userId = Double.valueOf(claims.get("userID").toString()).longValue(); // 토큰에서 유저 PK ID값 가져오기
 
          var authorities= Arrays.stream(arr).map(a-> new SimpleGrantedAuthority(a)).toList();

@@ -124,7 +124,19 @@
       </div>
       <div class="summary-details">
         <div class="summary-item">
-          <span>최종 결제 예상 금액</span>
+      <span>대여코디 개수</span>
+      <strong>{{ totalSelectedCoordinateQuantity }}개</strong>
+    </div>
+    <div class="summary-item">
+      <span>구매상품 개수</span>
+      <strong>{{ totalSelectedSingleQuantity }}개</strong>
+    </div>
+        <div class="summary-item">
+          <span>총 개수</span>
+          <strong>{{ totalQuantity }}개</strong>
+        </div>
+        <div class="summary-item">
+          <span>총 금액</span>
           <strong>{{ formatPrice(totalFinalPrice) }}원</strong>
         </div>
       </div>
@@ -213,9 +225,9 @@ const fetchCartItems = async () => {
   fetchCartItems();
   
   // 가격 포맷팅
-  const formatPrice = (price) => {
-    return price ? price.toLocaleString() : '0';
-  };
+  // const formatPrice = (price) => {
+  //   return price ? price.toLocaleString() : '0';
+  // };
 
   // 수량에 따라 단일 상품 가격 계산
   const getProductTotalPrice = (item) => {
@@ -275,21 +287,58 @@ const fetchCartItems = async () => {
   }
   };
 
-  // 선택된 아이템 계산
-  const selectedItems = computed(() => {
+  // // 선택된 아이템 계산
+  // const selectedItems = computed(() => {
+  // const selected = [...coordinateItems.value, ...singleItems.value].filter(item => item.selected);
+  // console.log("Selected items in cart.vue:", selected);
+  // return selected;
+  // });
+
+  
+  // // 총 수량 계산
+  // const totalQuantity = computed(() => {
+  //   return selectedItems.value.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  // });
+  
+  // // 최종 결제 금액 계산
+  // const totalFinalPrice = computed(() => {
+  // return selectedItems.value.reduce((acc, item) => {
+  //   if (item.type === 'coordinate') {
+  //     return acc + getCodiTotalPrice(item);
+  //   } else {
+  //     return acc + getProductTotalPrice(item);
+  //   }
+  // }, 0);
+  // });
+  
+// 선택된 아이템 계산
+const selectedItems = computed(() => {
   const selected = [...coordinateItems.value, ...singleItems.value].filter(item => item.selected);
   console.log("Selected items in cart.vue:", selected);
   return selected;
-  });
+});
 
-  
-  // 총 수량 계산
-  const totalQuantity = computed(() => {
-    return selectedItems.value.reduce((acc, item) => acc + (item.quantity || 1), 0);
-  });
-  
-  // 최종 결제 금액 계산
-  const totalFinalPrice = computed(() => {
+// 선택된 코디 상품 개수 계산
+const totalSelectedCoordinateQuantity = computed(() => {
+  return selectedItems.value
+    .filter(item => item.type === 'coordinate')
+    .reduce((acc, item) => acc + (item.quantity || 1), 0);
+});
+
+// 선택된 단일 상품 개수 계산
+const totalSelectedSingleQuantity = computed(() => {
+  return selectedItems.value
+    .filter(item => item.type === 'single')
+    .reduce((acc, item) => acc + (item.quantity || 1), 0);
+});
+
+// 총 선택된 상품 개수 계산 (코디 상품과 단일 상품 합산)
+const totalQuantity = computed(() => {
+  return totalSelectedCoordinateQuantity.value + totalSelectedSingleQuantity.value;
+});
+
+// 최종 결제 금액 계산
+const totalFinalPrice = computed(() => {
   return selectedItems.value.reduce((acc, item) => {
     if (item.type === 'coordinate') {
       return acc + getCodiTotalPrice(item);
@@ -297,8 +346,12 @@ const fetchCartItems = async () => {
       return acc + getProductTotalPrice(item);
     }
   }, 0);
-  });
-  
+});
+
+// 가격 포맷팅
+const formatPrice = (price) => {
+  return price ? price.toLocaleString() : '0';
+};
 
   
   // 수량 업데이트

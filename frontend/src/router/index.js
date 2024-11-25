@@ -22,6 +22,10 @@ const routes = [
         component: () => import("@/views/Main/SearchView.vue"),
         props: (route) => ({ keyword: route.query.keyword }),
       },
+      {
+        path: "coordi",
+        component: () => import("@/views/Main/CoordiView.vue"),
+      },
     ],
   },
   {
@@ -55,6 +59,10 @@ const routes = [
       {
         path: "inquiry/:inquiryId",
         component: () => import("@/views/Admin/InquiryAnswer.vue"),
+      },
+      {
+        path: "order/status",
+        component: () => import("@/views/Admin/OrderStatus.vue"),
       },
     ],
   },
@@ -160,6 +168,10 @@ const routes = [
         component: () => import("@/views/mypage/UserInfoView.vue"),
       },
     ],
+  },
+  {
+    path: "/:catchAll(.*)",
+    component: () => import("@/views/Error/Error404.vue"),
   },
 ];
 

@@ -43,7 +43,7 @@ public class CodiService {
     }
 
     public List<CodiProductDTO> getAllCoordiWithProducts() {
-        List<Object[]> results = codiRepository.findTop10CoordiWithProductsNative();
+        List<Object[]> results = codiRepository.findLast40CoordiWithProductsNative();
 
         return results.stream()
                 .map(row -> {

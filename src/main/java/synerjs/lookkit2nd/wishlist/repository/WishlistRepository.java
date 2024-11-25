@@ -1,6 +1,7 @@
 package synerjs.lookkit2nd.wishlist.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -36,7 +37,6 @@ public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
     List<WishlistResponseDTO> getWishlistByUserId(@Param("userId") Long userId);
 
 
-
     @Query("SELECT new synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO(" +
             "w.wishlistId, " +
             "p.productId, " +
@@ -63,4 +63,26 @@ public interface WishlistRepository extends JpaRepository<Wishlist,Long> {
     WishlistResponseDTO getWishByUserId(@Param("userId") Long userId, @Param("productId") Long productId, @Param("codiId") Long codiId);
 
     Optional<Wishlist> findByUserIdAndProduct_ProductId(Long userId, Long productId);
+
+
+    @Query(value = "SELECT PRODUCT_ID FROM wishlist " +
+            "WHERE USER_ID = :userId AND PRODUCT_ID IN (:itemIds)", nativeQuery = true)
+    List<Long> findAllItemIdsInWishlist(@Param("userId") Long userId, @Param("itemIds") List<Long> itemIds);
+
+
+    @Modifying
+    @Query("DELETE FROM Wishlist w WHERE w.userId = :userId AND w.product.id = :productId")
+    void deleteByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId);
+
+
+
+    @Query(value = "SELECT * FROM wishlist " +
+            "WHERE USER_ID = :userId AND CODI_ID = :codiId",
+            nativeQuery = true)
+    Optional<Wishlist> findByUserIdAndCodiId(@Param("userId") Long userId, @Param("codiId") Long codiId);
+
+
+    @Modifying
+    @Query(value = "INSERT INTO wishlist (USER_ID, CODI_ID) VALUES (:userId, :codiId)", nativeQuery = true)
+    void addWishlistByUserIdAndCodiId(Long userId, Long codiId);
 }

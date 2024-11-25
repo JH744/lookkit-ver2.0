@@ -9,6 +9,7 @@
 
 <script>
 import { ref, uploadBytes } from "firebase/storage";
+import { firebaseStorage } from "@/firebase/firebaseConfig";
 ///////////////////
 
 export default {
@@ -25,7 +26,7 @@ export default {
 
       this.currentFile = file.name;
       // Firebase 스토리지 경로 설정
-      const storageRef = ref(storage, `uploads/${file.name}`);
+      const storageRef = ref(firebaseStorage, `uploads/${file.name}`);
 
       // 파일 업로드
       try {

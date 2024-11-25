@@ -9,6 +9,7 @@
         >
           <div class="carousel-inner">
             <div class="carousel-item active" data-bs-interval="2000">
+              <!-- 2초 뒤 변경 -->
               <img
                 src="@/assets/banner/main_sumnail1.png"
                 class="d-block w-100"
@@ -56,74 +57,90 @@
       <div class="section-title">SELECT LOOK KIT</div>
       <div class="brand-container">
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/outer.png"
-            alt="브랜드 이미지"
-          />
-          <span class="brand-name">outer</span>
+          <router-link to="/main/category?type=outer">
+            <img
+              class="brand-image"
+              src="@/assets/category/outer.png"
+              alt="브랜드 이미지"
+            />
+            <span class="brand-name">outer</span>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/top.jpg"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">top</div>
+          <router-link to="/main/category?type=top">
+            <img
+              class="brand-image"
+              src="@/assets/category/top.jpg"
+              alt="브랜드 이미지"
+            />
+            <div class="brand-name">top</div>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/bottom1.jpg"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">bottom</div>
+          <router-link to="/main/category?type=bottom">
+            <img
+              class="brand-image"
+              src="@/assets/category/bottom1.jpg"
+              alt="브랜드 이미지"
+            />
+            <div class="brand-name">bottom</div>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/bag1.png"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">bag</div>
+          <router-link to="/main/category?type=bag">
+            <img
+              class="brand-image"
+              src="@/assets/category/bag1.png"
+              alt="브랜드 이미지"
+            />
+            <div class="brand-name">bag</div>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/c1_item1.jpg"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">shoes</div>
+          <router-link to="/main/category?type=shoes">
+            <img
+              class="brand-image"
+              src="@/assets/category/shoes.jpg"
+              alt="브랜드 이미지"
+            />
+            <div class="brand-name">shoes</div>
+          </router-link>
         </div>
       </div>
+
       <!-- 코디상품리스트 -->
       <div class="codi-container">
         <div class="codi-title">
-          <span class="circle"></span>
-          <span class="codi-text">BEST CODI</span>
-          <span class="view-more">+ VIEW MORE</span>
+          <div class="codi-title-box">
+            <span class="circle"></span>
+            <span class="codi-text">BEST CODI</span>
+          </div>
+          <router-link to="main/coordi">
+            <span class="view-more">+ VIEW MORE</span>
+          </router-link>
         </div>
         <div class="codi-main-container">
           <!--코디&상품 반복 시작-->
           <div v-for="(codi, index) in codiList" class="codi-block">
-            <img
-              class="codi-sumnail"
-              :src="encodedCodiImageUrl(codi.codiId)"
-              alt="코디 썸네일"
-            />
-
+            <router-link :to="`/codi/${codi.codiId}`">
+              <img
+                class="codi-sumnail"
+                :src="encodedCodiImageUrl(codi.codiId)"
+                alt="코디 썸네일"
+              />
+            </router-link>
             <div class="codi-product" v-for="product in codi.products">
               <img
                 class="codi-product-img"
                 :src="encodedProductImageUrl(product.productId)"
                 alt="상품 썸네일"
               />
-              <a :href="`/product/${product.productId}`">
+              <router-link :to="`/product/${product.productId}`">
                 <div class="codi-text">
                   <p>{{ product.productName }}</p>
                   <p>{{ product.productPrice }}</p>
                 </div>
-              </a>
+              </router-link>
             </div>
           </div>
           <!--반복 끝-->
@@ -144,7 +161,9 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const codiList = ref([]);
 const imageBaseUrl = ref(
   "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
@@ -173,6 +192,13 @@ const encodedProductImageUrl = computed(() => {
 });
 
 onMounted(async () => {
+  // 어드민계정 페이지전환
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  if (auth?.user?.role === "ROLE_ADMIN") {
+    console.log("어드민계정");
+    router.push("/admin/dashboard");
+    return;
+  }
   try {
     const response = await axios.get("http://localhost:8081/api/main/codiset");
     codiList.value = response.data;
@@ -376,5 +402,9 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   gap: 25px;
+}
+
+.codi-title-box {
+  display: flex;
 }
 </style>

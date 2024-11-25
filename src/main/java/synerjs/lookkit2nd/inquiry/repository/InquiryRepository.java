@@ -34,7 +34,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry,Long> {
     List<Object[]> getAllInquiriesWithUserUuid();
 
 
-
+// 모든 문의 목록 가져오기 * Uid->UUid
    @Query(value = "SELECT i.INQUIRY_ID AS inquiryId, " +
            "u.USER_UUID AS userUuid, " +
            "i.INQUIRY_TITLE AS inquiryTitle, " +

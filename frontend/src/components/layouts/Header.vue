@@ -3,9 +3,14 @@
     <div class="headerWrapper">
       <div class="navBox1">
         <router-link to="/main">
-          <img class="logo" src="/src/assets/logos/Logo1.png">
+          <img class="logo" src="/src/assets/logos/Logo1.png" />
         </router-link>
         <ul class="navMenu">
+          <li>
+            <router-link to="/main/category?type=all" class="menu"
+              >ALL</router-link
+            >
+          </li>
           <li>
             <router-link to="/main/category?type=outer" class="menu"
               >OUTER</router-link
