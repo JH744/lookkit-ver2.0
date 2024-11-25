@@ -206,7 +206,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-
+import { useModalStore } from "@/stores/modalStore";
 const logoutUrl = "/logout"; // 로그아웃 이동
 const router = useRouter();
 
@@ -257,13 +257,18 @@ const fetchOrderStatus = async () => {
 const updateOrderStatus = async (order) => {
   console.log("orderStatus to be sent:", order.orderStatus); // 로그 추가
   try {
-    const { data } = await axios.put(
+    const response = await axios.put(
       `http://localhost:8081/api/admin/orders/${order.orderId}/status`,
       {
         orderStatus: order.orderStatus,
       }
     );
-    console.log("res", data);
+    console.log("res", response.data);
+    if (response.status === 200) {
+      //완료 모달창 사용
+      const modalStore = useModalStore(); // 스토어를 가져와 사용
+      modalStore.showModal("주문현황", "주문상태 변경완료했습니다.");
+    }
   } catch (err) {
     console.error("주문상태 업데이트 중 오류 발생:", err);
   }
