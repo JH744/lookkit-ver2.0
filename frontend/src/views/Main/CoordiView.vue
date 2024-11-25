@@ -31,7 +31,7 @@ import defaultImage from "@/assets/img_none.png";
 import { useAuthStore } from "@/stores/authStore";
 import heart1 from "@/assets/icons/heart1.svg";
 import heart2 from "@/assets/icons/heart2.svg";
-import Coordi from "@/components/ui/\bCoordi.vue";
+import Coordi from "@/components/ui/Coordi.vue";
 
 const authStore = useAuthStore();
 const coordiList = ref([]); // 상품 리스트
