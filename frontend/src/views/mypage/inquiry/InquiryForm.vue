@@ -159,18 +159,9 @@ const uploadImagesToFirebase = async () => {
       const file = formData.imageFile[i];
       const uniqueName = `${Date.now()}-${file.name}`; // 고유한 파일 이름 생성
       const storageRef = firebaseRef(firebaseStorage, `uploads/inquiry/${uniqueName}`);
-      console.log(">>>?????",storageRef);
       try {
-        if (file.size > 5 * 1024 * 1024) { // 5MB 제한
-          throw new Error(`파일 ${file.name}이 5MB를 초과합니다`);
-        }
-        
-        console.log("업로드 시작:", file.name);
-        const snapshot = await uploadBytes(storageRef, file);
-        console.log("업로드 완료:", snapshot);
-
+        await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
-        console.log("저장 url 확인 : ",url);
         urls.push(url); // 업로드된 이미지의 URL을 리스트에 추가합니다.
       } catch (error) {
         console.error(`Error uploading image ${file.name}:`, error);

@@ -32,7 +32,7 @@ public class InquiryController {
         return new BaseResponse<>(response);
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public BaseResponse<InquiryResponseDTO> createInquiry(@RequestBody InquiryRequestDTO request) throws IOException {
         InquiryResponseDTO response = inquiryService.createInquiry(request);
         return new BaseResponse<>(response);
