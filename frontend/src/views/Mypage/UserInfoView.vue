@@ -335,23 +335,53 @@ const cancelUpdate = () => {
 
 // 탈퇴 요청 메서드
 const deleteAccount = async () => {
-  const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
-  if (confirmation) {
-    try {
-      await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
-      alert("회원 탈퇴가 완료되었습니다.");
-      modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
-      // 탈퇴 후 리다이렉트 동작 등 추가 가능
-      window.location.href = "/"; // 홈 페이지로 리다이렉트
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      confirmModalStore.showModal(
-        "회원탈퇴",
-        "회원정보 업데이트에 실패했습니다. ",
-        "",
-        "확인"
-      );
+  confirmModalStore.showModal(
+    "회원탈퇴",
+    "정말 회원 탈퇴를 진행하시겠습니까?",
+    "",
+    "확인",
+    () => {
+      deleteUser();
     }
+  );
+  // const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
+  // if (confirmation) {
+  //   try {
+  //     await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
+  //     alert("회원 탈퇴가 완료되었습니다.");
+  //     modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
+  //     // 탈퇴 후 리다이렉트 동작 등 추가 가능
+  //     window.location.href = "/"; // 홈 페이지로 리다이렉트
+  //   } catch (error) {
+  //     console.error("Error deleting account:", error);
+  //     confirmModalStore.showModal(
+  //       "회원탈퇴",
+  //       "회원정보 업데이트에 실패했습니다. ",
+  //       "",
+  //       "확인"
+  //     );
+  //   }
+  // }
+};
+
+const deleteUser = async () => {
+  try {
+    await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
+    modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
+    // 탈퇴 후 리다이렉트 동작 등 추가 가능
+
+    // 3초 뒤 메인페이지 자동이동
+    setTimeout(() => {
+      window.location.href = "/"; // 홈 페이지로 리다이렉트
+    }, 3000);
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    confirmModalStore.showModal(
+      "회원탈퇴",
+      "회원정보 업데이트에 실패했습니다. ",
+      "",
+      "확인"
+    );
   }
 };
 </script>
