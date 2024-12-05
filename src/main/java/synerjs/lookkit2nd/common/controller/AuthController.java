@@ -129,6 +129,7 @@ public class AuthController {
 
     @GetMapping("/kakao-login")
     public String kakaoLogin(@RequestParam String code) {
+        System.out.println("code:"+code);
         return "hello kakao, code=" + code;
     }
 
