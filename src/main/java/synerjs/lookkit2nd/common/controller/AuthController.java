@@ -133,4 +133,12 @@ public class AuthController {
         return "hello kakao, code=" + code;
     }
 
+    @PostMapping("/api/v1/auth/callback")
+    public ResponseEntity<String> kakaoCallback(@RequestBody Map<String, String> request) {
+        String code = request.get("code");
+        System.out.println("프론트에서 전달받은 인증코드:"+code);
+
+        return ResponseEntity.ok(null); // 현재는 null 반환
+    }
+
 }

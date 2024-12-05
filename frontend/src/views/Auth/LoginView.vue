@@ -75,15 +75,15 @@
             <h5>간편로그인</h5>
           </div> -->
           <div class="social-login-wrap">
-            <div class="social-login-box" @click="doKakaoLogin">
+            <div class="social-login-box" @click="handleKakaoLogin">
               <img src="@/assets/logos/kakao_logo.svg" width="60" />
               <span>카카오</span>
             </div>
-            <div class="social-login-box">
+            <div class="social-login-box" @click="handleNaverLogin">
               <img src="@/assets/logos/naver_logo.svg" width="60" />
               <span>네이버</span>
             </div>
-            <div class="social-login-box">
+            <div class="social-login-box" @click="handleGoogleLogin">
               <img src="@/assets/logos/google_logo.svg" width="60" />
               <span>구글</span>
             </div>
@@ -159,33 +159,17 @@ const handleLogin = async () => {
   }
 };
 
-// const handleSocialLogin = async () => {
-//   const response = await axios
-//     .get(
-//       "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=8fa3f276e24fa30b91e188091e7b2082&redirect_uri=http://localhost:8081/kakao-login"
-//     )
-//     .then((res) => {
-//       console.log("res", res);
-//     });
-// };
-
-const doKakaoLogin = async () => {
-  const client_id = import.meta.env.VITE_KAKAO_CLIENT_ID;
-  const redirect_uri = import.meta.env.VITE_KAKAO_REDIRECT_ID;
-  const url =
-    "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" +
-    client_id +
-    "&redirect_uri=" +
-    redirect_uri;
-
-  const response = await axios
-    .get(url)
-    .then((res) => {
-      console.log("res", res);
-    })
-    .catch((err) => {
-      console.error;
-    });
+const handleKakaoLogin = () => {
+  window.location.href = `http://localhost:8081/oauth2/authorization/kakao`; // 카카오 로그인 페이지로 리디렉션
+};
+const handleGoogleLogin = () => {
+  window.location.href = `http://localhost:8081/oauth2/authorization/google`; // 구글 로그인 페이지로 리디렉션
+};
+const handleNaverLogin = () => {
+  window.location.href = `http://localhost:8081/oauth2/authorization/naver`; // 네이버 로그인 페이지로 리디렉션
+};
+const handleGithubLogin = () => {
+  window.location.href = `http://localhost:8081/oauth2/authorization/github`; // 깃허브 로그인 페이지로 리디렉션
 };
 </script>
 
