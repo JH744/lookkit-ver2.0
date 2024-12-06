@@ -12,13 +12,17 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import synerjs.lookkit2nd.common.util.JwtUtil;
+import synerjs.lookkit2nd.oauth2.LoginResponse;
+import synerjs.lookkit2nd.oauth2.service.KakaoService;
 import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.user.UserDTO;
 import synerjs.lookkit2nd.user.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -28,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class AuthController {
     private final UserService userService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final KakaoService kakaoService;
 
 
     @PostMapping("/api/auth/login")
@@ -134,11 +139,16 @@ public class AuthController {
     }
 
     @PostMapping("/api/v1/auth/callback")
-    public ResponseEntity<String> kakaoCallback(@RequestBody Map<String, String> request) {
-        String code = request.get("code");
-        System.out.println("프론트에서 전달받은 인증코드:"+code);
-
-        return ResponseEntity.ok(null); // 현재는 null 반환
+    public ResponseEntity<String> kakaoLogin(@RequestBody Map<String, String> codes, HttpServletRequest request){
+        String code = codes.get("code");
+        try{
+            // 현재 도메인 확인
+            String currentDomain = request.getServerName();
+            return ResponseEntity.ok(kakaoService.kakaoLogin(code));
+        } catch (NoSuchElementException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Item Not Found");
+        }
     }
+
 
 }
