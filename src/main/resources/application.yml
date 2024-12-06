@@ -39,8 +39,8 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 90b8311d4ff255bb3b80bf50cf04708f
-            client-secret: HOZfi3b3K2IFkavM5fDEwRGYgV9aLoqW
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             scope:
               - profile_nickname
               - account_email
@@ -49,7 +49,7 @@ spring:
               - birthday
               - birthyear
               - phone_number
-            redirect-uri: "http://localhost:8081/kakao-login"
+            redirect-uri: ${KAKAO_REDIRECT_URL}
             client-name: kakao
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
@@ -59,6 +59,15 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+        google:
+          client-id: ${GOOGLE_CLIENT_ID}
+          client-secret: ${GOOGLE_CLIENT_SECRET}
+        naver:
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
+        github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
 
 server:
   port: 8081
@@ -67,9 +76,8 @@ server:
       force-response: true
       charset: UTF-8
     session:
-      timeout: 60m
-      cookie:
-        max-age: 60m
+      timeout: 0 # 세션 타임아웃 0으로 설정 (실질적으로 세션 비활성화)
+
 
 logging:
   level:

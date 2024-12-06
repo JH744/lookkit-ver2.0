@@ -29,6 +29,10 @@ const routes = [
     ],
   },
   {
+    path: "/login/oauth2/code/kakao",
+    component: () => import("@/views/Auth/oauth2/KakaoAuthRedirect.vue"),
+  },
+  {
     path: "/auth",
     children: [
       {

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @Setter
 @ToString
 @AllArgsConstructor
+@Builder
 public class UserDTO {
     private Long userId;
     private String userUuid;
