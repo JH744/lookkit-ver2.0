@@ -5,6 +5,11 @@
 <script setup>
 import { onMounted } from "vue";
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const authStore = useAuthStore();
 
 // 카카오 인증 코드 처리 함수
 onMounted(() => {
@@ -16,19 +21,27 @@ onMounted(() => {
 });
 
 // 백엔드에 인증 코드 전송해 jwt 받아오기
-async function handleKakaoCallback(code) {
+const handleKakaoCallback = async (code) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8081/api/v1/auth/callback",
-      { code }
-    );
-    const { token } = response.data.data;
-    localStorage.setItem("token", token);
+    const response = await axios
+      .post("http://localhost:8081/api/v1/auth/callback", { code })
+      .then((res) => {
+        const { token } = res.data;
+
+        console.log("logindata:", res.data);
+        console.log("jwt:", token);
+        let userInfo = {
+          username: res.data.username,
+          userId: res.data.userId,
+        };
+        authStore.setAuthData(token, userInfo);
+      });
+
     router.push("/main");
   } catch (error) {
     console.error("카카오 로그인 에러:", error);
   }
-}
+};
 </script>
 
 <style scoped></style>

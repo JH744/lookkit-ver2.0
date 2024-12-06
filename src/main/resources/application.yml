@@ -76,9 +76,8 @@ server:
       force-response: true
       charset: UTF-8
     session:
-      timeout: 60m
-      cookie:
-        max-age: 60m
+      timeout: 0 # 세션 타임아웃 0으로 설정 (실질적으로 세션 비활성화)
+
 
 logging:
   level:
