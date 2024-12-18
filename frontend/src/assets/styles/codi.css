@@ -24,6 +24,14 @@ body {
     align-items: center;
     justify-content: center;
 }
+.container3 {
+    width: 1200px;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    align-items: center;
+    justify-content: center;
+}
 
 .container2 {
     display: flex;
@@ -216,8 +224,9 @@ body {
 .tab-section {
     display: flex;
     gap: 80px;
-    margin-top: 20px;
+    margin-top: 10px;
     cursor: pointer;
+   
 }
 
 .tab-section div {
@@ -237,6 +246,7 @@ body {
     /* display: none; */
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
 
 .tab-content.active {

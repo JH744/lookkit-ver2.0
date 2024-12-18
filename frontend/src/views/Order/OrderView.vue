@@ -62,9 +62,7 @@
            <div v-else-if="item.type === 'codi'" class="product-name">{{ item.itemName }}</div>
            </div>
     
-           <div v-if="item.type === 'product'" class="product-variant">
-      {{ item.quantity }}개
-           </div>
+           <div v-if="item.type === 'product'" class="product-variant">{{ item.quantity }}개</div>
     
     
            <div v-else-if="item.type === 'codi'" class="product-variant">
@@ -79,7 +77,7 @@
           </div>
         </div>
       </div>
-
+      
 
       <!-- 단일 상품 정보 출력 -->
       <div v-else-if="orderItem">

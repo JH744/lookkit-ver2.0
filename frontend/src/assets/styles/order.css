@@ -46,7 +46,7 @@
 }
 .section-title {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 400;
 }
 .info-table {
   display: flex;
@@ -79,6 +79,7 @@
   border-radius: 3px;
   width: 330px;
 }
+
 .product-info-section {
   width: 100%;
   display: flex;
@@ -118,6 +119,7 @@
   padding: 10px;
   border: 1px solid #e6e6e6;
   border-radius: 5px;
+  margin: 10px 0px 10px 0px;
 }
 
 .brand-name {

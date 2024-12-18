@@ -19,6 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:///C:/upload/");
     }
 
+
 //    //CORS 설정 추가
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {

@@ -7,6 +7,7 @@ import synerjs.lookkit2nd.order.OrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {

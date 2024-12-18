@@ -50,7 +50,7 @@
         <div :class="{ active: activeTab === 'seller' }" @click="activeTab = 'seller'">판매자 정보</div>
       </div>
     </div>
-    <div class="container">
+    <div class="container3v">
       <div v-if="activeTab === 'details'" class="tab-content" id="details">
         <div v-for="(detailUrl, index) in detailImageUrls" :key="index">
           <img :src="detailUrl" :alt="'코디사진' + (index + 1)" />

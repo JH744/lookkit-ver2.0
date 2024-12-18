@@ -24,7 +24,7 @@ export default defineConfig({
     proxy: {
       "/api": {
         // 프록시 경로 설정
-        target: "http://localhost", // Spring Boot 서버 주소
+        target: "http://localhost", // 실제 Spring Boot 서버 주소
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""), // 경로 재작성 (필요에 따라 수정)
       },
