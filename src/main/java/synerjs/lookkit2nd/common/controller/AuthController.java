@@ -14,17 +14,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.oauth2.KakaoUserInfoResponseDto;
-import synerjs.lookkit2nd.oauth2.LoginResponse;
 import synerjs.lookkit2nd.oauth2.service.KakaoService;
 import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.user.UserDTO;
 import synerjs.lookkit2nd.user.UserService;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -131,12 +128,6 @@ public class AuthController {
         return ResponseEntity.ok(responseBody);
     }
 
-    //인증토큰 받아오기
-//    @GetMapping("/kakao-login")
-//    public String kakaoLogin(@RequestParam String code) {
-//        System.out.println("code:"+code);
-//        return "hello kakao, code=" + code;
-//    }
 
     @PostMapping("/api/v1/auth/callback")
     public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> codes,HttpServletResponse response) {
