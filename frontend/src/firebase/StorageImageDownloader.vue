@@ -25,11 +25,12 @@ export default {
   },
   methods: {
     async fetchImage() {
-      const storageRef = ref(
-        firebaseStorage,
-        `${this.imageUrl}/${this.fileName}`
-      ); //
-      // const storageRef = ref(storage, "uploads/outer.png"); 참고
+      // const storageRef = ref(
+      //   firebaseStorage,
+      //   `${this.imageUrl}/${this.fileName}`
+      // ); //
+      const storageRef = ref(firebaseStorage, "uploads/outer.png");
+      참고;
       try {
         // Firebase 스토리지에서 이미지 URL 가져오기
         this.imageUrl = await getDownloadURL(storageRef);

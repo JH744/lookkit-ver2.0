@@ -1,6 +1,5 @@
 package synerjs.lookkit2nd.common.config;
 
-import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.context.NullSecurityContextRepository;
-import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.oauth2.service.CustomOAuth2UserService;
 
 @Configuration
