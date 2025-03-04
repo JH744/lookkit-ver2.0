@@ -67,7 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .password(passwordEncoder.encode("password"))
                 .email(oAuth2Response.getProvider()+"_"+oAuth2Response.getEmail())
                 .phone(oAuth2Response.getPhone())
-                .address("주소지 미등록")
+                .address("미제공")
                 .userName(oAuth2Response.getName())
                 .birthDate(oAuth2Response.getBirthDate())
                 .gender(oAuth2Response.getGender())

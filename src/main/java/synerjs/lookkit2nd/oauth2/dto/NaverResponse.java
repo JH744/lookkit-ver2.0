@@ -25,7 +25,7 @@ public class NaverResponse implements OAuth2Response{
 
     @Override
     public String getUserUuid() {
-        return "naver" + attribute.get("id");
+        return "naver_" + attribute.get("id");
     }
 
     @Override
