@@ -1,53 +1,91 @@
 package synerjs.lookkit2nd.oauth2.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.Map;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import synerjs.lookkit2nd.oauth2.OAuth2Attributes;
+import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
+import synerjs.lookkit2nd.oauth2.dto.GoogleResponse;
+import synerjs.lookkit2nd.oauth2.dto.KakaoResponse;
+import synerjs.lookkit2nd.oauth2.dto.NaverResponse;
+import synerjs.lookkit2nd.oauth2.dto.OAuth2Response;
+import synerjs.lookkit2nd.user.User;
 import synerjs.lookkit2nd.user.UserDTO;
+import synerjs.lookkit2nd.user.UserRepository;
 import synerjs.lookkit2nd.user.UserService;
 
-import java.util.Collections;
-import java.util.Map;
-
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    @Autowired
-    private UserService userService; // DB 사용자 관리 서비스
+    private final UserService userService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("CustomOAuth2UserService 실행>>>>>");
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        System.out.println("CustomOAuth2UserService 실행>>>>>"+oAuth2User);
 
-        // provider 정보: kakao인지 google인지
+
+        // provider 확인 -> dto객체 생성
+
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        Map<String, Object> attributes =oAuth2User.getAttributes();
+        OAuth2Response oAuth2Response = null;
 
-        // user-name-attribute 설정 (카카오의 경우 id)
-        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
-                .getUserInfoEndpoint().getUserNameAttributeName();
+        if (registrationId.equals("naver")) {
+            System.out.println("네이버 로그인 요청");
+            oAuth2Response = new NaverResponse((Map)attributes.get("response"));
+        }
+        else if (registrationId.equals("google")) {
+            System.out.println("구글 로그인 요청");
+            oAuth2Response = new GoogleResponse(attributes);
+        }
+        else if (registrationId.equals("kakao")) {
+            System.out.println("카카오 로그인 요청");
+            oAuth2Response = new KakaoResponse(attributes);
+            System.out.println("KakaoResponse >>>>>>" +oAuth2Response);
+        }
+        else {
+            return null;
+        }
+        System.out.println("검증할 아이디 : "+oAuth2Response.getUserUuid());
+        //DB조회
+        Optional<User> existData = userRepository.findByUserUuid(oAuth2Response.getUserUuid());
 
-        // 카카오 사용자 정보를 바탕으로 UserDTO나 엔티티 생성/조회
-        OAuth2Attributes attributes = OAuth2Attributes.ofKakao(oAuth2User.getAttributes());
-        // OAuth2Attributes는 카카오 JSON 응답을 파싱하는 클래스이며, 사용자 정보 추출 로직 구현 필요
-
-
-        // DB에 사용자 정보 저장 또는 조회
-        UserDTO userDto = userService.findOrCreateKakaoUser(attributes);
-
-
-        // Spring Security의 OAuth2User 구현체 반환
-        Map<String, Object> userAttributes = attributes.toMap();
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                userAttributes,
-                userNameAttributeName
-        );
+        // db에서 가져온 회원이 없다면 회원가입 진행
+        if (existData.isEmpty()) {
+            System.out.println("회원가입 진행");
+            User userEntity =  User.builder()
+                .userUuid(oAuth2Response.getUserUuid())
+                .password(passwordEncoder.encode("qweqweqwe"))
+                .email(oAuth2Response.getProvider()+"_"+oAuth2Response.getEmail())
+                .phone(oAuth2Response.getPhone())
+                .address("주소지 미등록")
+                .userName(oAuth2Response.getName())
+                .birthDate(oAuth2Response.getBirthDate())
+                .gender(oAuth2Response.getGender())
+                .build();
+               User savedUserEntity =userRepository.save(userEntity);  // 유저엔티티 만들어서 저장
+             UserDTO userDTO=userService.convertToDTO(savedUserEntity);  // 유저엔티티 -> dto 변환 후 반환
+            return new CustomOAuth2User(userDTO);
+        }
+        // 존재한다면 이메일, 이름을 재설정 후 업데이트 진행
+        else {
+            System.out.println("업데이트만 진행");
+           User userEntity= existData.get();
+            userEntity.setEmail(oAuth2Response.getProvider()+"_"+oAuth2Response.getEmail());
+            userEntity.setUserName(oAuth2Response.getName());
+            // 업데이트 진행
+            userRepository.save(userEntity);
+            UserDTO userDTO=userService.convertToDTO(userEntity);  // 유저엔티티 -> dto 변환 후 반환
+            return new CustomOAuth2User(userDTO);
+        }
     }
 }

@@ -34,6 +34,8 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+  jwt:
+    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
   security:
     oauth2:
       client:

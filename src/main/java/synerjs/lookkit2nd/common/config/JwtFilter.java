@@ -1,82 +1,88 @@
 package synerjs.lookkit2nd.common.config;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import synerjs.lookkit2nd.common.util.JwtUtil;
-import synerjs.lookkit2nd.user.CustomUser;
-import java.io.IOException;
-import java.util.Arrays;
+import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
+import synerjs.lookkit2nd.user.UserDTO;
 
-@Component
 public class JwtFilter extends OncePerRequestFilter {
+    private final JwtUtil jwtUtil;
+    // 생성자
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
-        // 정적리소스 필터 적용 제외 설정
-        String path = request.getRequestURI();
-
-        // 특정 경로 제외
-        if (path.startsWith("/assets") || path.equals("/favicon.ico") || path.startsWith("/public")) {
-            filterChain.doFilter(request, response); // 다음 필터로 넘어감
-            return;
-        }
-        System.out.println("jwt필터실행");
-        // 쿠기 가져오기
-        Cookie[] cookies = request.getCookies(); // 담겨있는 쿠키가 배열형태로 반환
-
-        if(cookies == null){ // 쿠키 null이면 필터 통과
-            filterChain.doFilter(request,response);
-            return;
-
-
-        }
-        var jwtCookie = "";
-        for (int i = 0; i < cookies.length; i++){ //쿠키들 속 이름이 'jwt'인 쿠키를 변수에 저장
-            if (cookies[i].getName().equals("jwt")){
-                jwtCookie = cookies[i].getValue();
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//cookie들을 불러온 뒤 Authorization Key에 담긴 쿠키를 찾음
+        String authorization = null;
+        Cookie[] cookies = request.getCookies();
+        // 이름이 'Authorization'인 쿠키를 찾아 반환
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                System.out.println(cookie.getName());
+                if ("Authorization".equals(cookie.getName())) {
+                    authorization = cookie.getValue();
+                    break;
+                }
             }
         }
-        System.out.println(jwtCookie);
 
-        // 유효성 검증,위조 여부 확인
-        Claims claims;
-        try {
-        //
-        claims =JwtUtil.extractToken(jwtCookie); //토큰 파싱
-
-        }catch (Exception e){
+        // Authorization 쿠키가 없으면 바로 필터체인 진행
+        if (authorization == null) {
+            System.out.println("token null");
             filterChain.doFilter(request, response);
             return;
         }
-        var arr =  claims.get("authorities").toString().split(",");
-        String username = claims.get("username") != null ? claims.get("username").toString() : null;
-        long userId = Double.valueOf(claims.get("userID").toString()).longValue(); // 토큰에서 유저 PK ID값 가져오기
 
-         var authorities= Arrays.stream(arr).map(a-> new SimpleGrantedAuthority(a)).toList();
 
-        var customUser = new CustomUser(username,"none",authorities,userId);
-        var authToken = new UsernamePasswordAuthenticationToken(
-                customUser,""
-        );
+//Authorization 헤더 검증
+        if(authorization == null) {
+            System.out.println("token null");
+            // 필터체인 다시 타도록
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//토큰
+        String token = authorization;
+
+
+//토큰 소멸 시간 검증
+        if (jwtUtil.isExpired(token)) {
+            System.out.println("token expired");
+            filterChain.doFilter(request, response);
+//조건이 해당되면 메소드 종료 (필수)
+            return;
+        }
+
+//토큰 검증해 유효하다면 => 토큰에서 username과 role 획득
+        String username = jwtUtil.getUsername(token);
+        String role = jwtUtil.getRole(token);
+
+//userDTO를 생성하여 값set
+        UserDTO userDTO = UserDTO.builder()
+            .userUuid(username) // username = 아이디값을 가지고 있음
+            .role(role)
+            .build();
+
+//UserDetails에 회원 정보 객체 담기
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+
+//스프링 시큐리티 인증 토큰 생성 / Authenctication 객체 생성
+        Authentication authToken =
+            new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+//세션에 사용자 등록.  // contextHolder에 Authenctication 추가
         SecurityContextHolder.getContext().setAuthentication(authToken);
-
-
         filterChain.doFilter(request, response);
     }
 }
