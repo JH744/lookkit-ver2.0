@@ -168,9 +168,6 @@ const handleGoogleLogin = () => {
 const handleNaverLogin = () => {
   window.location.href = `http://localhost:8081/oauth2/authorization/naver`; // 네이버 로그인 페이지로 리디렉션
 };
-const handleGithubLogin = () => {
-  window.location.href = `http://localhost:8081/oauth2/authorization/github`; // 깃허브 로그인 페이지로 리디렉션
-};
 </script>
 
 <style scoped>

@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 
+@Getter
 public class OAuth2Attributes {
 
     private final String userUuid;
@@ -111,34 +113,7 @@ public class OAuth2Attributes {
         );
     }
 
-    // Getter 메서드들
-    public String getUserUuid() {
-        return userUuid;
-    }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
 
     // toMap() 메소드: 객체 데이터를 Map으로 변환
     public Map<String, Object> toMap() {
