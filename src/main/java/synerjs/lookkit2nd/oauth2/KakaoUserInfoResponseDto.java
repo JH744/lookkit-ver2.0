@@ -2,12 +2,9 @@ package synerjs.lookkit2nd.oauth2;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import synerjs.lookkit2nd.user.User;
-import synerjs.lookkit2nd.user.UserDTO;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
