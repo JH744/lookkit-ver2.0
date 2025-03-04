@@ -41,7 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         if (registrationId.equals("naver")) {
             System.out.println("네이버 로그인 요청");
-            oAuth2Response = new NaverResponse((Map)attributes.get("response"));
+            oAuth2Response = new NaverResponse(attributes);
         }
         else if (registrationId.equals("google")) {
             System.out.println("구글 로그인 요청");
@@ -64,7 +64,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             System.out.println("회원가입 진행");
             User userEntity =  User.builder()
                 .userUuid(oAuth2Response.getUserUuid())
-                .password(passwordEncoder.encode("qweqweqwe"))
+                .password(passwordEncoder.encode("password"))
                 .email(oAuth2Response.getProvider()+"_"+oAuth2Response.getEmail())
                 .phone(oAuth2Response.getPhone())
                 .address("주소지 미등록")
