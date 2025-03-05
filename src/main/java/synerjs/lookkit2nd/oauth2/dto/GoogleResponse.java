@@ -3,7 +3,8 @@ package synerjs.lookkit2nd.oauth2.dto;
 import java.time.LocalDate;
 import java.util.Map;
 
-public class GoogleResponse implements OAuth2Response{
+public class GoogleResponse implements OAuth2Response {
+
     private final Map<String, Object> attribute;
 
     public GoogleResponse(Map<String, Object> attribute) {
@@ -11,7 +12,9 @@ public class GoogleResponse implements OAuth2Response{
     }
 
     @Override
-    public String getProvider() {return "google";}
+    public String getProvider() {
+        return "google";
+    }
 
     @Override
     public String getProviderId() {
@@ -20,8 +23,9 @@ public class GoogleResponse implements OAuth2Response{
 
     @Override
     public String getUserUuid() {
-        return "google_"+attribute.get("sub");
+        return "google_" + attribute.get("sub");
     }
+
     //구글  기본정보외 미제공
     @Override
     public String getGender() {

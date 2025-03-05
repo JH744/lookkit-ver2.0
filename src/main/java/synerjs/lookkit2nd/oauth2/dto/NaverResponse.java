@@ -6,11 +6,13 @@ import java.util.Map;
 import lombok.ToString;
 
 @ToString
-public class NaverResponse implements OAuth2Response{
+public class NaverResponse implements OAuth2Response {
+
     private final Map<String, Object> attribute;
+
     public NaverResponse(Map<String, Object> attribute) {
         this.attribute = (Map<String, Object>) attribute.get("response");
-        System.out.println("네이버 >> "+(Map<String, Object>) attribute.get("response"));
+        // System.out.println("네이버 >> "+(Map<String, Object>) attribute.get("response"));
     }
 
     @Override
@@ -35,9 +37,9 @@ public class NaverResponse implements OAuth2Response{
 
     @Override
     public LocalDate getBirthDate() {
-        String birthYear =  attribute.get("birthyear").toString();
+        String birthYear = attribute.get("birthyear").toString();
         String birthDay = attribute.get("birthday").toString();
-        String birthDate = birthYear+"-"+birthDay;
+        String birthDate = birthYear + "-" + birthDay;
         return LocalDate.parse(birthDate);
     }
 

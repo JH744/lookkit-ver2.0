@@ -1,6 +1,5 @@
 package synerjs.lookkit2nd.oauth2;
 
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -16,14 +16,12 @@ import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
 
 @Component
+@RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
 
-    public CustomSuccessHandler(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
-    // 인증 성공시 jwt토큰을 쿠키로 발급함
-    @Override
+
+    @Override  // 인증 성공시 jwt토큰을 쿠키로 발급함
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         System.out.println("successHandler 동작");
         //OAuth2User
