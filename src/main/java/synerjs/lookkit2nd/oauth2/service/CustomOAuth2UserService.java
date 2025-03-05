@@ -34,27 +34,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
         // provider 확인 -> dto객체 생성
-
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes =oAuth2User.getAttributes();
-        OAuth2Response oAuth2Response = null;
 
-        if (registrationId.equals("naver")) {
-            System.out.println("네이버 로그인 요청");
-            oAuth2Response = new NaverResponse(attributes);
-        }
-        else if (registrationId.equals("google")) {
-            System.out.println("구글 로그인 요청");
-            oAuth2Response = new GoogleResponse(attributes);
-        }
-        else if (registrationId.equals("kakao")) {
-            System.out.println("카카오 로그인 요청");
-            oAuth2Response = new KakaoResponse(attributes);
-            System.out.println("KakaoResponse >>>>>>" +oAuth2Response);
-        }
-        else {
-            return null;
-        }
+        OAuth2Response oAuth2Response = switch (registrationId) {
+            case "naver" -> {
+                System.out.println("네이버 로그인 요청");
+                yield new NaverResponse(attributes);
+            }
+            case "google" -> {
+                System.out.println("구글 로그인 요청");
+                yield new GoogleResponse(attributes);
+            }
+            case "kakao" -> {
+                System.out.println("카카오 로그인 요청");
+                yield new KakaoResponse(attributes);
+            }
+            default -> null;
+        };
+
         System.out.println("검증할 아이디 : "+oAuth2Response.getUserUuid());
         //DB조회
         Optional<User> existData = userRepository.findByUserUuid(oAuth2Response.getUserUuid());
