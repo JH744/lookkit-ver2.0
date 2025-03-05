@@ -6,13 +6,14 @@ import java.util.Map;
 import lombok.ToString;
 
 @ToString
-public class KakaoResponse implements OAuth2Response{
+public class KakaoResponse implements OAuth2Response {
+
     private final Map<String, Object> account;
     private final Map<String, Object> attributes;
+
     public KakaoResponse(Map<String, Object> attribute) {
-        System.out.println("KakaoResponse 생성자 실행!!!!");
         this.attributes = attribute;
-        this.account =(Map<String, Object>) attribute.get("kakao_account");
+        this.account = (Map<String, Object>) attribute.get("kakao_account");
     }
 
     @Override
@@ -22,16 +23,19 @@ public class KakaoResponse implements OAuth2Response{
 
     @Override
     public String getProviderId() {
-        return   String.valueOf(attributes.get("id")); // Long -> String 변환
+        return String.valueOf(attributes.get("id")); // Long -> String 변환
     }
+
     @Override
-    public String getUserUuid() {return "kakao_" + attributes.get("id");}
+    public String getUserUuid() {
+        return "kakao_" + attributes.get("id");
+    }
 
     @Override
     public String getGender() {
         String genderRaw = (String) account.get("gender");
         String gender =
-        "male".equalsIgnoreCase(genderRaw)? "M":"F"; // 리팩토링 필요!
+            "male".equalsIgnoreCase(genderRaw) ? "M" : "F"; // 리팩토링 필요!
         return gender;
     }
 
