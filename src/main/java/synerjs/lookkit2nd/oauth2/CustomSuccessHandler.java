@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -15,28 +16,40 @@ import org.springframework.stereotype.Component;
 import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
     private final JwtUtil jwtUtil;
 
-
-    @Override  // 인증 성공시 jwt토큰을 쿠키로 발급함
+    // 인증 성공시 jwt토큰을 쿠키로 발급함
+    @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        System.out.println("successHandler 동작");
-        //OAuth2User
+
+        log.info("successHandler 동작");
+
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
+       //System.out.println("onAuthenticationSuccess : customOAuth2User: " + customUserDetails);
 
-        String username = customUserDetails.getName(); // 아이디
+        // 유저 아이디 추출
+        String username = customUserDetails.getName();
 
+
+        // 유저 ROLE 추출
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60*60*60L);
-        System.out.println("생성된 jwt >>>>>>>>>>>>>> "+token);
-        response.addCookie(createCookie("Authorization", token));
+
+        // JWT 토큰 생성
+        String jwtToken = jwtUtil.createJwt(username, role, 60*60*60L);
+        log.info("생성된 jwt >>>>>>>>>>>>>> : {} ", jwtToken);
+
+
+        // 쿠키에 JWT토큰 저장 후 응답
+        response.addCookie(createCookie("Authorization", jwtToken));
         response.sendRedirect("http://localhost:3000/");
     }
 

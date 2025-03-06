@@ -33,38 +33,37 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        log.info("CustomOAuth2UserService 실행 >> {}", oAuth2User);
-
+        //log.info("CustomOAuth2UserService 실행 >> {}", oAuth2User);
 
         // 공급자 확인 -> OAuth2Response 객체 생성
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+        String registrationId = userRequest.getClientRegistration().getRegistrationId(); //ex) kakao
+        log.info("요청된 Provider : {} ",registrationId);
 
-        OAuth2Response oAuth2Response = switch (registrationId) {
-            case "naver" -> {
-                log.info("네이버 로그인 요청");
-                yield new NaverResponse(attributes);
-            }
-            case "google" -> {
-                log.info("구글 로그인 요청");
-                yield new GoogleResponse(attributes);
-            }
-            case "kakao" -> {
-                log.info("카카오 로그인 요청");
-                yield new KakaoResponse(attributes);
-            }
-            default -> null;
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        OAuth2Response oAuth2Response =
+            switch (registrationId) {
+                case "naver" -> {
+                    yield new NaverResponse(attributes);
+                }
+                case "google" -> {
+                    yield new GoogleResponse(attributes);
+                }
+                case "kakao" -> {
+                    yield new KakaoResponse(attributes);
+                }
+                default -> null;
         };
 
-        // DB조회
-        log.info("검증할 아이디 : {}", oAuth2Response.getUserUuid());
-        Optional<User> existData = userRepository.findByUserUuid(oAuth2Response.getUserUuid());
+        //요청된 유저 DB 조회 하기
+        //log.info("검증할 아이디 : {}", oAuth2Response.getUserUuid());
+        Optional<User> optionalUser = userRepository.findByUserUuid(oAuth2Response.getUserUuid());
 
         // 기존 회원여부에 따라 회원가입 or 업데이트 진행
-        if (existData.isEmpty()) {
-            return signUpOAuth2User(oAuth2Response);
-        }
-        return updateOAuth2User(oAuth2Response, existData);
+        CustomOAuth2User customOAuth2User
+        = optionalUser.isEmpty()
+            ? signUpOAuth2User(oAuth2Response)
+            : updateOAuth2User(oAuth2Response, optionalUser);
+        return customOAuth2User;
     }
 
     // 신규유저 - 회원가입
