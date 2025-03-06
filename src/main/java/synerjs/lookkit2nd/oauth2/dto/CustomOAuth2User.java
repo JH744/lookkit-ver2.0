@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import synerjs.lookkit2nd.user.UserDTO;
 
 public class CustomOAuth2User implements OAuth2User {
+
     private final UserDTO userDTO;
 
     public CustomOAuth2User(UserDTO userDTO) {
@@ -34,10 +35,7 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return userDTO.getUserUuid()+" ";
+        return userDTO.getUserUuid() + " ";
     }
 
-//    public String getUsername() {
-//        return userDTO.getUsername();
-//    }
 }
