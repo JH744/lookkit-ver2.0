@@ -34,7 +34,7 @@ public class Product {
     private Category category;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CODI_ID")
     private Codi codi;
     private String productName;

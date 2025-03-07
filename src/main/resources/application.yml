@@ -2,7 +2,8 @@ spring:
   application:
     name: lookkit2nd
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -32,8 +33,9 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         use_sql_comments: true
+        generate_statistics: true
   jwt:
     secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
   security:
@@ -100,6 +102,11 @@ server:
 
 logging:
   level:
+    com.p6spy: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.p6spy.engine.spy.P6SpyDriver: DEBUG
+    com.p6spy.engine.logging: DEBUG
     org:
       springframework:
         web: DEBUG
