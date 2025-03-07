@@ -1,8 +1,10 @@
 package synerjs.lookkit2nd.codi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import synerjs.lookkit2nd.product.Product;
 import synerjs.lookkit2nd.review.Review;
 import java.util.ArrayList;
@@ -28,6 +30,11 @@ public class Codi {
     private Integer quantity = 1; // 기본값으로 1 설정
 
     @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Product> products = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
@@ -39,10 +46,5 @@ public class Codi {
         this.codiPrice = codiPrice;
         this.quantity = (quantity != null) ? quantity : 1;
     }
-
-//    @OneToMany(mappedBy = "codi", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JsonManagedReference // Product와의 순환 참조 방지
-//    private List<Product> products = new ArrayList<>();
-
 
 }
