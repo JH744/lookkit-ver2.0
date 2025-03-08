@@ -7,7 +7,9 @@
         </div>
         <div class="order-number-container">
           <div class="order-number-wrapper">
-            <div class="order-number">주문번호: <span>{{ orderId }}</span></div>
+            <div class="order-number">
+              주문번호: <span>{{ orderId }}</span>
+            </div>
           </div>
         </div>
         <div class="order-links">
@@ -24,33 +26,59 @@
           <div class="product-title">상품 정보</div>
         </div>
         <div class="product-list">
-          <div v-for="item in orderItems" :key="item.orderItemId" class="product-item">
+          <div
+            v-for="item in orderItems"
+            :key="item.orderItemId"
+            class="product-item"
+          >
             <div class="product-details-wrapper">
-              <img class="product-image" :src="item.thumbnailUrl || '/images/placeholder.png'" alt="상품 이미지" />
+              <img
+                class="product-image"
+                :src="item.thumbnailUrl || '/images/placeholder.png'"
+                alt="상품 이미지"
+              />
               <div class="product-description">
                 <div class="product-brand-name">{{ item.brandName }}</div>
                 <div class="product-name">{{ item.productName }}</div>
-                <div v-if="item.rentalStartDate && item.rentalEndDate" class="product-rental-dates">
-                  대여일 {{ item.rentalStartDate }} ~ 반납일 {{ item.rentalEndDate }}
+                <div
+                  v-if="item.rentalStartDate && item.rentalEndDate"
+                  class="product-rental-dates"
+                >
+                  대여일 {{ item.rentalStartDate }} ~ 반납일
+                  {{ item.rentalEndDate }}
                 </div>
                 <!-- 상품 수량 및 대여 정보 -->
                 <div v-if="item.type === 'product'">
                   <div class="product-variant">{{ item.quantity }}개</div>
                 </div>
                 <div v-else-if="item.type === 'codi'" class="product-variant">
-                  대여 기간 {{ calculateRentalDays(item.rentalStartDate, item.rentalEndDate) }}일
+                  대여 기간
+                  {{
+                    calculateRentalDays(
+                      item.rentalStartDate,
+                      item.rentalEndDate
+                    )
+                  }}일
                 </div>
               </div>
               <div class="product-price">
                 <!-- 상품의 경우 -->
                 <div v-if="item.type === 'product'">
-                  <div class="item-price">{{ formatPrice(item.productPrice) }}원</div>
-                  <div class="price-amount">{{ formatPrice(item.totalPrice) }}원</div>
+                  <div class="item-price">
+                    {{ formatPrice(item.productPrice) }}원
+                  </div>
+                  <div class="price-amount">
+                    {{ formatPrice(item.totalPrice) }}원
+                  </div>
                 </div>
                 <!-- 코디의 경우 -->
                 <div v-else-if="item.type === 'codi'">
-                  <div class="item-price">{{ formatPrice(item.productPrice) }}원</div>
-                  <div class="price-amount">{{ formatPrice(item.totalPrice) }}원</div>
+                  <div class="item-price">
+                    {{ formatPrice(item.productPrice) }}원
+                  </div>
+                  <div class="price-amount">
+                    {{ formatPrice(item.totalPrice) }}원
+                  </div>
                 </div>
               </div>
             </div>
@@ -65,7 +93,11 @@
           <div class="shipping-info-title">배송지 정보</div>
         </div>
         <div class="shipping-table">
-          <div class="shipping-row" v-for="(value, label, index) in shippingInfo" :key="index">
+          <div
+            class="shipping-row"
+            v-for="(value, label, index) in shippingInfo"
+            :key="index"
+          >
             <div class="shipping-cell">{{ label }}</div>
             <div class="shipping-data">
               <span class="span shipping-value">{{ value }}</span>
@@ -90,7 +122,9 @@
         </div>
         <div class="final-payment-border">
           <div class="final-payment-data">
-            <span class="span final-payment-amount">{{ formatPrice(totalAmount) }} 원</span>
+            <span class="span final-payment-amount"
+              >{{ formatPrice(totalAmount) }} 원</span
+            >
           </div>
         </div>
       </div>
@@ -99,8 +133,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import "@/assets/styles/orderComplete.css";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
@@ -111,13 +145,13 @@ const userId = authStore.user?.userId;
 const route = useRoute();
 const router = useRouter();
 
-const orderId = ref('');
+const orderId = ref("");
 const orderItems = ref([]);
 const shippingInfo = ref({});
-const paymentMethod = ref('카드');
+const paymentMethod = ref("카드");
 const totalAmount = ref(0);
 const finalAmount = ref(0);
-
+const baseURL = import.meta.env.VITE_APP_BASE_URL;
 const fetchOrderData = async () => {
   const orderIdFromParams = route.query.orderId;
   if (!orderIdFromParams) {
@@ -129,17 +163,18 @@ const fetchOrderData = async () => {
   orderId.value = orderIdFromParams;
 
   try {
-    const response = await fetch(`http://localhost:8081/api/order/orderComplete?orderId=${orderId.value}`);
+    const response = await fetch(
+      `${baseURL}/api/order/orderComplete?orderId=${orderId.value}`
+    );
     if (!response.ok) {
-      throw new Error('네트워크 응답에 문제가 있습니다.');
+      throw new Error("네트워크 응답에 문제가 있습니다.");
     }
     const orderData = await response.json();
 
     // API로부터 가져온 주문 데이터를 화면에 반영
     orderId.value = orderData.orderId;
-    paymentMethod.value = '카드';  // 현재는 '카드'로 고정
+    paymentMethod.value = "카드"; // 현재는 '카드'로 고정
     totalAmount.value = orderData.totalAmount;
-    
 
     if (orderData.orderDetails && Array.isArray(orderData.orderDetails)) {
       orderItems.value = orderData.orderDetails.map((item) => {
@@ -147,7 +182,10 @@ const fetchOrderData = async () => {
 
         if (item.codiId) {
           // 대여 기간 계산 및 추가 요금 적용
-          const rentalDays = calculateRentalDays(item.rentalStartDate, item.rentalEndDate);
+          const rentalDays = calculateRentalDays(
+            item.rentalStartDate,
+            item.rentalEndDate
+          );
           const additionalDays = rentalDays > 3 ? rentalDays - 3 : 0;
           const additionalFee = additionalDays * 10000; // 하루에 10,000원 추가 요금
           totalPrice = item.productPrice + additionalFee;
@@ -166,7 +204,7 @@ const fetchOrderData = async () => {
           rentalEndDate: item.rentalEndDate,
           productPrice: item.productPrice,
           totalPrice: totalPrice,
-          type: item.codiId ? 'codi' : 'product'
+          type: item.codiId ? "codi" : "product",
         };
       });
 
@@ -177,19 +215,19 @@ const fetchOrderData = async () => {
     }
 
     shippingInfo.value = {
-      '주소': orderData.orderAddress,
-      '받는 사람': orderData.orderAddressee,
-      '휴대폰번호': orderData.orderPhone,
-      '배송 메모': orderData.orderComment,
+      주소: orderData.orderAddress,
+      "받는 사람": orderData.orderAddressee,
+      휴대폰번호: orderData.orderPhone,
+      "배송 메모": orderData.orderComment,
     };
   } catch (error) {
-    console.error('주문 정보를 불러오는 데 실패했습니다:', error);
-    alert('주문 정보를 불러오는 데 실패했습니다.');
+    console.error("주문 정보를 불러오는 데 실패했습니다:", error);
+    alert("주문 정보를 불러오는 데 실패했습니다.");
   }
 };
 
 const formatPrice = (price) => {
-  return price ? price.toLocaleString() : '0';
+  return price ? price.toLocaleString() : "0";
 };
 
 const fetchImageForItem = async (item) => {
@@ -200,7 +238,7 @@ const fetchImageForItem = async (item) => {
     storagePath = `lookkit/codi/0${item.codiId}/${item.codiId}_thumbnail.webp`;
   }
 
-  console.log('이미지 경로 확인:', storagePath);
+  console.log("이미지 경로 확인:", storagePath);
   try {
     const imageRef = firebaseRef(firebaseStorage, storagePath);
     const url = await getDownloadURL(imageRef);
@@ -220,11 +258,11 @@ const calculateRentalDays = (startDate, endDate) => {
 };
 
 const viewOrder = () => {
-  router.push('/mypage/manage');
+  router.push("/mypage/manage");
 };
 
 const goHome = () => {
-  router.push('/main');
+  router.push("/main");
 };
 
 onMounted(() => {

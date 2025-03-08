@@ -78,7 +78,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
+import axios from "@/api/axios";
 import defaultImage from "@/assets/img_none.png";
 import { useAuthStore } from "@/stores/authStore";
 import heart1 from "@/assets/icons/heart1.svg";
@@ -114,15 +114,12 @@ const handleImageError = (event) => {
 // 카테고리별 상품리스트 가져오기
 const fetchProducts = async () => {
   try {
-    const { data } = await axios.get(
-      "http://localhost:8081/api/main/category",
-      {
-        params: {
-          type: categoryType.value,
-          sort: sortBy.value,
-        },
-      }
-    );
+    const { data } = await axios.get("/api/main/category", {
+      params: {
+        type: categoryType.value,
+        sort: sortBy.value,
+      },
+    });
     products.value = data;
     console.log("리스트", data);
     // console.log("상품 리스트:", products.value);
@@ -130,7 +127,7 @@ const fetchProducts = async () => {
     const productIds = products.value.map((product) => product.productId);
     // 위시리스트 상태 확인
     const wishlistResponse = await axios.post(
-      `http://localhost:8081/api/main/checkBatch/${authStore.user.userId}`,
+      `/api/main/checkBatch/${authStore.user.userId}`,
       productIds
     );
 
@@ -175,7 +172,7 @@ const likeProduct = async (productId) => {
     if (wishlistItemIds.value.includes(productId)) {
       console.log("찜삭제");
       const response = await axios.post(
-        `http://localhost:8081/api/main/wishlist/delete/${authStore.user.userId}`,
+        `/api/main/wishlist/delete/${authStore.user.userId}`,
         {
           productId: productId,
         }
@@ -190,7 +187,7 @@ const likeProduct = async (productId) => {
       console.log("찜하기");
 
       const response = await axios.post(
-        `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`,
+        `/api/mypage/wishlist/${authStore.user.userId}`,
         {
           productId: productId,
         }

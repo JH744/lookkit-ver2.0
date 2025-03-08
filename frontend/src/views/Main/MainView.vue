@@ -14,7 +14,6 @@
                 src="@/assets/banner/main_sumnail1.webp"
                 class="d-block w-100"
                 alt="..."
-                
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
@@ -182,8 +181,8 @@
 
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
+import axios from "@/api/axios";
 
 const router = useRouter();
 const codiList = ref([]);
@@ -222,7 +221,7 @@ onMounted(async () => {
     return;
   }
   try {
-    const response = await axios.get("http://localhost:8081/api/main/codiset");
+    const response = await axios.get("/api/main/codiset");
     codiList.value = response.data;
     console.log("코디 리스트:", codiList.value);
     console.log("코디 데이터0:", codiList.value[0]);

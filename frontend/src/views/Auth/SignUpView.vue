@@ -208,7 +208,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import axios from "axios";
+import axios from "@/api/axios";
 import { useRouter } from "vue-router";
 import { useForm, useField } from "vee-validate";
 import * as yup from "yup";
@@ -301,8 +301,7 @@ const checkDuplicateID = () => {
 const fetchDuplicateCheckId = async (Id) => {
   try {
     const response = await axios
-      // .get(`/api/users/check-id?userUuid=${Id}`)
-      .get(`http://localhost:8081/api/users/check-id?userUuid=${Id}`)
+      .get(`/api/users/check-id?userUuid=${Id}`)
       .then((res) => {
         console.log(res);
         modalStore.showModal("회원가입", "사용가능한 아이디입니다.");
@@ -338,7 +337,7 @@ const handleSignUp = async () => {
   try {
     const response = await axios
       // .post("/api/auth/signup", {
-      .post("http://localhost:8081/api/auth/signup", {
+      .post("/api/auth/signup", {
         userName: userName.value,
         password: password.value,
         userUuid: userUuid.value,

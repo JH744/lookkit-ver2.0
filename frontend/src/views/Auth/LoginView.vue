@@ -97,7 +97,7 @@
 <script setup>
 import { ref, watch, onMounted, reactive } from "vue";
 import { useAuthStore } from "@/stores/authStore";
-import axios from "axios";
+import axios from "@/api/axios";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -128,7 +128,7 @@ const handleLogin = async () => {
   try {
     const response = await axios
       .post(
-        "http://localhost:8081/api/auth/login",
+        "/api/auth/login",
         // "/api/auth/login",
         {
           username: username.value,

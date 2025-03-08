@@ -1,14 +1,19 @@
 <template>
   <div class="review-container">
-      <div class="review-section">
-        <div class="average-rating">
-          <div class="star-ratings">
-           <div class="star-ratings-fill" :style="{ width: `${(averageRating / 5) * 100}%` }"></div>
-          </div>
-          <h3>평균 평점 {{ averageRating }} / 5</h3>
+    <div class="review-section">
+      <div class="average-rating">
+        <div class="star-ratings">
+          <div
+            class="star-ratings-fill"
+            :style="{ width: `${(averageRating / 5) * 100}%` }"
+          ></div>
         </div>
-        <div class="add-review">
-        <button class="add-review-button" @click="toggleReviewForm">리뷰 작성하기</button>
+        <h3>평균 평점 {{ averageRating }} / 5</h3>
+      </div>
+      <div class="add-review">
+        <button class="add-review-button" @click="toggleReviewForm">
+          리뷰 작성하기
+        </button>
         <div v-if="showReviewForm" class="expanded-review-form">
           <div class="rating-section">
             <label>평점:</label>
@@ -20,55 +25,77 @@
               <option value="5">5</option>
             </select>
           </div>
-          <textarea v-model="reviewText" placeholder="리뷰를 작성해주세요"></textarea>
+          <textarea
+            v-model="reviewText"
+            placeholder="리뷰를 작성해주세요"
+          ></textarea>
           <div class="image-upload-section">
-            <label for="image-upload" class="image-upload-label">이미지 업로드:</label>
-            <input type="file" id="image-upload" @change="onImageUpload" accept="image/*" />
+            <label for="image-upload" class="image-upload-label"
+              >이미지 업로드:</label
+            >
+            <input
+              type="file"
+              id="image-upload"
+              @change="onImageUpload"
+              accept="image/*"
+            />
             <div v-if="uploadedImage" class="image-preview">
               <img :src="uploadedImage" alt="업로드된 이미지 미리보기" />
             </div>
           </div>
-          <button type="button" class="submit-review" @click="submitReview">리뷰 제출하기</button>
-        </div>
+          <button type="button" class="submit-review" @click="submitReview">
+            리뷰 제출하기
+          </button>
         </div>
       </div>
-      <div class="review-section2">
-        <div v-if="reviews && reviews.length" class="review-list">
-        <div v-for="review in paginatedReviews" :key="review.reviewId" class="review-item">
-        <div class="review-header">
-          <span class="review-rating">{{ review.rating }}점</span>
-          <div v-if="review.imageUrl" class="review-image">
-            <img :src="review.imageUrl" alt="리뷰 이미지" />
+    </div>
+    <div class="review-section2">
+      <div v-if="reviews && reviews.length" class="review-list">
+        <div
+          v-for="review in paginatedReviews"
+          :key="review.reviewId"
+          class="review-item"
+        >
+          <div class="review-header">
+            <span class="review-rating">{{ review.rating }}점</span>
+            <div v-if="review.imageUrl" class="review-image">
+              <img :src="review.imageUrl" alt="리뷰 이미지" />
+            </div>
+          </div>
+          <div class="review-text">
+            <p>{{ review.reviewText }}</p>
+          </div>
+          <div class="review-info">
+            <span class="review-date">{{
+              formatReviewDate(review.createdAt)
+            }}</span>
+            <span class="review-user">{{ review.userId }}</span>
           </div>
         </div>
-        <div class="review-text">
-          <p>{{ review.reviewText }}</p>
-        </div>
-        <div class="review-info">
-          <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
-          <span class="review-user">{{ review.userId }}</span>
-        </div>
-        </div>
         <div class="pagination">
-        <button @click="previousPage" :disabled="currentPage === 1">이전</button>
-        <span>{{ currentPage }} / {{ totalPages }}</span>
-        <button @click="nextPage" :disabled="currentPage === totalPages">다음</button>
-      </div>
-    </div>
-        <div v-else>
-          <p>작성된 리뷰가 없습니다.</p>
+          <button @click="previousPage" :disabled="currentPage === 1">
+            이전
+          </button>
+          <span>{{ currentPage }} / {{ totalPages }}</span>
+          <button @click="nextPage" :disabled="currentPage === totalPages">
+            다음
+          </button>
         </div>
       </div>
+      <div v-else>
+        <p>작성된 리뷰가 없습니다.</p>
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, computed, onMounted } from "vue";
+import axios from "@/api/axios";
 
-const reviews = ref([]); 
+const reviews = ref([]);
 const reviewRating = ref(5);
-const reviewText = ref('');
+const reviewText = ref("");
 const showReviewForm = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 5;
@@ -76,13 +103,13 @@ const uploadedImage = ref(null);
 
 const props = defineProps({
   codiId: {
-    type:  String,
-    default: null
+    type: String,
+    default: null,
   },
   productId: {
     type: String,
-    default: null
-  }
+    default: null,
+  },
 });
 
 // 이미지 파일 업로드 핸들러
@@ -99,27 +126,26 @@ const onImageUpload = (event) => {
 
 onMounted(async () => {
   try {
-    console.log('props.codiId:', props.codiId);
-    console.log('props.productId:', props.productId);
+    console.log("props.codiId:", props.codiId);
+    console.log("props.productId:", props.productId);
 
-    let url = '';
+    let url = "";
     if (props.codiId) {
-      url = `http://localhost:8081/api/reviews/codi/${props.codiId}`;
+      url = `/api/reviews/codi/${props.codiId}`;
     } else if (props.productId) {
-      url = `http://localhost:8081/api/reviews/product/${props.productId}`;
+      url = `/api/reviews/product/${props.productId}`;
     }
-    
-    console.log('API 요청 URL:', url);
+
+    console.log("API 요청 URL:", url);
 
     if (url) {
       const response = await axios.get(url);
-      console.log('리뷰 데이터:', response.data);
+      console.log("리뷰 데이터:", response.data);
       reviews.value = Array.isArray(response.data) ? response.data : [];
-      console.log('리뷰 데이터:', reviews.value);
-
+      console.log("리뷰 데이터:", reviews.value);
     }
   } catch (error) {
-    console.error('리뷰 데이터를 불러오는데 실패했습니다:', error);
+    console.error("리뷰 데이터를 불러오는데 실패했습니다:", error);
   }
 });
 
@@ -147,7 +173,6 @@ const averageRating = computed(() => {
   const total = reviews.value.reduce((sum, review) => sum + review.rating, 0);
   return (total / reviews.value.length).toFixed(1);
 });
-
 
 // 페이지네이션을 적용한 리뷰 목록
 const paginatedReviews = computed(() => {
@@ -185,12 +210,12 @@ const submitReview = async () => {
       userId,
       rating: reviewRating.value,
       reviewText: reviewText.value,
-      imageUrl: uploadedImage.value
+      imageUrl: uploadedImage.value,
     };
 
-    const response = await axios.post('http://localhost:8081/api/reviews/write', reviewData);
+    const response = await axios.post("/api/reviews/write", reviewData);
     if (response.status === 201) {
-      alert('리뷰 작성 완료');
+      alert("리뷰 작성 완료");
       reviews.value.push({
         ...reviewData,
         createdAt: new Date().toISOString(),
@@ -198,18 +223,18 @@ const submitReview = async () => {
       });
       toggleReviewForm();
     } else {
-      alert('리뷰 작성 실패');
+      alert("리뷰 작성 실패");
     }
   } catch (error) {
-    console.error('리뷰 작성 오류:', error);
-    alert('리뷰 작성에 실패했습니다.');
+    console.error("리뷰 작성 오류:", error);
+    alert("리뷰 작성에 실패했습니다.");
   }
 };
 
 // 날짜 포맷팅 함수
 const formatReviewDate = (dateString) => {
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-  return new Date(dateString).toLocaleDateString('ko-KR', options);
+  const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+  return new Date(dateString).toLocaleDateString("ko-KR", options);
 };
 </script>
 
@@ -270,7 +295,7 @@ const formatReviewDate = (dateString) => {
 }
 
 .image-upload-section {
-  width:25%;
+  width: 25%;
 }
 
 .image-preview img {
@@ -280,10 +305,9 @@ const formatReviewDate = (dateString) => {
 }
 
 .review-header {
-
 }
 .review-text {
-width: 40%;
+  width: 40%;
 }
 .review-info {
   display: flex;
@@ -298,12 +322,11 @@ width: 40%;
 
 .review-item {
   display: flex;
-    gap: 20px;
-    padding: 20px;
-    border-bottom: 1px solid #cdcdcd;
-    flex-direction: row;
-    justify-content: space-around;
-    
+  gap: 20px;
+  padding: 20px;
+  border-bottom: 1px solid #cdcdcd;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .product-info {
@@ -425,17 +448,16 @@ width: 40%;
 }
 .add-review {
   display: flex;
- 
 }
 
 .average-rating {
   margin-bottom: 10px;
   font-size: 18px;
-    font-weight: bold;
-    gap: 10%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  font-weight: bold;
+  gap: 10%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .star-ratings {
   display: inline-block;
@@ -461,5 +483,4 @@ width: 40%;
 .star-ratings-fill::before {
   content: "★★★★★";
 }
-
 </style>

@@ -11,7 +11,13 @@
           <p class="inquiry-content-title">문의 제목</p>
           <p class="error-message" v-if="titleError">문의명을 입력해주세요</p>
         </div>
-        <input type="text" v-model="formData.title" class="input-title" placeholder="문의명을 입력하세요" required />
+        <input
+          type="text"
+          v-model="formData.title"
+          class="input-title"
+          placeholder="문의명을 입력하세요"
+          required
+        />
       </div>
 
       <div class="form-content">
@@ -19,21 +25,44 @@
           <p class="inquiry-content-title">문의 내용</p>
           <p class="error-message" v-if="contentError">내용을 입력해 주세요</p>
         </div>
-        <textarea v-model="formData.content" class="input-content" placeholder="문의 내용은 2,000자 이내로 입력하세요" required></textarea>
+        <textarea
+          v-model="formData.content"
+          class="input-content"
+          placeholder="문의 내용은 2,000자 이내로 입력하세요"
+          required
+        ></textarea>
       </div>
 
       <div class="image-upload">
         <!-- 각 개별 이미지 업로드 영역 -->
-        <div v-for="(image, index) in imagePreview" :key="index" class="image-placeholder" @click="selectSingleFile(index)">
-          <input :ref="el => fileInputs[index] = el" style="display:none;" type="file" accept="image/*" @change="event => handleSingleFileChange(event, index)" />
+        <div
+          v-for="(image, index) in imagePreview"
+          :key="index"
+          class="image-placeholder"
+          @click="selectSingleFile(index)"
+        >
+          <input
+            :ref="(el) => (fileInputs[index] = el)"
+            style="display: none"
+            type="file"
+            accept="image/*"
+            @change="(event) => handleSingleFileChange(event, index)"
+          />
           <div v-if="!image" class="plus-text">+</div>
           <img v-else :src="image" />
         </div>
 
         <!-- 다중 파일 업로드 버튼 -->
         <div class="upload-button" @click="triggerFileInput">
-          <input type="file" ref="multipleFileInput" style="display:none;" accept="image/*" multiple @change="handleMultipleFileChange" />
-          <img class="upload-icon" src="/images/add_img.png">
+          <input
+            type="file"
+            ref="multipleFileInput"
+            style="display: none"
+            accept="image/*"
+            multiple
+            @change="handleMultipleFileChange"
+          />
+          <img class="upload-icon" src="/images/add_img.png" />
           <span class="upload-text">여러장 선택하기</span>
         </div>
       </div>
@@ -51,7 +80,10 @@
       </div>
       <div class="notice-text">
         <ul>
-          <li>개인정보를 남기면 타인에 의해 도용될 수 있으니 문의하기 작성 시 주의해주세요</li>
+          <li>
+            개인정보를 남기면 타인에 의해 도용될 수 있으니 문의하기 작성 시
+            주의해주세요
+          </li>
           <li>사진은 최대 3개까지 업로드 가능합니다</li>
         </ul>
       </div>
@@ -60,18 +92,22 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
-import axios from 'axios';
-import router from '@/router';
-import { useAuthStore } from '@/stores/authStore';
-import { ref as firebaseRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, reactive } from "vue";
+import axios from "@/api/axios";
+import router from "@/router";
+import { useAuthStore } from "@/stores/authStore";
+import {
+  ref as firebaseRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
 
 const authStore = useAuthStore();
 const formData = reactive({
-  title: '',
-  content: '',
-  imageFile: []
+  title: "",
+  content: "",
+  imageFile: [],
 });
 
 const titleError = ref(false);
@@ -111,7 +147,7 @@ const handleSingleFileChange = (event, index) => {
 const handleMultipleFileChange = (event) => {
   const files = Array.from(event.target.files);
   if (files.length > 3) {
-    alert('사진은 최대 3개까지만 업로드 가능합니다.');
+    alert("사진은 최대 3개까지만 업로드 가능합니다.");
     return;
   }
   formData.imageFile = [];
@@ -136,17 +172,16 @@ const submitForm = async () => {
         userId: authStore.user.userId,
         inquiryTitle: formData.title,
         inquiryContents: formData.content,
-        imageUrls // 업로드된 이미지의 URL 리스트 추가
+        imageUrls, // 업로드된 이미지의 URL 리스트 추가
       };
 
-      const response = await axios.post('http://localhost:8081/api/mypage/inquiry', requestPayload);
+      const response = await axios.post("/api/mypage/inquiry", requestPayload);
       router.push({
-        name: 'InquiryDetail',
-        params: { inquiryId: response.data.data.inquiryId }
+        name: "InquiryDetail",
+        params: { inquiryId: response.data.data.inquiryId },
       });
-
     } catch (error) {
-      console.log('문의 등록 중 오류:', error);
+      console.log("문의 등록 중 오류:", error);
     }
   }
 };
@@ -158,7 +193,10 @@ const uploadImagesToFirebase = async () => {
     if (formData.imageFile[i]) {
       const file = formData.imageFile[i];
       const uniqueName = `${Date.now()}-${file.name}`; // 고유한 파일 이름 생성
-      const storageRef = firebaseRef(firebaseStorage, `uploads/inquiry/${uniqueName}`);
+      const storageRef = firebaseRef(
+        firebaseStorage,
+        `uploads/inquiry/${uniqueName}`
+      );
       try {
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
@@ -176,219 +214,216 @@ const cancelForm = () => {
 };
 </script>
 
-
 <style scoped>
 .section-inquiries {
-    border-bottom: 2px solid #727272;
-
+  border-bottom: 2px solid #727272;
 }
 
 .section-inquiries p:first-of-type {
-    font-size: 24px;
-    margin-top: 65px;
-    margin-bottom: 0px;
+  font-size: 24px;
+  margin-top: 65px;
+  margin-bottom: 0px;
 }
 
 .section-inquiries p:nth-of-type(2) {
-   font-size : 13px;
-   margin: 20px 0px;
+  font-size: 13px;
+  margin: 20px 0px;
 }
 
 .space-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .inquiry-form,
 .inquiry-form * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .inquiry-form {
-    height: auto;
-    position: relative;
+  height: auto;
+  position: relative;
 }
 .form-content {
-    margin-top: 50px;
+  margin-top: 50px;
 }
 
 .inquiry-content-title {
-    font-size: 17px;
+  font-size: 17px;
 }
 
 .button-group {
-    display: flex;
-    justify-content: center;
-    gap: 7px;
-    margin-top: 75px;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 75px;
 }
 
 .btn-submit {
-    background: #0d1134;
-    color: #fff;
-    border-radius: 35px;
-    width: 184px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "Inter-SemiBold", sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
+  background: #0d1134;
+  color: #fff;
+  border-radius: 35px;
+  width: 184px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .btn-cancel {
-    background: #fff;
-    color: #000;
-    border: 1px solid #b2b2b2;;
-    border-radius: 35px;
-    width: 184px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "Inter-Medium", sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
+  background: #fff;
+  color: #000;
+  border: 1px solid #b2b2b2;
+  border-radius: 35px;
+  width: 184px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .input-title {
-    background: #fff;
-    border: 1px solid #b2b2b2;;
-    padding: 10px;
-    font-family: "Inter-Medium", sans-serif;
-    font-size: 16px;
-    width: 100%;
+  background: #fff;
+  border: 1px solid #b2b2b2;
+  padding: 10px;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 16px;
+  width: 100%;
 }
 
 .inquiry-inline {
-    display: inline-flex;
-    margin-top: 40px;
-    margin-bottom: 8px;
-    align-items: center;
+  display: inline-flex;
+  margin-top: 40px;
+  margin-bottom: 8px;
+  align-items: center;
 }
 
 .input-content {
-    background: #fff;
-    border: 1px solid #b2b2b2;;
-    padding: 10px;
-    font-family: "Inter-Medium", sans-serif;
-    font-size: 16px;
-    resize: none;
-    height: 200px;
-    width: 100%;
+  background: #fff;
+  border: 1px solid #b2b2b2;
+  padding: 10px;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 16px;
+  resize: none;
+  height: 200px;
+  width: 100%;
 }
 
 .error-message {
-    color : #F44336;
-    margin: 0px;
-    font-size: 15px;
-    margin-left: 15px;
-    display : none;
+  color: #f44336;
+  margin: 0px;
+  font-size: 15px;
+  margin-left: 15px;
+  display: none;
 }
 
 .image-upload {
-    display: flex;
-    gap: 10px;
-    margin-top: 7px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-top: 7px;
+  align-items: center;
 }
 
 .image-placeholder {
-    background: #f0f0f0;
-    width: 85px;
-    height: 85px;
-    border: 1px dashed #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #aaa;
-    cursor: pointer;
+  background: #f0f0f0;
+  width: 85px;
+  height: 85px;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #aaa;
+  cursor: pointer;
 }
 
 .image-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .upload-button {
-    background: #fff;
-    border: 1px solid #ccc;
-    width: 150px;
-    height: 85px;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    gap: 5px;
-    cursor: pointer;
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 150px;
+  height: 85px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  cursor: pointer;
 }
 
 .upload-icon {
-    width: 25px;
+  width: 25px;
 }
 
 .upload-text {
-    color: #555553;
-    font-family: "Inter-Medium", sans-serif;
-    font-size: 16px;
+  color: #555553;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 16px;
 }
 
 /* 유의사항 */
 .notice {
-    display: grid;
-    align-items: center;
-    margin-top: 80px;
+  display: grid;
+  align-items: center;
+  margin-top: 80px;
 }
 
 .notice-icon {
-    background: #b8b8b8;
-    color: #fff;
-    border-radius: 50%;
-    width: 21px;
-    height: 21px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "Georgia-Bold", sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    margin-right: 7px;
+  background: #b8b8b8;
+  color: #fff;
+  border-radius: 50%;
+  width: 21px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Georgia-Bold", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin-right: 7px;
 }
 
 .notice-text {
-    color: #818181;
-    font-family: "Inter-Medium", sans-serif;
-    font-size: 18px;
+  color: #818181;
+  font-family: "Inter-Medium", sans-serif;
+  font-size: 18px;
 }
 
-.notice-text ul{
-    font-size: 13px;
-    margin-top: 10px;
+.notice-text ul {
+  font-size: 13px;
+  margin-top: 10px;
 }
 
-.notice-text ul li{
-    margin-bottom: 5px;
+.notice-text ul li {
+  margin-bottom: 5px;
 }
 
 .notice-icon-block {
-    display: inline-flex;
-    align-items: center;
+  display: inline-flex;
+  align-items: center;
 }
 
 .notice-icon-block span {
-    color: #818181;
-    font-size: 17px;
+  color: #818181;
+  font-size: 17px;
 }
 
 .plus-text {
   font-size: 50px;
   font-weight: lighter;
 }
-
 </style>

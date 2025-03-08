@@ -26,7 +26,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
+import axios from "@/api/axios";
 import defaultImage from "@/assets/img_none.png";
 import { useAuthStore } from "@/stores/authStore";
 import heart1 from "@/assets/icons/heart1.svg";
@@ -50,28 +50,9 @@ const handleImageError = (event) => {
 // 코디 리스트 가져오기
 const fetchProducts = async () => {
   try {
-    const { data } = await axios.get(
-      "http://localhost:8081/api/main/codis/all"
-    );
+    const { data } = await axios.get("/api/main/codis/all");
     console.log("리스트", data);
     coordiList.value = data;
-    // 상품 ID 리스트 추출
-    // const productIds = products.value.map((product) => product.productId);
-    // 위시리스트 상태 확인
-    // const wishlistResponse = await axios.post(
-    //   `http://localhost:8081/api/main/checkBatch/${authStore.user.userId}`,
-    //   productIds
-    // );
-
-    // // 위시리스트에 포함된 상품 ID 가져오기
-    // wishlistItemIds.value = wishlistResponse.data.wishlistItemIds;
-    // console.log("wishlistItemIds", wishlistItemIds.value);
-
-    // // 상품 데이터에 wishlist 상태를 추가
-    // products.value = products.value.map((product) => ({
-    //   ...product,
-    //   wishlist: wishlistItemIds.value.includes(product.productId),
-    // }));
   } catch (error) {
     console.error("상품 데이터 조회 오류 발생:", error);
   }
