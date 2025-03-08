@@ -11,23 +11,25 @@
             <div class="carousel-item active" data-bs-interval="2000">
               <!-- 2초 뒤 변경 -->
               <img
-                src="@/assets/banner/main_sumnail1.png"
+                src="@/assets/banner/main_sumnail1.webp"
                 class="d-block w-100"
                 alt="..."
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
               <img
-                src="@/assets/banner/main_sumnail2.png"
+                src="@/assets/banner/main_sumnail2.webp"
                 class="d-block w-100"
                 alt="..."
+                loading="lazy"
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
               <img
-                src="@/assets/banner/main_sumnail3.png"
+                src="@/assets/banner/main_sumnail3.webp"
                 class="d-block w-100"
                 alt="..."
+                loading="lazy"
               />
             </div>
           </div>
@@ -60,8 +62,9 @@
           <router-link to="/main/category?type=outer">
             <img
               class="brand-image"
-              src="@/assets/category/outer.png"
+              src="@/assets/category/outer.webp"
               alt="브랜드 이미지"
+              loading="lazy"
             />
             <span class="brand-name">outer</span>
           </router-link>
@@ -70,8 +73,9 @@
           <router-link to="/main/category?type=top">
             <img
               class="brand-image"
-              src="@/assets/category/top.jpg"
+              src="@/assets/category/top.webp"
               alt="브랜드 이미지"
+              loading="lazy"
             />
             <div class="brand-name">top</div>
           </router-link>
@@ -80,8 +84,9 @@
           <router-link to="/main/category?type=bottom">
             <img
               class="brand-image"
-              src="@/assets/category/bottom1.jpg"
+              src="@/assets/category/bottom1.webp"
               alt="브랜드 이미지"
+              loading="lazy"
             />
             <div class="brand-name">bottom</div>
           </router-link>
@@ -90,8 +95,9 @@
           <router-link to="/main/category?type=bag">
             <img
               class="brand-image"
-              src="@/assets/category/bag1.png"
+              src="@/assets/category/bag1.webp"
               alt="브랜드 이미지"
+              loading="lazy"
             />
             <div class="brand-name">bag</div>
           </router-link>
@@ -100,8 +106,9 @@
           <router-link to="/main/category?type=shoes">
             <img
               class="brand-image"
-              src="@/assets/category/shoes.jpg"
+              src="@/assets/category/shoes.webp"
               alt="브랜드 이미지"
+              loading="lazy"
             />
             <div class="brand-name">shoes</div>
           </router-link>
@@ -127,6 +134,7 @@
                 class="codi-sumnail"
                 :src="encodedCodiImageUrl(codi.codiId)"
                 alt="코디 썸네일"
+                loading="lazy"
               />
             </router-link>
             <div class="codi-product" v-for="product in codi.products">
@@ -134,6 +142,7 @@
                 class="codi-product-img"
                 :src="encodedProductImageUrl(product.productId)"
                 alt="상품 썸네일"
+                loading="lazy"
               />
               <router-link :to="`/product/${product.productId}`">
                 <div class="codi-text">
@@ -149,9 +158,21 @@
       <div class="new-container">
         <p>NEW-IN</p>
         <div class="new-product-block">
-          <img class="new-product-img" src="@/assets/38_thumbnail.webp" />
-          <img class="new-product-img" src="@/assets/39_thumbnail.webp" />
-          <img class="new-product-img" src="@/assets/40_thumbnail.webp" />
+          <img
+            class="new-product-img"
+            src="@/assets/38_thumbnail.webp"
+            loading="lazy"
+          />
+          <img
+            class="new-product-img"
+            src="@/assets/39_thumbnail.webp"
+            loading="lazy"
+          />
+          <img
+            class="new-product-img"
+            src="@/assets/40_thumbnail.webp"
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
