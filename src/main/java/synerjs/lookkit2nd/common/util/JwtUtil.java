@@ -33,6 +33,9 @@ public class JwtUtil {
     }
 
     public Boolean isExpired(String token) {
+        if (token == null || token.isEmpty()) {
+            return true;
+        }
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 

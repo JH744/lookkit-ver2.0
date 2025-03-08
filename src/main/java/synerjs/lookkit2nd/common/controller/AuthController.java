@@ -39,7 +39,7 @@ public class AuthController {
         // JWT 생성
         String jwt = JwtUtil.createToken(SecurityContextHolder.getContext().getAuthentication());
         // JWT를 쿠키에 저장
-        var cookie = new Cookie("jwt", jwt);
+        var cookie = new Cookie("Authorization", jwt);
         cookie.setMaxAge(60 * 60 * 24); // 하루 유효
         cookie.setHttpOnly(true);
         cookie.setPath("/");
@@ -48,7 +48,7 @@ public class AuthController {
         CustomUser user = (CustomUser) auth.getPrincipal();
         // 반환 데이터
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("jwt", jwt); // JWT
+        responseBody.put("Authorization", jwt); // JWT
         responseBody.put("userId", user.getUserId());     // 사용자 ID
         responseBody.put("username", user.getUsername()); // 사용자 이름
         responseBody.put("roles", user.getAuthorities()); // 권한 정보
@@ -71,7 +71,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
         // JWT 쿠키를 삭제하기 위한 쿠키 설정
         System.out.println("로그아웃진행");
-        Cookie cookie = new Cookie("jwt", null);
+        Cookie cookie = new Cookie("Authorization", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(0); // 즉시 만료
