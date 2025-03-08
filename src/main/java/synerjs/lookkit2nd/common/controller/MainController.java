@@ -1,23 +1,26 @@
 package synerjs.lookkit2nd.common.controller;
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import synerjs.lookkit2nd.codi.CodiDTO;
 import synerjs.lookkit2nd.codi.CodiService;
 import synerjs.lookkit2nd.inquiry.dto.CodiProductDTO;
 import synerjs.lookkit2nd.product.ProductDTO;
 import synerjs.lookkit2nd.product.ProductService;
 import synerjs.lookkit2nd.wishlist.dto.WishlistRequestDTO;
-import synerjs.lookkit2nd.wishlist.dto.WishlistResponseDTO;
-import synerjs.lookkit2nd.wishlist.entity.Wishlist;
 import synerjs.lookkit2nd.wishlist.service.WishlistService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/main/")
