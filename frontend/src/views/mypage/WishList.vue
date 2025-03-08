@@ -73,7 +73,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import axios from "@/api/axios";
 import { useAuthStore } from "@/stores/authStore";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
@@ -112,7 +112,7 @@ const fetchImageForItem = async (item) => {
 const loadWishlist = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:8081/api/mypage/wishlist/${authStore.user.userId}`
+      `/api/mypage/wishlist/${authStore.user.userId}`
     );
 
     // 초기 데이터 설정

@@ -169,7 +169,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import axios from "@/api/axios";
 import { useAuthStore } from "@/stores/authStore";
 import { useModalStore } from "@/stores/modalStore";
 import { useConfirmModalStore } from "@/stores/modalStore";
@@ -195,9 +195,7 @@ onMounted(async () => {
   console.log("유저ID : ", id.value);
 
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/v1/userinfo/${id.value}`
-    );
+    const response = await axios.get(`/api/v1/userinfo/${id.value}`);
     Object.assign(userData.value, response.data);
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -232,14 +230,11 @@ const updatePassword = async () => {
     return;
   }
   try {
-    await axios.post(
-      `http://localhost:8081/api/v1/userinfo/${id.value}/change-password`,
-      {
-        currentPassword: currentPassword.value,
-        newPassword: newPassword.value,
-        confirmNewPassword: confirmPassword.value,
-      }
-    );
+    await axios.post(`/api/v1/userinfo/${id.value}/change-password`, {
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value,
+      confirmNewPassword: confirmPassword.value,
+    });
     modalStore.showModal(
       "개인정보수정",
       "비밀번호가 성공적으로 변경되었습니다."
@@ -263,10 +258,7 @@ const updatePassword = async () => {
 // 회원정보 업데이트 로직
 const updateProfile = async () => {
   try {
-    await axios.put(
-      `http://localhost:8081/api/v1/userinfo/${id.value}`,
-      userData.value
-    );
+    await axios.put(`/api/v1/userinfo/${id.value}`, userData.value);
     modalStore.showModal(
       "개인정보수정",
       "회원정보를 성공적으로 업데이트했습니다."
@@ -298,14 +290,11 @@ const checkEmailDuplicate = async () => {
   console.log("이메일 중복 확인 요청: ", userData.value.email);
 
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/v1/userinfo/check-email`,
-      {
-        params: {
-          email: userData.value.email,
-        },
-      }
-    );
+    const response = await axios.get(`/api/v1/userinfo/check-email`, {
+      params: {
+        email: userData.value.email,
+      },
+    });
     console.log(response.data); // 응답 데이터 로그 확인
     if (response.data.exists === true) {
       emailCheckResult.value.message = "이미 사용 중인 이메일입니다.";
@@ -344,29 +333,11 @@ const deleteAccount = async () => {
       deleteUser();
     }
   );
-  // const confirmation = confirm("정말 회원 탈퇴를 진행하시겠습니까?");
-  // if (confirmation) {
-  //   try {
-  //     await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
-  //     alert("회원 탈퇴가 완료되었습니다.");
-  //     modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
-  //     // 탈퇴 후 리다이렉트 동작 등 추가 가능
-  //     window.location.href = "/"; // 홈 페이지로 리다이렉트
-  //   } catch (error) {
-  //     console.error("Error deleting account:", error);
-  //     confirmModalStore.showModal(
-  //       "회원탈퇴",
-  //       "회원정보 업데이트에 실패했습니다. ",
-  //       "",
-  //       "확인"
-  //     );
-  //   }
-  // }
 };
 
 const deleteUser = async () => {
   try {
-    await axios.delete(`http://localhost:8081/api/v1/userinfo/${id.value}`);
+    await axios.delete(`/api/v1/userinfo/${id.value}`);
     modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
     // 탈퇴 후 리다이렉트 동작 등 추가 가능
 
@@ -938,8 +909,7 @@ const deleteUser = async () => {
 }
 
 .address-group {
-  display: grid
-;
-    gap: 5px;
+  display: grid;
+  gap: 5px;
 }
 </style>

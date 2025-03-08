@@ -40,7 +40,7 @@ import AuthenticationEmail from "./components/AuthenticationEmail.vue";
 import UpdatePassword from "./components/UpdatePassword.vue";
 import FindPassword from "./components/FindPasswordForm.vue";
 import { ref } from "vue";
-import axios from "axios";
+import axios from "@/api/axios";
 import FindResultModal from "./components/FindResultModal.vue";
 import { useModalStore, useConfirmModalStore } from "@/stores/modalStore";
 
@@ -86,7 +86,7 @@ const sendEmail = (data) => {
 const sendEmailVerification = async () => {
   await axios
     // .post("/api/mailsender", { userName: userName.value, email: email.value })
-    .post("http://localhost:8081/api/mailsender", {
+    .post("/api/mailsender", {
       userUuid: userUuid.value,
       email: email.value,
     })
