@@ -2,7 +2,11 @@
   <div class="pw-check-section">
     <div class="section-header">
       <h2>비밀번호 재입력</h2>
-      <img src="/images/close-button.png" @click="closeSection" class="close-button">
+      <img
+        src="/images/close-button.png"
+        @click="closeSection"
+        class="close-button"
+      />
     </div>
     <form @submit.prevent="verifyPassword" class="password-check-form">
       <span class="section-subtitle">
@@ -25,7 +29,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router"; // 라우터 임포트
-import axios from "axios";
+import axios from "@/api/axios";
 
 const emit = defineEmits(["close"]);
 const props = defineProps({
@@ -50,7 +54,7 @@ const verifyPassword = async () => {
 
   try {
     const response = await axios.post(
-      "http://localhost:8081/api/v1/mypage/verifyPassword",
+      "/api/v1/mypage/verifyPassword",
       {
         currentPassword: currentPassword.value,
       },
