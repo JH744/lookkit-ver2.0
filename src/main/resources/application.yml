@@ -97,7 +97,10 @@ server:
       force-response: true
       charset: UTF-8
 
-
+  compression:
+    enabled: true
+    mime-types: text/html, text/xml, text/plain, text/css, application/json, application/javascript, application/xml
+    min-response-size: 1024
 
 logging:
   level:

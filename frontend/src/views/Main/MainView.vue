@@ -14,6 +14,7 @@
                 src="@/assets/banner/main_sumnail1.webp"
                 class="d-block w-100"
                 alt="..."
+                
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
