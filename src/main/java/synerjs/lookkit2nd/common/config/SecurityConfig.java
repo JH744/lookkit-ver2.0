@@ -61,7 +61,7 @@ public class SecurityConfig {
         http  // URL 접근 권한 설정
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/**", "/auth/**", "/kakao-login", "/oauth2/**", "/product/**", "/common/**", "/main/**", "/error/**", "/fail/**", "/mailsender").permitAll()
+                .requestMatchers("/api/**", "/auth/**", "/kakao-login", "/oauth2/**", "/product/**", "/common/**", "/main/**", "/error/**", "/fail/**", "/mailsender","/").permitAll()
                 .requestMatchers("/cart", "/mypage").authenticated()
                 .anyRequest().authenticated()
         );
@@ -88,6 +88,9 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .requestMatchers("/*.html", "/html/**");
+                .requestMatchers("/*.html", "/html/**")
+         .requestMatchers("/assets/**"); // 정적 리소스 폴더
     }
+
+
 }

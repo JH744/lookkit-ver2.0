@@ -143,7 +143,7 @@ const handleLogin = async () => {
           userId: res.data.userId,
           role: res.data.roles[0].authority,
         };
-        authStore.setAuthData(res.data.jwt, userInfo);
+        authStore.setAuthData(res.data.Authorization, userInfo);
         // 아이디 저장 체크시 로그인완료된 아이디를 로컬스토리지에 저장
         if (isRememberId.value) {
           localStorage.setItem("savedId", username.value);
