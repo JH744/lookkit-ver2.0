@@ -34,7 +34,7 @@ spring:
       hibernate:
         format_sql: false
         use_sql_comments: true
-        generate_statistics: true
+        generate_statistics: false
   jwt:
     secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
   security:

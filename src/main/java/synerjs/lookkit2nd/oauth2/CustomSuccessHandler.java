@@ -54,7 +54,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 쿠키에 JWT토큰 저장 후 응답
         response.addCookie(createCookie("Authorization", jwtToken));
-        response.sendRedirect(domainUri);
+        response.sendRedirect(domainUri); // 토큰 쿠키발급 후 메인페이지 redirect
     }
 
     // 쿠키 생성

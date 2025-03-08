@@ -2,13 +2,16 @@ package synerjs.lookkit2nd.common.controller;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +28,7 @@ import synerjs.lookkit2nd.user.UserService;
 public class AuthController {
     private final UserService userService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
@@ -34,10 +37,23 @@ public class AuthController {
                 data.get("username"), data.get("password")
         );
         // 인증 수행
-        Authentication auth = authenticationManagerBuilder.getObject().authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 유저네임 추출
+        CustomUser customUser =(CustomUser)authentication.getPrincipal();
+        String username = customUser.getUsername();
+
+        // 유저 ROLE 추출
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+        String role = auth.getAuthority();
+
+
         // JWT 생성
-        String jwt = JwtUtil.createToken(SecurityContextHolder.getContext().getAuthentication());
+        String jwt = jwtUtil.createJwt(username, role, 60*60*60L);
+
         // JWT를 쿠키에 저장
         var cookie = new Cookie("Authorization", jwt);
         cookie.setMaxAge(60 * 60 * 24); // 하루 유효
@@ -45,13 +61,12 @@ public class AuthController {
         cookie.setPath("/");
         response.addCookie(cookie);
         // 사용자 정보 가져오기(CustomUser 사용)
-        CustomUser user = (CustomUser) auth.getPrincipal();
         // 반환 데이터
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("Authorization", jwt); // JWT
-        responseBody.put("userId", user.getUserId());     // 사용자 ID
-        responseBody.put("username", user.getUsername()); // 사용자 이름
-        responseBody.put("roles", user.getAuthorities()); // 권한 정보
+        responseBody.put("userId", customUser.getUserId());     // 사용자 ID
+        responseBody.put("username", customUser.getUsername()); // 사용자 이름
+        responseBody.put("roles", customUser.getAuthorities()); // 권한 정보
         return ResponseEntity.ok(responseBody);
     }
 
