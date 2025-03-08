@@ -49,28 +49,4 @@ public class JwtUtil {
             .compact();
     }
 
-    //밑에는 일반로그인 jwt 방식구현을 위한 로직. 현재 분리되어있지만 합칠 예정
-    // 해싱키 설정하기
-    static final SecretKey key =
-        Keys.hmacShaKeyFor(Decoders.BASE64.decode(
-            "jwtpassword123jwtpassword123jwtpassword123jwtpassword123jwtpassword"
-        ));
-
-    // JWT 생성 매서드
-    public static String createToken(Authentication auth) {
-        CustomUser user =(CustomUser)auth.getPrincipal();
-        user.getAuthorities().stream().map(data->data.getAuthority()).collect(Collectors.joining(","));
-
-
-        String jwt = Jwts.builder()
-            .claim("username", user.getUsername())
-            .claim("userId", user.getUserId())
-            .claim("authorities", user.getAuthorities())
-            .issuedAt(new Date(System.currentTimeMillis()))
-            .expiration(new Date(System.currentTimeMillis() + 60000))
-            .signWith(key) //해싱 키 삽입
-            .compact();
-        return jwt;
-    }
-
 }
