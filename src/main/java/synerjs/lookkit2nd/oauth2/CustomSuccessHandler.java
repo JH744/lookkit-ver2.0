@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -22,6 +23,9 @@ import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+
+    @Value("${DOMAIN_URI}")
+    private String domainUri;
 
     // 인증 성공시 jwt토큰을 쿠키로 발급함
     @Override
@@ -50,7 +54,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 쿠키에 JWT토큰 저장 후 응답
         response.addCookie(createCookie("Authorization", jwtToken));
-        response.sendRedirect("http://localhost:3000/");
+        response.sendRedirect(domainUri);
     }
 
     // 쿠키 생성
