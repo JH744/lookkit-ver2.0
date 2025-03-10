@@ -19,6 +19,7 @@ public class InquiryResponseDTO {
     private String inquiryContents;
     private LocalDateTime inquiryCreatedAt;
     private String answerState;
+    @Builder.Default
     private List<InquiryImageDTO> inquiryImages = new ArrayList<>();
 
     public static InquiryResponseDTO fromEntity(Inquiry inquiry, List<InquiryImageDTO> inquiryImages) {
