@@ -36,7 +36,7 @@ spring:
         use_sql_comments: true
         generate_statistics: false
   jwt:
-    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+    secret: ${SECRET_KEY}
   security:
     oauth2:
       client:
