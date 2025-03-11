@@ -38,4 +38,4 @@ jobs:
             echo "Gradle 빌드 시작..."
             ./gradlew clean build -x test
             sudo fuser -k -n tcp 8081 || true 
-            nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
+            nohup java -jar build/libs/lookkit2nd-0.0.1-SNAPSHOT.jar > ./output.log 2>&1 &
