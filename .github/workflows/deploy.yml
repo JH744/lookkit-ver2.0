@@ -30,7 +30,9 @@ jobs:
             if [ -f frontend/src/firebase/firebaseConfig.js ]; then
               rm -rf frontend/src/firebase/firebaseConfig.js
             fi
-   
+            
+            rm -rf src/main/resources/application.yml
+            
             git pull origin main
             echo "$APPLICATION_PROPERTIES" > src/main/resources/application.yml
             echo "$AXIOS_BASEURL" > frontend/src/api/axios.js
