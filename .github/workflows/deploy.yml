@@ -12,8 +12,8 @@ jobs:
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         env:
-          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }},
-          AXIOS_BASEURL: ${{ secrets.AXIOS_BASEURL }},
+          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
+          AXIOS_BASEURL: ${{ secrets.AXIOS_BASEURL }}
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         with:
           host: ${{ secrets.EC2_HOST }} # EC2의 주소
