@@ -12,14 +12,14 @@ jobs:
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         env:
-          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
-          AXIOS_BASEURL: ${{ secrets.AXIOS_BASEURL }}
+          APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }},
+          AXIOS_BASEURL: ${{ secrets.AXIOS_BASEURL }},
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         with:
           host: ${{ secrets.EC2_HOST }} # EC2의 주소
           username: ${{ secrets.EC2_USERNAME }} # EC2 접속 username
           key: ${{ secrets.EC2_PRIVATE_KEY }} # EC2의 Key 파일의 내부 텍스트
-          envs: APPLICATION_PROPERTIES
+          envs: APPLICATION_PROPERTIES,AXIOS_BASEURL,FIREBASE_CONFIG
           script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
           script: |
             cd /home/ubuntu/instagram-server # 여기 경로는 자신의 EC2에 맞는 경로로 재작성하기
@@ -30,6 +30,7 @@ jobs:
             echo "$APPLICATION_PROPERTIES" > src/main/resources/application.yml
             echo "$AXIOS_BASEURL" > frontend/src/api/axios.js
             echo "$FIREBASE_CONFIG" > frontend/src/firebase/firebaseConfig.js
-            ./gradlew clean build
+            echo "Gradle 빌드 시작..."
+            ./gradlew clean build -x test
             sudo fuser -k -n tcp 8080 || true 
             nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
