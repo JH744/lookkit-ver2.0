@@ -22,7 +22,7 @@ jobs:
           envs: APPLICATION_PROPERTIES,AXIOS_BASEURL,FIREBASE_CONFIG
           script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
           script: |
-            cd /home/ubuntu/lookkit-2.0-server # 여기 경로는 자신의 EC2에 맞는 경로로 재작성하기
+            cd /home/ubuntu/lookkit-2.0 # 여기 경로는 자신의 EC2에 맞는 경로로 재작성하기
             rm -rf src/main/resources/application.yml
             rm -rf frontend/src/api/axios.js
             rm -rf frontend/src/firebase/firebaseConfig.js
@@ -32,5 +32,5 @@ jobs:
             echo "$FIREBASE_CONFIG" > frontend/src/firebase/firebaseConfig.js
             echo "Gradle 빌드 시작..."
             ./gradlew clean build -x test
-            sudo fuser -k -n tcp 8080 || true 
+            sudo fuser -k -n tcp 8081 || true 
             nohup java -jar build/libs/*SNAPSHOT.jar > ./output.log 2>&1 &
