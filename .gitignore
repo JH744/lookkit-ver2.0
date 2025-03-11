@@ -41,3 +41,6 @@ out/
 
 # Ignore Firebase service account key file
 src/main/resources/serviceAccountKey.json
+
+
+application.yml
