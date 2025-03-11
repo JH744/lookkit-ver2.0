@@ -9,24 +9,27 @@
         >
           <div class="carousel-inner">
             <div class="carousel-item active" data-bs-interval="2000">
+              <!-- 2초 뒤 변경 -->
               <img
-                src="@/assets/banner/main_sumnail1.png"
+                src="@/assets/banner/main_sumnail1.webp"
                 class="d-block w-100"
                 alt="..."
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
               <img
-                src="@/assets/banner/main_sumnail2.png"
+                src="@/assets/banner/main_sumnail2.webp"
                 class="d-block w-100"
                 alt="..."
+                loading="lazy"
               />
             </div>
             <div class="carousel-item" data-bs-interval="2000">
               <img
-                src="@/assets/banner/main_sumnail3.png"
+                src="@/assets/banner/main_sumnail3.webp"
                 class="d-block w-100"
                 alt="..."
+                loading="lazy"
               />
             </div>
           </div>
@@ -56,96 +59,177 @@
       <div class="section-title">SELECT LOOK KIT</div>
       <div class="brand-container">
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/outer.png"
-            alt="브랜드 이미지"
-          />
-          <span class="brand-name">outer</span>
+          <router-link to="/main/category?type=outer">
+            <img
+              class="brand-image"
+              src="@/assets/category/outer.webp"
+              alt="브랜드 이미지"
+              loading="lazy"
+            />
+            <span class="brand-name">outer</span>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/top.jpg"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">top</div>
+          <router-link to="/main/category?type=top">
+            <img
+              class="brand-image"
+              src="@/assets/category/top.webp"
+              alt="브랜드 이미지"
+              loading="lazy"
+            />
+            <div class="brand-name">top</div>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/bottom1.jpg"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">bottom</div>
+          <router-link to="/main/category?type=bottom">
+            <img
+              class="brand-image"
+              src="@/assets/category/bottom1.webp"
+              alt="브랜드 이미지"
+              loading="lazy"
+            />
+            <div class="brand-name">bottom</div>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/category/bag1.png"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">bag</div>
+          <router-link to="/main/category?type=bag">
+            <img
+              class="brand-image"
+              src="@/assets/category/bag1.webp"
+              alt="브랜드 이미지"
+              loading="lazy"
+            />
+            <div class="brand-name">bag</div>
+          </router-link>
         </div>
         <div class="brand-image-container">
-          <img
-            class="brand-image"
-            src="@/assets/c1_item1.jpg"
-            alt="브랜드 이미지"
-          />
-          <div class="brand-name">shoes</div>
+          <router-link to="/main/category?type=shoes">
+            <img
+              class="brand-image"
+              src="@/assets/category/shoes.webp"
+              alt="브랜드 이미지"
+              loading="lazy"
+            />
+            <div class="brand-name">shoes</div>
+          </router-link>
         </div>
       </div>
+
       <!-- 코디상품리스트 -->
       <div class="codi-container">
         <div class="codi-title">
-          <span class="circle"></span>
-          <span class="codi-text">BEST CODI</span>
-          <span class="view-more">+ VIEW MORE</span>
+          <div class="codi-title-box">
+            <span class="circle"></span>
+            <span class="codi-text">BEST CODI</span>
+          </div>
+          <router-link to="main/coordi">
+            <span class="view-more">+ VIEW MORE</span>
+          </router-link>
         </div>
         <div class="codi-main-container">
           <!--코디&상품 반복 시작-->
-          <!-- <div th:each="codi:${coordiList}" class="codi-block">
-            <img
-              class="codi-sumnail"
-              th:src="@{'/images/coordi/0' + ${codi.codiId} + '/' + ${codi.codiId} + '_thumbnail.webp'}"
-              alt="코디 썸네일"
-            />
-            <div class="codi-product" th:each="product : ${codi.products}">
+          <div v-for="(codi, index) in codiList" class="codi-block">
+            <router-link :to="`/codi/${codi.codiId}`">
+              <img
+                class="codi-sumnail"
+                :src="encodedCodiImageUrl(codi.codiId)"
+                alt="코디 썸네일"
+                loading="lazy"
+              />
+            </router-link>
+            <div class="codi-product" v-for="product in codi.products">
               <img
                 class="codi-product-img"
-                th:src="@{'/images/products/0' + ${product.productId} + '/'+ ${product.productThumbnail}}"
-                alt="코디 썸네일"
+                :src="encodedProductImageUrl(product.productId)"
+                alt="상품 썸네일"
+                loading="lazy"
               />
-              <a th:href="@{|/product/${product.productId}|}">
+              <router-link :to="`/product/${product.productId}`">
                 <div class="codi-text">
-                  <p th:text="${product.productName}">DIEMME</p>
-                  <p th:text="${product.productPrice}">
-                    FOUND TIE FRONT PANT (BLACK)
-                  </p>
+                  <p>{{ product.productName }}</p>
+                  <p>{{ product.productPrice }}</p>
                 </div>
-              </a>
+              </router-link>
             </div>
-          </div> -->
+          </div>
           <!--반복 끝-->
         </div>
       </div>
       <div class="new-container">
         <p>NEW-IN</p>
         <div class="new-product-block">
-          <img class="new-product-img" src="@/assets/38_thumbnail.webp" />
-          <img class="new-product-img" src="@/assets/39_thumbnail.webp" />
-          <img class="new-product-img" src="@/assets/40_thumbnail.webp" />
+          <img
+            class="new-product-img"
+            src="@/assets/38_thumbnail.webp"
+            loading="lazy"
+          />
+          <img
+            class="new-product-img"
+            src="@/assets/39_thumbnail.webp"
+            loading="lazy"
+          />
+          <img
+            class="new-product-img"
+            src="@/assets/40_thumbnail.webp"
+            loading="lazy"
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: "MainView",
-};
+<script setup>
+import { onMounted, ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import axios from "@/api/axios";
+
+const router = useRouter();
+const codiList = ref([]);
+const imageBaseUrl = ref(
+  "https://firebasestorage.googleapis.com/v0/b/test-24a07.appspot.com/o/lookkit"
+);
+
+const encodedCodiImageUrl = computed(() => {
+  return (codiId) => {
+    const folderPath = `/codi/0${codiId}`;
+    const fileName = `/${codiId}_thumbnail.webp`;
+    const encodedPath = `${encodeURIComponent(folderPath)}${encodeURIComponent(
+      fileName
+    )}`;
+    return `${imageBaseUrl.value}${encodedPath}?alt=media`;
+  };
+});
+
+const encodedProductImageUrl = computed(() => {
+  return (productId) => {
+    const folderPath = `/products/0${productId}`;
+    const fileName = `/${productId}_thumbnail.webp`;
+    const encodedPath = `${encodeURIComponent(folderPath)}${encodeURIComponent(
+      fileName
+    )}`;
+    return `${imageBaseUrl.value}${encodedPath}?alt=media`;
+  };
+});
+
+onMounted(async () => {
+  // 어드민계정 페이지전환
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  if (auth?.user?.role === "ROLE_ADMIN") {
+    console.log("어드민계정");
+    router.push("/admin/dashboard");
+    return;
+  }
+  try {
+    const response = await axios.get("/api/main/codiset");
+    codiList.value = response.data;
+    console.log("코디 리스트:", codiList.value);
+    console.log("코디 데이터0:", codiList.value[0]);
+    console.log("코디 데이터0의 상품리스트:", codiList.value[0].products);
+  } catch (error) {
+    console.error("코디 데이터 조회 실패:", error);
+  }
+});
 </script>
 
 <style scoped>
@@ -268,6 +352,10 @@ export default {
 .codi-text {
   font-size: 16px;
   font-weight: bold;
+
+  p {
+    padding-bottom: 4px;
+  }
 }
 
 .codi-sumnail {
@@ -285,17 +373,19 @@ export default {
 .codi-product {
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 
 .codi-product-img {
   width: 50px;
-  height: 50px;
+  height: 55px;
 }
 
 .codi-block {
   display: flex;
   flex-direction: column;
   justify-items: center;
+  gap: 3px;
 }
 
 .codi-text p {
@@ -333,5 +423,9 @@ export default {
   display: flex;
   justify-content: space-between;
   gap: 25px;
+}
+
+.codi-title-box {
+  display: flex;
 }
 </style>

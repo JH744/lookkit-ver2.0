@@ -40,6 +40,13 @@ dependencies {
 	implementation 'io.github.cdimascio:dotenv-java:2.2.4'
 	implementation 'org.springframework:spring-context-support:5.3.24'
 	implementation 'javax.mail:mail:1.4.7'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	implementation 'io.jsonwebtoken:jjwt-gson:0.12.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5' // or jjwt-gson
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 }
 
 tasks.named('test') {

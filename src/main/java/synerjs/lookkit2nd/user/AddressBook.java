@@ -15,7 +15,7 @@ public class AddressBook {
     private Long addressId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "USER_ID")
     private User user;
 
     private String addressName;

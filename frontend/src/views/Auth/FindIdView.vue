@@ -1,4 +1,11 @@
 <template>
+  <div v-if="isShowModal">
+    <FindResultModal
+      @onCloseModal="HandleShowModal"
+      :resultMessage="resultMessage"
+      ><p>아이디 찾기 완료</p>
+    </FindResultModal>
+  </div>
   <div class="findIdContainer">
     <div class="findIdTitle">
       <img src="@/assets/logos/Logo2.png" width="300px" />
@@ -8,6 +15,11 @@
         <div class="tabActive">
           <div class="tabTextActive">아이디찾기</div>
         </div>
+      </div>
+      <div class="error-text-box">
+        <span v-if="isFail" class="error-text"
+          >조회되는 아이디가 없습니다.</span
+        >
       </div>
       <form
         action="/auth/findID"
@@ -19,23 +31,63 @@
         <input
           class="formInput"
           placeholder="이름을 입력해 주세요"
-          name="name"
+          v-model="userName"
         />
         <div class="formLabel">이메일</div>
         <input
           class="formInput"
           placeholder="이메일을 입력해 주세요"
-          name="email"
+          v-model="email"
         />
-        <div id="findIdBtn" class="buttonContainer">확인</div>
-        <!--            <span class="notice-label">* 일치하는 아이디가 없습니다.</span>-->
+        <div id="findIdBtn" class="buttonContainer" @click="HandleFindId">
+          확인
+        </div>
       </form>
     </div>
   </div>
 </template>
 
-<script>
-export default { name: "FindIdView", setup() {}, data() {} };
+<script setup>
+import FindResultModal from "./components/FindResultModal.vue";
+import { ref } from "vue";
+import axios from "@/api/axios";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const isShowModal = ref(false);
+const userName = ref("");
+const email = ref("");
+const userId = ref("");
+const isFail = ref("");
+const resultMessage = ref("");
+
+// 모달창 오픈 토글이벤트
+const HandleShowModal = () => {
+  isShowModal.value = !isShowModal.value;
+};
+
+const HandleFindId = async () => {
+  try {
+    const response = await axios
+      .post(
+        "/api/users/find/id",
+        {
+          userName: userName.value,
+          email: email.value,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log("res", res);
+        userId.value = res.data; //서버에서 받아온 아이디를 저장
+        HandleShowModal(); // 모달창 오픈해 아이디를 표시
+        isFail.value = false;
+        resultMessage.value = `${userName.value}님의 아이디는 ${res.data}입니다.`; // 유저에게 보여줄 조회결과 텍스트 작성
+      });
+  } catch (error) {
+    console.log("error", error);
+    isFail.value = true;
+  }
+};
 </script>
 
 <style scoped>
@@ -118,10 +170,10 @@ body {
 }
 
 .formContainer {
-  padding: calc(31.5px * 1.2) 20px 24px 20px;
+  padding: calc(16.5px * 1.2) 20px 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: var(--item-spacing-115, 11.5px);
+  gap: var(--item-spacing-115, 3.5px);
   align-items: flex-start;
   justify-content: flex-start;
   align-self: stretch;
@@ -132,7 +184,7 @@ body {
   color: var(--wwwkurlycom-mine-shaft, #333333);
   text-align: left;
   font-family: "NotoSansKr-Thin", sans-serif;
-  font-size: var(--font-size-14, 16px);
+  font-size: var(--font-size-14, 18px);
   line-height: var(--line-height-19, 19px);
   font-weight: var(--opacity-100, 400);
   position: relative;
@@ -149,6 +201,7 @@ body {
   padding: 10px;
   display: flex;
   flex-direction: row;
+  margin-bottom: 18px;
   gap: 0px;
   align-items: flex-start;
   justify-content: center;
@@ -159,6 +212,11 @@ body {
   overflow: hidden;
   font-size: 18px;
 }
+
+.formInput::placeholder {
+  font-size: 18px;
+}
+
 .inputContainer {
   display: flex;
   flex-direction: column;
@@ -169,34 +227,7 @@ body {
   position: relative;
   overflow: hidden;
 }
-.inputPlaceholder {
-  color: var(--color-grey-46, #757575);
-  text-align: left;
-  font-family: var(
-    --wwwkurlycom-semantic-input-font-family,
-    "NotoSansKr-Thin",
-    sans-serif
-  );
-  font-size: var(--wwwkurlycom-semantic-input-font-size, 16px);
-  font-weight: var(--wwwkurlycom-semantic-input-font-weight, 100);
-  position: relative;
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-.inputPlaceholderSecondary {
-  color: var(--color-grey-46, #757575);
-  text-align: left;
-  font-family: "NotoSansKr-Thin", sans-serif;
-  font-size: var(--font-size-18, 18px);
-  font-weight: var(--opacity-100, 400);
-  position: relative;
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
+
 .buttonContainer {
   background: #dddddd;
   border-radius: 4px;
@@ -209,6 +240,7 @@ body {
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  margin-top: 10px;
 }
 .buttonContainer:hover {
   background: #0d1134;
@@ -240,5 +272,14 @@ body {
 
 .notice-label {
   display: none;
+}
+
+.error-text-box {
+  margin-top: 14px;
+  height: 14px;
+}
+.error-text {
+  color: #ff294f;
+  font-size: 14px;
 }
 </style>

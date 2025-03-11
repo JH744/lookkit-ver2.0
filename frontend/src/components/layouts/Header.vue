@@ -2,8 +2,15 @@
   <div class="header">
     <div class="headerWrapper">
       <div class="navBox1">
-        <router-link to="/main" class="logo">LOOK KIT</router-link>
+        <router-link to="/main">
+          <img class="logo" src="/src/assets/logos/Logo1.png" />
+        </router-link>
         <ul class="navMenu">
+          <li>
+            <router-link to="/main/category?type=all" class="menu"
+              >ALL</router-link
+            >
+          </li>
           <li>
             <router-link to="/main/category?type=outer" class="menu"
               >OUTER</router-link
@@ -38,15 +45,19 @@
       </div>
       <div class="navBox2">
         <div class="searchBox">
-          <input id="searchInputEl" class="searchInput" />
-          <span class="searchBtn">
+          <input
+            id="searchInputEl"
+            class="searchInput"
+            v-model="inputKeyword"
+          />
+          <span class="searchBtn" @click="goToSearch">
             <img src="@/assets/icons/search.png" />
           </span>
         </div>
 
         <div class="navIcon">
           <!-- 비로그인시 로그인버튼 노출-->
-          <div id="LoginBtn" class="iconBtn">
+          <div id="LoginBtn" class="iconBtn" v-if="!authStore.isLoggedIn">
             <router-link to="/auth/login" class="btn-a">
               <img
                 src="@/assets/icons/login.png"
@@ -58,17 +69,16 @@
             </router-link>
           </div>
           <!-- 로그인시 로그아웃버튼 노출-->
-          <!-- <div id="LogoutBtn" class="iconBtn" sec:authorize="isAuthenticated()">
-            <a th:href="@{/logout}" class="btn-a">
+          <div id="LogoutBtn" class="iconBtn" v-if="authStore.isLoggedIn">
+            <div class="btn-a logout-btn" @click="logout">
               <img
                 src="@/assets/icons/logout.png"
                 class="simptip-position-top"
-                data-tooltip="Logout"
                 width="26px"
               />
               <p class="btn-text">LOG OUT</p>
-            </a>
-          </div> -->
+            </div>
+          </div>
           <div class="iconBtn">
             <router-link to="/mypage/manage" class="btn-a">
               <img
@@ -96,8 +106,39 @@
   </div>
 </template>
 
-<script>
-export default {};
+<script setup>
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import axios from "@/api/axios";
+
+const authStore = useAuthStore();
+const router = useRouter();
+const inputKeyword = ref("");
+
+const goToSearch = () => {
+  let keyword = inputKeyword.value;
+  inputKeyword.value = "";
+  router.push(`/main/search?keyword=${keyword}`);
+};
+
+const logout = async () => {
+  try {
+    //로그아웃-서버
+    await axios.post("/api/auth/logout", null, {
+      withCredentials: true, // 쿠키 전송 허용
+    });
+
+    //로그아웃-프론트
+    // document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";프론트단에서 세션 무효화
+    authStore.clearAuthData();
+    localStorage.removeItem("auth");
+    // 로그아웃 후 리다이렉트
+    router.push("/auth/login");
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
+  }
+};
 </script>
 
 <style scoped>
@@ -106,7 +147,7 @@ export default {};
 .header,
 .header * {
   box-sizing: border-box;
-  width: 100%;
+  /* width: 100%; */
 }
 .header {
   height: 95px;
@@ -123,7 +164,7 @@ export default {};
 }
 .navBox1 {
   display: flex;
-  gap: 100px;
+  gap: 65px;
   align-items: center;
   flex-basis: 60%; /* 헤더의 60% 차지 */
 }
@@ -146,11 +187,12 @@ export default {};
 }
 
 .logo {
-  color: #232b6e;
+  /* color: #232b6e;
   font-size: 28px;
   font-weight: 700;
   min-width: fit-content;
-  max-width: fit-content;
+  max-width: fit-content; */
+  width: 160px;
 }
 .menu {
   color: #000000;
@@ -197,7 +239,7 @@ export default {};
   width: fit-content;
 }
 
-.LogoutBtn {
+#LogoutBtn {
   cursor: pointer;
 }
 
@@ -214,5 +256,9 @@ export default {};
   justify-items: center;
   gap: 6px;
   width: max-content;
+}
+
+.navMenu a:hover {
+  border-bottom: 3px solid rgb(45, 43, 43);
 }
 </style>

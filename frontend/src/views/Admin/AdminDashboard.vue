@@ -2,7 +2,7 @@
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand-->
     <a class="navbar-brand ps-3" th:href="@{/admin/dashboard}">ADMIN PAGE</a>
-    <!-- Sidebar Toggle-->
+
     <button
       class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
       id="sidebarToggle"
@@ -39,15 +39,6 @@
           aria-expanded="false"
           ><i class="fas fa-user fa-fw"></i
         ></a>
-        <ul
-          class="dropdown-menu dropdown-menu-end"
-          aria-labelledby="navbarDropdown"
-        >
-          <li><a class="dropdown-item" href="#!">Settings</a></li>
-          <li><a class="dropdown-item" href="#!">Activity Log</a></li>
-          <li><hr class="dropdown-divider" /></li>
-          <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
-        </ul>
       </li>
     </ul>
   </nav>
@@ -56,137 +47,22 @@
       <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
           <div class="nav">
-            <div class="sb-sidenav-menu-heading">Core</div>
-            <a class="nav-link" th:href="@{/admin/dashboard}">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              Dashboard
-            </a>
-            <div class="sb-sidenav-menu-heading">Interface</div>
-            <a
-              class="nav-link collapsed"
-              href="#"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseLayouts"
-              aria-expanded="false"
-              aria-controls="collapseLayouts"
-            >
-              <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-              Layouts
-              <div class="sb-sidenav-collapse-arrow">
-                <i class="fas fa-angle-down"></i>
-              </div>
-            </a>
-            <div
-              class="collapse"
-              id="collapseLayouts"
-              aria-labelledby="headingOne"
-              data-bs-parent="#sidenavAccordion"
-            >
-              <nav class="sb-sidenav-menu-nested nav">
-                <a class="nav-link" href="layout-static.html"
-                  >Static Navigation</a
-                >
-                <a class="nav-link" href="layout-sidenav-light.html"
-                  >Light Sidenav</a
-                >
-              </nav>
-            </div>
-            <a
-              class="nav-link collapsed"
-              href="#"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapsePages"
-              aria-expanded="false"
-              aria-controls="collapsePages"
-            >
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-book-open"></i>
-              </div>
-              Pages
-              <div class="sb-sidenav-collapse-arrow">
-                <i class="fas fa-angle-down"></i>
-              </div>
-            </a>
-            <div
-              class="collapse"
-              id="collapsePages"
-              aria-labelledby="headingTwo"
-              data-bs-parent="#sidenavAccordion"
-            >
-              <nav
-                class="sb-sidenav-menu-nested nav accordion"
-                id="sidenavAccordionPages"
-              >
-                <a
-                  class="nav-link collapsed"
-                  href="#"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#pagesCollapseAuth"
-                  aria-expanded="false"
-                  aria-controls="pagesCollapseAuth"
-                >
-                  Authentication
-                  <div class="sb-sidenav-collapse-arrow">
-                    <i class="fas fa-angle-down"></i>
-                  </div>
-                </a>
-                <div
-                  class="collapse"
-                  id="pagesCollapseAuth"
-                  aria-labelledby="headingOne"
-                  data-bs-parent="#sidenavAccordionPages"
-                >
-                  <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="login.html">Login</a>
-                    <a class="nav-link" href="register.html">Register</a>
-                    <a class="nav-link" href="password.html">Forgot Password</a>
-                  </nav>
-                </div>
-                <a
-                  class="nav-link collapsed"
-                  href="#"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#pagesCollapseError"
-                  aria-expanded="false"
-                  aria-controls="pagesCollapseError"
-                >
-                  Error
-                  <div class="sb-sidenav-collapse-arrow">
-                    <i class="fas fa-angle-down"></i>
-                  </div>
-                </a>
-                <div
-                  class="collapse"
-                  id="pagesCollapseError"
-                  aria-labelledby="headingOne"
-                  data-bs-parent="#sidenavAccordionPages"
-                >
-                  <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="401.html">401 Page</a>
-                    <a class="nav-link" href="404.html">404 Page</a>
-                    <a class="nav-link" href="500.html">500 Page</a>
-                  </nav>
-                </div>
-              </nav>
-            </div>
-            <div class="sb-sidenav-menu-heading">Addons</div>
-            <a class="nav-link" href="charts.html">
-              <div class="sb-nav-link-icon">
-                <i class="fas fa-chart-area"></i>
-              </div>
-              Charts
-            </a>
-            <a class="nav-link" th:href="@{/admin/orderStatus}">
+            <div class="sb-sidenav-menu-heading">Menu</div>
+
+            <router-link class="nav-link" to="/admin/order/status">
               <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
               주문현황
-            </a>
+            </router-link>
           </div>
         </div>
         <div class="sb-sidenav-footer">
-          <div class="small">Logged in as:</div>
-          Start Bootstrap
+          <div class="small">관리자로 로그인됨</div>
+          <button
+            class="btn btn-outline-light btn-sm mt-2 w-100"
+            @click="handleLogout"
+          >
+            로그아웃
+          </button>
         </div>
       </nav>
     </div>
@@ -197,7 +73,7 @@
           <ol class="breadcrumb mb-4">
             <li class="breadcrumb-item active">Dashboard</li>
           </ol>
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-xl-3 col-md-6">
               <div class="card bg-primary text-white mb-4">
                 <div class="card-body">Primary Card</div>
@@ -258,13 +134,13 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="row">
             <div class="col-xl-6">
               <div class="card mb-4">
                 <div class="card-header">
                   <i class="fas fa-chart-area me-1"></i>
-                  Area Chart Example
+                  월 매출액
                 </div>
                 <div class="card-body">
                   <canvas id="myAreaChart" width="100%" height="40"></canvas>
@@ -275,7 +151,7 @@
               <div class="card mb-4">
                 <div class="card-header">
                   <i class="fas fa-chart-bar me-1"></i>
-                  Bar Chart Example
+                  월 누적이익
                 </div>
                 <div class="card-body">
                   <canvas id="myBarChart" width="100%" height="40"></canvas>
@@ -289,7 +165,7 @@
               1:1 문의현황
             </div>
             <div class="card-body">
-              <table id="datatablesSimple">
+              <table class="table table-striped">
                 <thead>
                   <tr>
                     <th>문의번호</th>
@@ -302,49 +178,80 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr th:each="list :${inquiryList}">
-                    <td th:text="|${list.inquiryId}|">교환번호</td>
-                    <!-- inquiryTitle 출력 -->
+                  <tr
+                    v-for="inquiry in paginatedInquiries"
+                    :key="inquiry.inquiryId"
+                  >
                     <td>
-                      <a
-                        class="answer-link"
-                        th:text="${list.userUuid}"
-                        th:href="@{/admin/answer/{inquiryId}(inquiryId=${list.inquiryId})}"
-                        >user11</a
-                      >
+                      {{ inquiry.inquiryId }}
                     </td>
-                    <!-- userUuid 출력 -->
+                    <td>{{ inquiry.userUuid }}</td>
                     <td>
-                      <a
-                        class="answer-link"
-                        th:text="${list.inquiryTitle}"
-                        th:href="@{/admin/answer/{inquiryId}(inquiryId=${list.inquiryId})}"
-                        >교환문의</a
-                      >
+                      <RouterLink :to="`/admin/inquiry/${inquiry.inquiryId}`">
+                        {{ inquiry.inquiryTitle }}
+                      </RouterLink>
                     </td>
-                    <!-- inquiryTitle 출력 -->
                     <td>
-                      <a
-                        class="answer-link"
-                        th:text="${list.inquiryContents}"
-                        th:href="@{/admin/answer/{inquiryId}(inquiryId=${list.inquiryId})}"
-                        >교환 가능할까요</a
-                      >
+                      <RouterLink :to="`/admin/inquiry/${inquiry.inquiryId}`">
+                        {{ inquiry.inquiryContents }}
+                      </RouterLink>
                     </td>
-                    <!-- inquiryContents 출력 -->
-                    <td
-                      th:text="${#temporals.format(list.inquiryCreatedAt, 'yyyy/MM/dd')}"
-                    >
-                      2024/11/04
+                    <td>
+                      {{
+                        new Date(inquiry.inquiryCreatedAt).toLocaleDateString(
+                          "ko-KR"
+                        )
+                      }}
                     </td>
-                    <!-- inquiryCreatedAt 날짜 형식 -->
-                    <td th:text="|${list.answerState}|">N</td>
-                    <!-- answerState 출력 -->
+                    <td>{{ inquiry.answerState }}</td>
                     <td>삭제</td>
-                    <!-- answerState 출력 -->
                   </tr>
                 </tbody>
               </table>
+
+              <!-- 페이지네이션 컴포넌트 추가 -->
+              <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === 1 }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="changePage(currentPage - 1)"
+                    >
+                      이전
+                    </a>
+                  </li>
+                  <li
+                    v-for="page in totalPages"
+                    :key="page"
+                    class="page-item"
+                    :class="{ active: currentPage === page }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="changePage(page)"
+                    >
+                      {{ page }}
+                    </a>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === totalPages }"
+                  >
+                    <a
+                      class="page-link"
+                      href="#"
+                      @click.prevent="changePage(currentPage + 1)"
+                    >
+                      다음
+                    </a>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
@@ -352,7 +259,7 @@
       <footer class="py-4 bg-light mt-auto">
         <div class="container-fluid px-4">
           <div class="d-flex align-items-center justify-content-between small">
-            <div class="text-muted">Copyright &copy; Your Website 2023</div>
+            <div class="text-muted">Copyright &copy; lookkit</div>
             <div>
               <a href="#">Privacy Policy</a>
               &middot;
@@ -366,9 +273,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import axios from "@/api/axios";
+import { onMounted, ref, computed, watchEffect } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 
-// 스크립트 로드 상태 관리
+// 스크립트 로드 상태 ��리
 const scriptsLoaded = ref(false);
 
 // Chart.js 인스턴스 저장
@@ -377,6 +287,42 @@ const barChart = ref(null);
 
 // DataTable 인스턴스 저장
 const dataTable = ref(null);
+
+const inquiryList = ref([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const totalPages = ref(0);
+
+// 페이지네이션된 데이터 계산
+const paginatedInquiries = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return inquiryList.value.slice(start, end);
+});
+
+// 총 페이지 수 계산
+watchEffect(() => {
+  totalPages.value = Math.ceil(inquiryList.value.length / itemsPerPage.value);
+});
+
+// 페이지 변경 함수
+const changePage = (page) => {
+  currentPage.value = page;
+};
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+// 로그아웃 처리 함수 추가
+const handleLogout = async () => {
+  try {
+    await axios.post("/api/auth/logout");
+    authStore.clearAuthData(); // 로컬 인증 정보 삭제
+    router.push("/auth/login"); // 로그인 페이지로 리다이렉트
+  } catch (error) {
+    console.error("로그아웃 처리 중 오류 발생:", error);
+  }
+};
 
 onMounted(async () => {
   try {
@@ -400,6 +346,16 @@ onMounted(async () => {
     scriptsLoaded.value = true;
   } catch (error) {
     console.error("스크립트 로드 중 에러 발생:", error);
+  }
+
+  try {
+    const response = await axios.get("/api/admin/dashboard").then((res) => {
+      console.log(res.data);
+      inquiryList.value = res.data;
+      console.log("리스트", inquiryList.value[0]);
+    });
+  } catch (err) {
+    console.log(err);
   }
 });
 
@@ -489,4 +445,50 @@ const initializeDataTable = () => {
 
 <style scoped>
 @import "@/assets/styles/admin.style.css";
+
+/* RouterLink 텍스트 스타일링 */
+.router-link-active {
+  color: #0d1134;
+  text-decoration: none;
+}
+
+.router-link-exact-active {
+  color: #0d1134;
+  font-weight: bold;
+}
+
+a {
+  color: #333;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #0d1134;
+  text-decoration: underline;
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+.page-item.disabled .page-link {
+  cursor: not-allowed;
+}
+
+.table th:nth-child(3) {
+  width: 150px;
+}
+.table th:nth-child(4) {
+  width: 40%;
+}
+
+th {
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow: hidden; /* 넘친 내용 숨기기 */
+  text-overflow: ellipsis; /* 생략 부호(...) 표시 */
+}
 </style>

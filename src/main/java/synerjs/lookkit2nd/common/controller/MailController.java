@@ -2,19 +2,21 @@ package synerjs.lookkit2nd.common.controller;
 
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Map;
 import java.util.Random;
 
-@Controller
+@RestController
 @Setter
 public class MailController {
 
@@ -25,7 +27,10 @@ public class MailController {
         this.javaMailSender = javaMailSender;
     }
 
-    @PostMapping("/mailsender")
+    @Value("${MAIL_EMAIL}")
+    private String mailEmail;
+
+    @PostMapping("/api/mailsender")
     @ResponseBody
     public String send(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
@@ -35,7 +40,7 @@ public class MailController {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 
             // 발신자 이메일과 표시할 이름 설정
-            messageHelper.setFrom(new InternetAddress("dhkdwk9430@gmail.com", "Lookkit"));
+            messageHelper.setFrom(new InternetAddress(mailEmail, "Lookkit"));
 
             // 수신자 이메일 설정
             messageHelper.setTo(email);

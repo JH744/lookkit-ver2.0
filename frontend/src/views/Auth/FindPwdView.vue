@@ -1,73 +1,115 @@
 <template>
+  <div v-if="isShowModal">
+    <FindResultModal
+      :resultMessage="resultMessage"
+      @onCloseModal="HandleShowModal"
+      ><p>비밀번호 변경완료</p>
+    </FindResultModal>
+  </div>
+  <ConfirmModal
+    v-if="isShowConfirmModal"
+    :confirmMessage="confirmMessage"
+    @onCloseModal="HandleShowConfirmModal"
+  />
   <div class="findIdContainer">
     <div class="findIdTitle">
       <img src="@/assets/logos/Logo2.png" width="300px" />
     </div>
     <div class="findIdBackground">
-      <div class="tabContainer">
-        <div class="tabActive">
-          <div class="tabTextActive">비밀번호찾기</div>
-        </div>
-      </div>
-      <div class="formContainer">
-        <div class="formLabel">이름</div>
-        <input
-          class="formInput"
-          placeholder="이름을 입력해 주세요"
-          name="name"
-        />
-        <div class="formLabel">이메일</div>
-        <input
-          class="formInput"
-          placeholder="이메일을 입력해 주세요"
-          name="email"
-        />
-        <div id="authenticationBtn" class="buttonContainer">인증받기</div>
-      </div>
-      <div class="formContainer2">
-        <input class="formInput" placeholder="인증번호 입력" name="veriCode" />
-        <div style="margin: 15px">
-          <span class="verificationNotice"
-            >*3분 이내로 인증번호 6자리를 입력해주세요.</span
-          >
-          <!-- 인증번호를 재입력해주세요. -->
-        </div>
-        <div id="authenticationOKBtn" class="buttonContainer">확인</div>
-      </div>
-
-      <form action="/auth/updatePwd" method="post" class="formContainer3">
-        <span class="">새비밀번호입력</span>
-        <input
-          type="password"
-          class="formInput"
-          placeholder="새비밀번호를 입력해 주세요"
-          name="newPassword"
-          id="newPwd"
-        />
-        <span class="">새비밀번호 재입력</span>
-        <input
-          type="password"
-          class="formInput"
-          placeholder="새비밀번호를 재입력해 주세요"
-          id="newPwd2"
-        />
-        <div id="ModifyBtn" class="buttonContainer">확인</div>
-      </form>
-      <div class="formContainer4">
-        <div>
-          <p>비밀번호를 성공적으로 변경하였습니다.</p>
-        </div>
-        <div id="goToLoginBtn" class="buttonContainer">로그인하러가기</div>
-      </div>
+      <FindPassword v-if="selectBox == 'box1'" @onEmailSender="sendEmail">
+        <span>{{ errorMessage }}</span>
+      </FindPassword>
+      <AuthenticationEmail
+        v-if="selectBox == 'box2'"
+        :verification-code="verificationCode"
+        @completeAuthentication="completeAuthentication"
+      >
+        <span>{{ errorMessage2 }}</span>
+      </AuthenticationEmail>
+      <UpdatePassword
+        v-if="selectBox == 'box3'"
+        :userUuid="userUuid"
+        @onOpenModal="HandleShowModal"
+      />
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  setup() {
-    return {};
-  },
+<script setup>
+import AuthenticationEmail from "./components/AuthenticationEmail.vue";
+import UpdatePassword from "./components/UpdatePassword.vue";
+import FindPassword from "./components/FindPasswordForm.vue";
+import { ref } from "vue";
+import axios from "@/api/axios";
+import FindResultModal from "./components/FindResultModal.vue";
+import { useModalStore, useConfirmModalStore } from "@/stores/modalStore";
+
+const selectBox = ref("box1");
+const verificationCode = ref("");
+const userUuid = ref("");
+const email = ref("");
+const isShowModal = ref(false);
+const resultMessage = ref("");
+const errorMessage = ref("");
+const errorMessage2 = ref("");
+const isShowConfirmModal = ref(false);
+const confirmMessage = ref("");
+// 모달창 오픈 토글이벤트
+const HandleShowModal = () => {
+  console.log("HandleShowModal 호출");
+  isShowModal.value = !isShowModal.value;
+  resultMessage.value = "비밀번호를 성공적으로 변경하였습니다.";
+};
+
+/**이메일 인증 발송 */
+const sendEmail = (data) => {
+  console.log("userUuid", data.userUuid);
+  console.log("email", data.email);
+  userUuid.value = data.userUuid;
+  email.value = data.email;
+  let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (data.userUuid.trim() === "") {
+    errorMessage.value = "아이디를 입력해 주세요.";
+    // alert(errorMessage.value);
+    return;
+  }
+  if (!emailPattern.test(email.value)) {
+    errorMessage.value = "올바른 이메일 형식을 입력해 주세요.";
+    // alert(errorMessage.value);
+    return;
+  }
+  errorMessage.value = "이메일 인증 요청중입니다....";
+  sendEmailVerification();
+};
+
+/** 이메일 인증 요청 함수 */
+const sendEmailVerification = async () => {
+  await axios
+    // .post("/api/mailsender", { userName: userName.value, email: email.value })
+    .post("/api/mailsender", {
+      userUuid: userUuid.value,
+      email: email.value,
+    })
+    .then((res) => {
+      console.log("인증코드", res.data);
+      verificationCode.value = String(res.data);
+      //완료 모달창 사용
+      const modalStore = useModalStore(); // 스토어를 가져와 사용
+      modalStore.showModal(
+        "이메일 인증",
+        "입력하신 이메일로 인증번호를 발송했습니다."
+      );
+      console.log("인증코드: ", verificationCode.value);
+      selectBox.value = "box2"; // 박스 체인지
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      errorMessage2.value = "이메일 인증에 실패했습니다. 다시 시도해 주세요.";
+    });
+};
+
+const completeAuthentication = () => {
+  selectBox.value = "box3"; // 박스 체인지
 };
 </script>
 
@@ -152,7 +194,7 @@ body {
 }
 
 .formContainer {
-  padding: calc(31.5px * 1.2) 20px 24px 20px;
+  padding: calc(25px * 1.2) 20px 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -163,25 +205,8 @@ body {
   position: relative;
 }
 
-.formContainer3 {
-  padding: calc(31.5px * 1.2) 10px 14px 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  align-self: stretch;
-  flex-shrink: 0;
-  position: relative;
-  gap: 16px;
-
-  height: 400px;
-  span {
-    font-size: 18px;
-  }
-  input {
-    width: 100%;
-  }
-  display: none;
+.formInput::placeholder {
+  font-size: 16px;
 }
 
 .formContainer2 {
@@ -194,20 +219,13 @@ body {
   align-self: stretch;
   flex-shrink: 0;
   position: relative;
-  display: none;
+  /* display: none; */
 
   input {
     width: 100%;
   }
 }
-.formContainer4 {
-  display: none;
-  height: 450px;
-  p {
-    font-size: 20px;
-    padding: 40px 20px;
-  }
-}
+
 .formLabel {
   color: var(--wwwkurlycom-mine-shaft, #333333);
   text-align: left;

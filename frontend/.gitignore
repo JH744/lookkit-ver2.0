@@ -28,3 +28,11 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+
+# .env.local
+.env.local
+
+src/firebase/firebaseConfig.js
+
+src/api/axios.js
