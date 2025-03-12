@@ -152,7 +152,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useRoute } from "vue-router";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
@@ -208,7 +208,7 @@ const fetchImages = async () => {
 
 const fetchProduct = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${productId.value}`);
+    const response = await api.get(`${API_BASE_URL}/${productId.value}`);
     product.value = response.data;
   } catch (error) {
     console.error("상품 데이터를 불러오는데 실패했습니다.", error);
@@ -234,7 +234,7 @@ const resetQuantity = () => {
 const addToCart = async () => {
   try {
     const API_BASE_URL = "/api/cart";
-    const response = await axios.post(
+    const response = await api.post(
       `${API_BASE_URL}/add/product/${product.value.productId}?quantity=${quantity.value}&userId=${userId}`
     );
 
@@ -265,7 +265,7 @@ const confirmAddToCart = () => {
 
 const buyNow = async () => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `${API_BASE_URL}/buy?productId=${product.value.productId}&quantity=${quantity.value}`
     );
 

@@ -45,7 +45,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import router from "@/router";
 import { useModalStore, useConfirmModalStore } from "@/stores/modalStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -57,7 +57,7 @@ const authStore = useAuthStore();
 const loadInquiries = async () => {
   console.log(">>>>>>>>>>>>>>>>", authStore.user.userId);
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `/api/mypage/inquiry/user/${authStore.user.userId}`
     );
     inquiries.value = response.data.data;
@@ -91,7 +91,7 @@ const showDeleteConfirmModal = (inquiryId) => {
 // 문의 삭제 함수
 const deleteInquiry = async (inquiryId) => {
   try {
-    await axios.delete(`/api/mypage/inquiry/${inquiryId}`);
+    await api.delete(`/api/mypage/inquiry/${inquiryId}`);
     inquiries.value = inquiries.value.filter(
       (inquiry) => inquiry.inquiryId !== inquiryId
     );
