@@ -148,7 +148,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import "@/assets/styles/codi.css";
 import ReviewView from "@/views/Review/ReviewView.vue";
 import Datepicker from "vue3-datepicker";
@@ -204,7 +204,7 @@ const fetchImages = async () => {
 
 const fetchCodi = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${codiId.value}`);
+    const response = await api.get(`${API_BASE_URL}/${codiId.value}`);
     codi.value = response.data;
   } catch (error) {
     console.error("코디 데이터를 불러오는데 실패했습니다.", error);
@@ -306,7 +306,7 @@ const addToCart = async () => {
     );
     const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
 
-    const response = await axios.post(
+    const response = await api.post(
       `${API_BASE_URL}/add/codi/${codi.value.codiId}?rentalStartDate=${formattedStartDate}&rentalEndDate=${formattedEndDate}&userId=${userId}`,
       {}
     );
@@ -338,7 +338,7 @@ const rentNow = async () => {
     );
     const formattedEndDate = getFormattedDate(new Date(rentalEndDate.value));
 
-    const response = await axios.post(
+    const response = await api.post(
       `${API_BASE_URL}/rent?codiId=${codi.value.codiId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
     );
 

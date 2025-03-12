@@ -35,7 +35,7 @@
 
 <script setup>
 import { ref, defineEmits } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 const props = defineProps({
   userUuid: String,
 });
@@ -52,7 +52,7 @@ const reNewPassword = ref("");
 
 const fetchUpdatePassword = async () => {
   if (newPassword.value == reNewPassword.value) {
-    axios
+    api
       .post("/api/users/update/password", {
         userUuid: props.userUuid,
         password: newPassword.value,

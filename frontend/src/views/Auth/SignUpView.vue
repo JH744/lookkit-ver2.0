@@ -208,7 +208,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useRouter } from "vue-router";
 import { useForm, useField } from "vee-validate";
 import * as yup from "yup";
@@ -300,7 +300,7 @@ const checkDuplicateID = () => {
 /**아이디 중복 확인 */
 const fetchDuplicateCheckId = async (Id) => {
   try {
-    const response = await axios
+    const response = await api
       .get(`/api/users/check-id?userUuid=${Id}`)
       .then((res) => {
         console.log(res);
@@ -335,7 +335,7 @@ const handleSignUp = async () => {
   console.log(" total_address", total_address.value);
 
   try {
-    const response = await axios
+    const response = await api
       // .post("/api/auth/signup", {
       .post("/api/auth/signup", {
         userName: userName.value,

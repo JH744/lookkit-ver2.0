@@ -78,7 +78,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import defaultImage from "@/assets/img_none.png";
 import { useAuthStore } from "@/stores/authStore";
 import heart1 from "@/assets/icons/heart1.svg";
@@ -114,7 +114,7 @@ const handleImageError = (event) => {
 // 카테고리별 상품리스트 가져오기
 const fetchProducts = async () => {
   try {
-    const { data } = await axios.get("/api/main/category", {
+    const { data } = await api.get("/api/main/category", {
       params: {
         type: categoryType.value,
         sort: sortBy.value,
@@ -126,7 +126,7 @@ const fetchProducts = async () => {
     // 상품 ID 리스트 추출
     const productIds = products.value.map((product) => product.productId);
     // 위시리스트 상태 확인
-    const wishlistResponse = await axios.post(
+    const wishlistResponse = await api.post(
       `/api/main/checkBatch/${authStore.user.userId}`,
       productIds
     );
@@ -171,7 +171,7 @@ const likeProduct = async (productId) => {
     // 이미 위시리스트에 포함된 상품은 삭제 ,없는 상품은 새로 추가
     if (wishlistItemIds.value.includes(productId)) {
       console.log("찜삭제");
-      const response = await axios.post(
+      const response = await api.post(
         `/api/main/wishlist/delete/${authStore.user.userId}`,
         {
           productId: productId,
@@ -186,7 +186,7 @@ const likeProduct = async (productId) => {
     } else {
       console.log("찜하기");
 
-      const response = await axios.post(
+      const response = await api.post(
         `/api/mypage/wishlist/${authStore.user.userId}`,
         {
           productId: productId,
@@ -210,11 +210,11 @@ const likeProduct = async (productId) => {
 
 //     if (product.wishlist) {
 //       // 위시리스트에서 제거
-//       await axios.delete(`/wishlist?userId=${userId}&itemId=${itemId}`);
+//       await api.delete(`/wishlist?userId=${userId}&itemId=${itemId}`);
 //       product.wishlist = false;
 //     } else {
 //       // 위시리스트에 추가
-//       await axios.post(`/wishlist/add`, {
+//       await api.post(`/wishlist/add`, {
 //         userId,
 //         itemId,
 //       });

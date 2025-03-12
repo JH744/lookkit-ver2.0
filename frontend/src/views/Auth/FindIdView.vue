@@ -50,7 +50,7 @@
 <script setup>
 import FindResultModal from "./components/FindResultModal.vue";
 import { ref } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useRouter } from "vue-router";
 const router = useRouter();
 const isShowModal = ref(false);
@@ -67,7 +67,7 @@ const HandleShowModal = () => {
 
 const HandleFindId = async () => {
   try {
-    const response = await axios
+    const response = await api
       .post(
         "/api/users/find/id",
         {
