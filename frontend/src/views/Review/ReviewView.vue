@@ -91,7 +91,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 
 const reviews = ref([]);
 const reviewRating = ref(5);
@@ -139,7 +139,7 @@ onMounted(async () => {
     console.log("API 요청 URL:", url);
 
     if (url) {
-      const response = await axios.get(url);
+      const response = await api.get(url);
       console.log("리뷰 데이터:", response.data);
       reviews.value = Array.isArray(response.data) ? response.data : [];
       console.log("리뷰 데이터:", reviews.value);
@@ -213,7 +213,7 @@ const submitReview = async () => {
       imageUrl: uploadedImage.value,
     };
 
-    const response = await axios.post("/api/reviews/write", reviewData);
+    const response = await api.post("/api/reviews/write", reviewData);
     if (response.status === 201) {
       alert("리뷰 작성 완료");
       reviews.value.push({

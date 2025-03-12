@@ -54,7 +54,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useRouter } from "vue-router";
 import { ref as firebaseRef, getDownloadURL } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
@@ -70,7 +70,7 @@ const imageUrls = ref([]); // 다운로드된 이미지 URL 리스트
 const loadDetailInquiry = async () => {
   try {
     const inquiryId = route.params.inquiryId;
-    const response = await axios.get(`/api/mypage/inquiry/${inquiryId}`);
+    const response = await api.get(`/api/mypage/inquiry/${inquiryId}`);
     inquiry.value = response.data.data;
 
     // 이미지 경로가 있다면 Firebase에서 다운로드 URL을 가져옴

@@ -184,7 +184,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useAuthStore } from "@/stores/authStore";
 import { useRoute, useRouter } from "vue-router";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
@@ -240,7 +240,7 @@ onMounted(() => {
 const fetchPurchasedProduct = async (productId, userId) => {
   try {
     // 사용자 리뷰 가져오기
-    const reviewResponse = await axios.get(`/api/reviews/list/${userId}`);
+    const reviewResponse = await api.get(`/api/reviews/list/${userId}`);
     const userReviews = reviewResponse.data;
 
     // 해당 상품에 대한 리뷰가 이미 작성되었는지 확인
@@ -260,7 +260,7 @@ const fetchPurchasedProduct = async (productId, userId) => {
       return;
     }
 
-    const response = await axios.get(`/api/products/${productId}`);
+    const response = await api.get(`/api/products/${productId}`);
     selectedProduct.value = response.data;
     await fetchImageForItem(selectedProduct.value);
   } catch (error) {
@@ -270,7 +270,7 @@ const fetchPurchasedProduct = async (productId, userId) => {
 
 const fetchPurchasedCodi = async (codiId, userId) => {
   try {
-    const reviewResponse = await axios.get(`/api/reviews/list/${userId}`);
+    const reviewResponse = await api.get(`/api/reviews/list/${userId}`);
     const userReviews = reviewResponse.data;
 
     const existingReview = userReviews.find(
@@ -288,7 +288,7 @@ const fetchPurchasedCodi = async (codiId, userId) => {
       return;
     }
 
-    const response = await axios.get(`/api/codi/${codiId}`);
+    const response = await api.get(`/api/codi/${codiId}`);
     selectedCodi.value = response.data;
     await fetchImageForItem(selectedCodi.value, "codi");
   } catch (error) {
@@ -424,7 +424,7 @@ const submitReview = async () => {
       new Blob([JSON.stringify(reviewData)], { type: "application/json" })
     );
 
-    await axios.post("/api/reviews/write", formData, {
+    await api.post("/api/reviews/write", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

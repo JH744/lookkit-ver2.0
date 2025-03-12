@@ -169,7 +169,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useAuthStore } from "@/stores/authStore";
 import { useModalStore } from "@/stores/modalStore";
 import { useConfirmModalStore } from "@/stores/modalStore";
@@ -195,7 +195,7 @@ onMounted(async () => {
   console.log("유저ID : ", id.value);
 
   try {
-    const response = await axios.get(`/api/v1/userinfo/${id.value}`);
+    const response = await api.get(`/api/v1/userinfo/${id.value}`);
     Object.assign(userData.value, response.data);
   } catch (error) {
     console.error("Error loading user data:", error);
@@ -230,7 +230,7 @@ const updatePassword = async () => {
     return;
   }
   try {
-    await axios.post(`/api/v1/userinfo/${id.value}/change-password`, {
+    await api.post(`/api/v1/userinfo/${id.value}/change-password`, {
       currentPassword: currentPassword.value,
       newPassword: newPassword.value,
       confirmNewPassword: confirmPassword.value,
@@ -258,7 +258,7 @@ const updatePassword = async () => {
 // 회원정보 업데이트 로직
 const updateProfile = async () => {
   try {
-    await axios.put(`/api/v1/userinfo/${id.value}`, userData.value);
+    await api.put(`/api/v1/userinfo/${id.value}`, userData.value);
     modalStore.showModal(
       "개인정보수정",
       "회원정보를 성공적으로 업데이트했습니다."
@@ -290,7 +290,7 @@ const checkEmailDuplicate = async () => {
   console.log("이메일 중복 확인 요청: ", userData.value.email);
 
   try {
-    const response = await axios.get(`/api/v1/userinfo/check-email`, {
+    const response = await api.get(`/api/v1/userinfo/check-email`, {
       params: {
         email: userData.value.email,
       },
@@ -337,7 +337,7 @@ const deleteAccount = async () => {
 
 const deleteUser = async () => {
   try {
-    await axios.delete(`/api/v1/userinfo/${id.value}`);
+    await api.delete(`/api/v1/userinfo/${id.value}`);
     modalStore.showModal("회원탈퇴", "회원 탈퇴가 완료되었습니다.");
     // 탈퇴 후 리다이렉트 동작 등 추가 가능
 
