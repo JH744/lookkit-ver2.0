@@ -28,7 +28,7 @@ import heart1 from "@/assets/icons/heart1.svg";
 import heart2 from "@/assets/icons/heart2.svg";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
-import axios from "axios";
+import api from "@/api/axios";
 const authStore = useAuthStore();
 const router = useRouter();
 const heartIcon1 = heart1;
@@ -88,8 +88,8 @@ const handleImageError = (event) => {
 const likeCodi = async (codiId) => {
   console.log("코디 좋아요 추가");
   try {
-    const response = await axios
-      .post("http://localhost:8081/api/main/coordi/wish/add", {
+    const response = await api
+      .post("/api/main/coordi/wish/add", {
         userId: authStore.user.userId,
         codiId: codiId,
       })
@@ -107,8 +107,8 @@ const likeCodi = async (codiId) => {
 // 위시리스트 체크 메소드 추가
 const checkWishlist = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:8081/api/main/checkBatchCodi/${authStore.user.userId}/${props.codiId}`
+    const response = await api.get(
+      `/api/main/checkBatchCodi/${authStore.user.userId}/${props.codiId}`
     );
     isWishlisted.value = response.data;
     // console.log("Wishlist Response:", response.data);
