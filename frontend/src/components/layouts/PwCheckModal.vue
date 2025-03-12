@@ -29,7 +29,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router"; // 라우터 임포트
-import axios from "@/api/axios";
+import api from "@/api/axios";
 
 const emit = defineEmits(["close"]);
 const props = defineProps({
@@ -53,7 +53,7 @@ const verifyPassword = async () => {
   }
 
   try {
-    const response = await axios.post(
+    const response = await api.post(
       "/api/v1/mypage/verifyPassword",
       {
         currentPassword: currentPassword.value,
