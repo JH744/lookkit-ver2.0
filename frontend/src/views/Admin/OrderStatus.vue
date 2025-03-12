@@ -205,7 +205,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useModalStore } from "@/stores/modalStore";
 const logoutUrl = "/logout"; // 로그아웃 이동
 const router = useRouter();
@@ -243,7 +243,7 @@ const changePage = (page) => {
 // fetchOrderStatus 함수 수정
 const fetchOrderStatus = async () => {
   try {
-    const { data } = await axios.get("/api/admin/orderStatus");
+    const { data } = await api.get("/api/admin/orderStatus");
     orderList.value = data;
     totalItems.value = data.length;
   } catch (err) {
@@ -255,7 +255,7 @@ const fetchOrderStatus = async () => {
 const updateOrderStatus = async (order) => {
   console.log("orderStatus to be sent:", order.orderStatus); // 로그 추가
   try {
-    const response = await axios.put(
+    const response = await api.put(
       `/api/admin/orders/${order.orderId}/status`,
       {
         orderStatus: order.orderStatus,

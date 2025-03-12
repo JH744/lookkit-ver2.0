@@ -136,7 +136,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useModalStore } from "@/stores/modalStore";
 
 const dashboardUrl = "/admin/dashboard"; // 대쉬보드 이동
@@ -158,7 +158,7 @@ const submitForm = async () => {
       return;
     }
 
-    const response = await axios.post(
+    const response = await api.post(
       `/api/admin/inquiries/${inquiryId.value}/answer`,
       {
         answerContents: answer.value,
@@ -187,7 +187,7 @@ const cancelForm = () => {
 onMounted(async () => {
   try {
     // inquiryId.value를 사용하여 URL 구성
-    const response = await axios.get(`/api/admin/inquiries/${inquiryId.value}`);
+    const response = await api.get(`/api/admin/inquiries/${inquiryId.value}`);
     console.log("응답", response.data);
     writer.value = response.data.userUuid;
     title.value = response.data.inquiryTitle;
@@ -203,7 +203,7 @@ onMounted(async () => {
 // 등록된 문의 답변 가져오기
 const getAnswer = async () => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `/api/admin/inquiries/${inquiryId.value}/answer`
     );
     if (response.status === 200) {

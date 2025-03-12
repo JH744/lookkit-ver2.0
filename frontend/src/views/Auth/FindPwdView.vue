@@ -40,7 +40,7 @@ import AuthenticationEmail from "./components/AuthenticationEmail.vue";
 import UpdatePassword from "./components/UpdatePassword.vue";
 import FindPassword from "./components/FindPasswordForm.vue";
 import { ref } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import FindResultModal from "./components/FindResultModal.vue";
 import { useModalStore, useConfirmModalStore } from "@/stores/modalStore";
 
@@ -84,7 +84,7 @@ const sendEmail = (data) => {
 
 /** 이메일 인증 요청 함수 */
 const sendEmailVerification = async () => {
-  await axios
+  await api
     // .post("/api/mailsender", { userName: userName.value, email: email.value })
     .post("/api/mailsender", {
       userUuid: userUuid.value,
