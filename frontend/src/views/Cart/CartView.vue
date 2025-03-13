@@ -235,7 +235,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { getDownloadURL, ref as firebaseRef } from "firebase/storage";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
 import "@/assets/styles/cart.css";
@@ -281,7 +281,7 @@ const fetchCartItems = async () => {
   try {
     console.log("Fetching cart items for user ID:", userId); // 추가된 로그
     const API_BASE_URL = "/api/cart";
-    const response = await axios.get(`${API_BASE_URL}/items?userId=${userId}`, {
+    const response = await api.get(`${API_BASE_URL}/items?userId=${userId}`, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
       },
@@ -344,7 +344,7 @@ const deleteSelectedItems = async () => {
 
   try {
     const API_BASE_URL = "http://localhost:8081/api/cart";
-    await axios.post(`${API_BASE_URL}/delete/bulk`, {
+    await api.post(`${API_BASE_URL}/delete/bulk`, {
       cartIds: itemsToDelete.map((item) => item.cartId),
     });
     coordinateItems.value = coordinateItems.value.filter((i) => !i.selected);
@@ -359,7 +359,7 @@ const deleteSelectedItems = async () => {
 const deleteItem = async (item) => {
   try {
     const API_BASE_URL = "http://localhost:8081/api/cart";
-    await axios.post(`${API_BASE_URL}/delete`, { cartId: item.cartId });
+    await api.post(`${API_BASE_URL}/delete`, { cartId: item.cartId });
     if (item.type === "coordinate") {
       coordinateItems.value = coordinateItems.value.filter(
         (i) => i.cartId !== item.cartId
@@ -453,7 +453,7 @@ const updateItemQuantity = async (item) => {
   }
   try {
     const API_BASE_URL = "http://localhost:8081/api/cart";
-    await axios.post(`${API_BASE_URL}/update?userId=${userId}`, {
+    await api.post(`${API_BASE_URL}/update?userId=${userId}`, {
       cartId: item.cartId,
       quantity: item.quantity,
     });
@@ -467,7 +467,7 @@ const updateItemQuantity = async (item) => {
 const updateRentalDate = async (item, dateType) => {
   try {
     const API_BASE_URL = "http://localhost:8081/api/cart";
-    await axios.post(`${API_BASE_URL}/update?userId=${userId}`, {
+    await api.post(`${API_BASE_URL}/update?userId=${userId}`, {
       cartId: item.cartId,
       rentalStartDate: dateType === "start" ? item.rentalStartDate : undefined,
       rentalEndDate: dateType === "end" ? item.rentalEndDate : undefined,

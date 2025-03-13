@@ -185,7 +185,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { format } from "date-fns";
 import { useModalStore, useConfirmModalStore } from "@/stores/modalStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -265,7 +265,7 @@ const showConfirmModal = (product) => {
 const confirmRental = async (product) => {
   product.isPurchaseConfirmed = true;
   try {
-    await axios.patch("/api/mypage/manage", {
+    await api.patch("/api/mypage/manage", {
       orderId: product.orderId,
       productId: product.productId,
     });
@@ -298,7 +298,7 @@ const fetchImageForProduct = async (product) => {
 // 주문 정보 불러오기 및 이미지 설정
 const loadOrder = async () => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `/api/mypage/manage/${authStore.user.userId}`
     );
     products.value = response.data.data.products.flatMap((order) =>

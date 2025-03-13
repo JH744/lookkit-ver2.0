@@ -53,7 +53,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useRouter } from "vue-router";
 import { firebaseStorage } from "@/firebase/firebaseConfig";
 import { ref as firebaseRef, getDownloadURL } from "firebase/storage";
@@ -66,7 +66,7 @@ const router = useRouter();
 
 const loadReviews = async () => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `/api/reviews/list/${authStore.user.userId}`
     );
     reviews.value = response.data;
@@ -136,7 +136,7 @@ const showDeleteConfirmModal = (reviewId) => {
 
 const deleteReview = async (reviewId) => {
   try {
-    await axios.delete(`/api/reviews/${reviewId}`);
+    await api.delete(`/api/reviews/${reviewId}`);
     reviews.value = reviews.value.filter(
       (review) => review.reviewId !== reviewId
     );

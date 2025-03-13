@@ -273,7 +273,7 @@
 </template>
 
 <script setup>
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { onMounted, ref, computed, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
@@ -316,7 +316,7 @@ const authStore = useAuthStore();
 // 로그아웃 처리 함수 추가
 const handleLogout = async () => {
   try {
-    await axios.post("/api/auth/logout");
+    await api.post("/api/auth/logout");
     authStore.clearAuthData(); // 로컬 인증 정보 삭제
     router.push("/auth/login"); // 로그인 페이지로 리다이렉트
   } catch (error) {
@@ -349,7 +349,7 @@ onMounted(async () => {
   }
 
   try {
-    const response = await axios.get("/api/admin/dashboard").then((res) => {
+    const response = await api.get("/api/admin/dashboard").then((res) => {
       console.log(res.data);
       inquiryList.value = res.data;
       console.log("리스트", inquiryList.value[0]);

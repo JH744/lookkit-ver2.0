@@ -58,7 +58,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import defaultImage from "@/assets/img_none.png";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -88,7 +88,7 @@ watch(
 // 상품 데이터를 가져오는 함수
 const fetchProductByKeyword = async () => {
   try {
-    const response = await axios.get("/api/main/search", {
+    const response = await api.get("/api/main/search", {
       params: {
         keyword: keyword.value,
       },

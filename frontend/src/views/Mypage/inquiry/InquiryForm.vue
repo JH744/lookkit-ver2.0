@@ -93,7 +93,7 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import router from "@/router";
 import { useAuthStore } from "@/stores/authStore";
 import {
@@ -175,7 +175,7 @@ const submitForm = async () => {
         imageUrls, // 업로드된 이미지의 URL 리스트 추가
       };
 
-      const response = await axios.post("/api/mypage/inquiry", requestPayload);
+      const response = await api.post("/api/mypage/inquiry", requestPayload);
       router.push({
         name: "InquiryDetail",
         params: { inquiryId: response.data.data.inquiryId },

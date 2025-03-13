@@ -97,7 +97,7 @@
 <script setup>
 import { ref, watch, onMounted, reactive } from "vue";
 import { useAuthStore } from "@/stores/authStore";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -126,7 +126,7 @@ watch(
 
 const handleLogin = async () => {
   try {
-    const response = await axios
+    const response = await api
       .post(
         "/api/auth/login",
         // "/api/auth/login",

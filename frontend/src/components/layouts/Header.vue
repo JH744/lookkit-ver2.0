@@ -110,7 +110,7 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -125,7 +125,7 @@ const goToSearch = () => {
 const logout = async () => {
   try {
     //로그아웃-서버
-    await axios.post("/api/auth/logout", null, {
+    await api.post("/api/auth/logout", null, {
       withCredentials: true, // 쿠키 전송 허용
     });
 

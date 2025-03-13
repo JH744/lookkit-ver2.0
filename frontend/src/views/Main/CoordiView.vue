@@ -26,7 +26,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import axios from "@/api/axios";
+import api from "@/api/axios";
 import defaultImage from "@/assets/img_none.png";
 import { useAuthStore } from "@/stores/authStore";
 import heart1 from "@/assets/icons/heart1.svg";
@@ -50,7 +50,7 @@ const handleImageError = (event) => {
 // 코디 리스트 가져오기
 const fetchProducts = async () => {
   try {
-    const { data } = await axios.get("/api/main/codis/all");
+    const { data } = await api.get("/api/main/codis/all");
     console.log("리스트", data);
     coordiList.value = data;
   } catch (error) {
@@ -89,11 +89,11 @@ const fetchProducts = async () => {
 
 //     if (product.wishlist) {
 //       // 위시리스트에서 제거
-//       await axios.delete(`/wishlist?userId=${userId}&itemId=${itemId}`);
+//       await api.delete(`/wishlist?userId=${userId}&itemId=${itemId}`);
 //       product.wishlist = false;
 //     } else {
 //       // 위시리스트에 추가
-//       await axios.post(`/wishlist/add`, {
+//       await api.post(`/wishlist/add`, {
 //         userId,
 //         itemId,
 //       });
