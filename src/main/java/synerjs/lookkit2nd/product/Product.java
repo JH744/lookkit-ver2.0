@@ -46,7 +46,7 @@ public class Product {
     private Timestamp productCreatedAt;
     private Timestamp productUpdatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
