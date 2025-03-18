@@ -160,13 +160,13 @@ const handleLogin = async () => {
 };
 
 const handleKakaoLogin = () => {
-  window.location.href = `http://localhost:8081/oauth2/authorization/kakao`; // 카카오 로그인 페이지로 리디렉션
+  window.location.href = `http://13.125.194.23:8081/oauth2/authorization/kakao`; // 카카오 로그인 페이지로 리디렉션
 };
 const handleGoogleLogin = () => {
-  window.location.href = `http://localhost:8081/oauth2/authorization/google`; // 구글 로그인 페이지로 리디렉션
+  window.location.href = `http://13.125.194.23:8081/oauth2/authorization/google`; // 구글 로그인 페이지로 리디렉션
 };
 const handleNaverLogin = () => {
-  window.location.href = `http://localhost:8081/oauth2/authorization/naver`; // 네이버 로그인 페이지로 리디렉션
+  window.location.href = `http://13.125.194.23:8081/oauth2/authorization/naver`; // 네이버 로그인 페이지로 리디렉션
 };
 </script>
 
