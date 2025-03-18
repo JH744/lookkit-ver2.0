@@ -2,10 +2,11 @@ package synerjs.lookkit2nd.user;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -26,17 +27,20 @@ public class UserService {
 
     //회원가입 하기
     public boolean insertUser(UserDTO userDto) {
-        boolean result = true;
         try {
-            userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));// 암호화
-             User user  = userDto.toEntity(userDto);  // dto -> 엔티티 변환
+            // 패스워드 암호화
+            userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            // DTO -> 엔티티 변환
+            User user  = userDto.toEntity(userDto);
             userRepository.save(user);
+            log.info("회원가입 완료 : {}",user.getUserName());
+            return true;
         }catch (Exception e){
-            System.out.println("에러발생: "+e.getMessage());
-           result =false; // 에러 발생시 결과에 false 리턴
+            log.error("회원가입 중 에러발생 : {}",e.getMessage());
+            return false;
         }
-        return result;
     }
+
 
     public User getUserInfo(Long id) {
         return userRepository.findById(id).get();
@@ -64,6 +68,7 @@ public class UserService {
             return "실패";
         }
     }
+
 
     public UserDTO convertToDTO(User user) {
         return UserDTO.builder()

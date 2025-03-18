@@ -49,7 +49,6 @@ public class MailController {
             messageHelper.setSubject("[Lookkit] 이메일 인증");
             String randomCode = generateRandomCode();  // 인증코드 생성
             messageHelper.setText("인증 코드: " + randomCode);
-            System.out.println("메일 보내기 진행중 ");
             // 메일 발송
             javaMailSender.send(mimeMessage);
             return randomCode;  // 인증 코드 반환

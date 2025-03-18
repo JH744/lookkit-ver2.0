@@ -4,7 +4,9 @@ package synerjs.lookkit2nd.common.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +42,12 @@ public class MainController {
     // 코디 세트 & 연관상품 조회
     @GetMapping("/codiset")
     public ResponseEntity<List<CodiProductDTO>> getAllCoordiWithProducts() {
-        return ResponseEntity.ok(coordisetService.getAllCoordiWithProducts());
+        List<CodiProductDTO> products = coordisetService.getAllCoordiWithProducts();
+
+        return ResponseEntity
+            .ok()
+            .cacheControl(CacheControl.maxAge(3600, TimeUnit.SECONDS)) // 1시간 캐싱 유지
+            .body(products);
     }
 
 

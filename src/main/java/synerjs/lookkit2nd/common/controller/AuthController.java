@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,6 +23,7 @@ import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.user.UserDTO;
 import synerjs.lookkit2nd.user.UserService;
 
+@Slf4j
 @RestController
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
@@ -30,6 +32,9 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtUtil jwtUtil;
 
+    /*
+     * 로그인
+     */
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
         // 아이디와 비밀번호 가져오기
@@ -70,11 +75,15 @@ public class AuthController {
         return ResponseEntity.ok(responseBody);
     }
 
+
+    /**
+     * 회원가입
+     */
     @PostMapping("api/auth/signup")
     public ResponseEntity signUp(@RequestBody UserDTO user) {
-        System.out.println("회원가입 요청 :  "+user);
+        log.info("회원가입 요청 : {}",user);
         boolean result = userService.insertUser(user);
-        System.out.println("회원가입 결과:" + result);
+        log.info("회원가입 결과 : {}",result);
         if (result) {
             return ResponseEntity.status(200).body("회원가입 성공");
         } else {
@@ -82,10 +91,14 @@ public class AuthController {
         }
     }
 
+
+    /**
+     * 로그아웃
+     */
     @PostMapping("/api/auth/logout")
     public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
         // JWT 쿠키를 삭제하기 위한 쿠키 설정
-        System.out.println("로그아웃진행");
+        log.info("로그아웃 진행");
         Cookie cookie = new Cookie("Authorization", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
