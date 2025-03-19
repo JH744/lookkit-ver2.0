@@ -20,7 +20,11 @@ public class WebConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin(domainUri); // e.g. http://domain1.com
+        // 도메인과 퍼블릭 ip Cors 허용
+        config.addAllowedOrigin("http://www.lookkit.store:8081");
+        config.addAllowedOrigin("http://www.lookkit.store");
+        config.addAllowedOrigin("http://lookkit.store");
+        config.addAllowedOrigin(domainUri);
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
