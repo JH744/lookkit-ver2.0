@@ -34,19 +34,8 @@ jobs:
             echo "$APPLICATION_PROPERTIES" > src/main/resources/application.yml
             echo "$AXIOS_BASEURL" > frontend/src/api/axios.js
             echo "$FIREBASE_CONFIG" > frontend/src/firebase/firebaseConfig.js
-            
-            # 프론트엔드 빌드 과정 추가
-            echo "프론트엔드 빌드 시작..."
-            cd frontend
-            npm install
-            npm run build
-            cd ..
-            
-            # 백엔드 빌드 시작
-            echo "백엔드 빌드 시작..."
+            echo "Gradle 빌드 시작..."
             ./gradlew clean build -x test
-            
-            # 기존 프로세스 종료
             sudo fuser -k -n tcp 8081 || true 
             
             # iptables-persistent 패키지 설치 (이미 설치되어 있어도 오류 발생 안함)
