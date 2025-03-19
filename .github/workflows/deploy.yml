@@ -1,10 +1,8 @@
 name: Deploy To EC2
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,7 +24,6 @@ jobs:
             if [ -f frontend/src/api/axios.js ]; then
               rm -rf frontend/src/api/axios.js
             fi
-
             if [ -f frontend/src/firebase/firebaseConfig.js ]; then
               rm -rf frontend/src/firebase/firebaseConfig.js
             fi
@@ -40,4 +37,18 @@ jobs:
             echo "Gradle 빌드 시작..."
             ./gradlew clean build -x test
             sudo fuser -k -n tcp 8081 || true 
+            
+            # iptables-persistent 패키지 설치 (이미 설치되어 있어도 오류 발생 안함)
+            echo "iptables-persistent iptables-persistent/autosave_v4 boolean true" | sudo debconf-set-selections
+            echo "iptables-persistent iptables-persistent/autosave_v6 boolean true" | sudo debconf-set-selections
+            sudo apt-get update -qq && sudo apt-get install -y -qq iptables-persistent
+            
+            # 포트포워딩 설정 - 기존 룰 삭제 후 새로 추가
+            sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081 || true
+            sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
+            
+            # 포트포워딩 설정 저장 (영구적으로 적용)
+            sudo netfilter-persistent save
+            
+            # 애플리케이션 실행
             nohup java -jar build/libs/lookkit2nd-0.0.1-SNAPSHOT.jar > ./output.log 2>&1 &
