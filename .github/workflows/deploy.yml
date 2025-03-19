@@ -1,10 +1,8 @@
 name: Deploy To EC2
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,72 +13,53 @@ jobs:
           APPLICATION_PROPERTIES: ${{ secrets.APPLICATION_PROPERTIES }}
           AXIOS_BASEURL: ${{ secrets.AXIOS_BASEURL }}
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
-          NGINX_CONFIG: ${{ secrets.NGINX_CONFIG }}
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          envs: APPLICATION_PROPERTIES,AXIOS_BASEURL,FIREBASE_CONFIG,NGINX_CONFIG
-          script_stop: true
+          host: ${{ secrets.EC2_HOST }} # EC2의 주소
+          username: ${{ secrets.EC2_USERNAME }} # EC2 접속 username
+          key: ${{ secrets.EC2_PRIVATE_KEY }} # EC2의 Key 파일의 내부 텍스트
+          envs: APPLICATION_PROPERTIES,AXIOS_BASEURL,FIREBASE_CONFIG
+          script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
           script: |
-            echo "EC2 서버 접속 완료"
-
-            cd /home/ubuntu/lookkit-ver2.0
-
-            #  기존 설정 파일 삭제
+            cd /home/ubuntu/lookkit-ver2.0 # 여기 경로는 자신의 EC2에 맞는 경로로 재작성하기
             if [ -f frontend/src/api/axios.js ]; then
               rm -rf frontend/src/api/axios.js
             fi
-
             if [ -f frontend/src/firebase/firebaseConfig.js ]; then
               rm -rf frontend/src/firebase/firebaseConfig.js
             fi
             
             rm -rf src/main/resources/application.yml
-
-            #  최신 코드 가져오기
-            echo "Git Pull 실행..."
+            
             git pull origin main
-
-            #  환경 변수 반영
             echo "$APPLICATION_PROPERTIES" > src/main/resources/application.yml
             echo "$AXIOS_BASEURL" > frontend/src/api/axios.js
             echo "$FIREBASE_CONFIG" > frontend/src/firebase/firebaseConfig.js
-
-            #  Gradle 빌드 실행
-            echo "Gradle 빌드 시작..."
+            
+            # 프론트엔드 빌드 과정 추가
+            echo "프론트엔드 빌드 시작..."
+            cd frontend
+            npm install
+            npm run build
+            cd ..
+            
+            # 백엔드 빌드 시작
+            echo "백엔드 빌드 시작..."
             ./gradlew clean build -x test
-
-            #  기존 Spring Boot 프로세스 종료 (8081)
-            echo "기존 Spring Boot 종료..."
+            
+            # 기존 프로세스 종료
             sudo fuser -k -n tcp 8081 || true 
-
-            #  Spring Boot 새로 실행
-            echo " Spring Boot 실행 (포트 8081)..."
+            
+            # iptables-persistent 패키지 설치 (이미 설치되어 있어도 오류 발생 안함)
+            echo "iptables-persistent iptables-persistent/autosave_v4 boolean true" | sudo debconf-set-selections
+            echo "iptables-persistent iptables-persistent/autosave_v6 boolean true" | sudo debconf-set-selections
+            sudo apt-get update -qq && sudo apt-get install -y -qq iptables-persistent
+            
+            # 포트포워딩 설정 - 기존 룰 삭제 후 새로 추가
+            sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081 || true
+            sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8081
+            
+            # 포트포워딩 설정 저장 (영구적으로 적용)
+            sudo netfilter-persistent save
+            
+            # 애플리케이션 실행
             nohup java -jar build/libs/lookkit2nd-0.0.1-SNAPSHOT.jar > ./output.log 2>&1 &
-
-            #  Nginx 설치 (없으면 설치)
-            if ! command -v nginx &> /dev/null
-            then
-                echo " Nginx 설치 중..."
-                sudo apt update
-                sudo apt install nginx -y
-            else
-                echo " Nginx가 이미 설치되어 있음."
-            fi
-
-            #  Nginx 설정 적용
-            echo "Nginx 설정 적용 중..."
-            echo "$NGINX_CONFIG" | sudo tee /etc/nginx/sites-available/default > /dev/null
-
-            #  방화벽 설정 (80, 443 포트 허용)
-            echo "방화벽 설정 중..."
-            sudo ufw allow 'Nginx Full'
-            sudo ufw enable
-            sudo ufw status
-
-            #  Nginx 설정 적용 & 재시작
-            echo " Nginx 설정 적용 중..."
-            sudo nginx -t && sudo systemctl restart nginx
-
-            echo "배포 완료"
