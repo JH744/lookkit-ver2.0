@@ -8,9 +8,12 @@
 
 ### 개발 일정
 * 2024.10.24 ~ 2024.11.21
+### 데모 사이트
 
- 
+* <a href="http://www.lookkit.store/">www.lookkit.store</a> 
+
 ## ⚙️ 기술 스택
+
 
 #### Front-end
 
