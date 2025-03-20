@@ -61,7 +61,7 @@ public class CodiService {
 //    }
 
     public List<CodiProductDTO> getAllCoordiWithProducts() {
-        List<Codi> codis = codiRepository.findAllCodisWithProducts();
+        List<Codi> codis = codiRepository.findAllByOrderByCodiIdDesc();
 
         return codis.stream()
             .map(codi -> new CodiProductDTO(

@@ -41,4 +41,5 @@ public interface CodiRepository extends JpaRepository<Codi, Long> {
 
     @EntityGraph(attributePaths = {"products", "products.category"})
     List<Codi> findAllByOrderByCodiIdDesc();
+
 }
