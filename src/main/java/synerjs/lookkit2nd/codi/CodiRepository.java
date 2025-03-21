@@ -25,17 +25,21 @@ public interface CodiRepository extends JpaRepository<Codi, Long> {
 
 
     // fetch join방식 테스트
-//    @Query("""
-//            SELECT DISTINCT c
-//              FROM Codi c
-//              LEFT JOIN FETCH c.products p
-//             ORDER BY c.codiId DESC
-//        """)
+//   @Query("""
+//        SELECT DISTINCT c
+//          FROM Codi c
+//          LEFT JOIN FETCH c.products p
+//          LEFT JOIN FETCH p.category
+//         ORDER BY c.codiId DESC
+//    """)
 //    List<Codi> findAllCodisWithProducts();
 
 //    EntityGraph 방식 테스트
+//    @EntityGraph(attributePaths = {"products", "products.category"})
+//    @Query("SELECT c FROM Codi c ORDER BY c.codiId DESC")
+//    List<Codi> findAllCodisWithProducts();
+
     @EntityGraph(attributePaths = {"products", "products.category"})
-    @Query("SELECT c FROM Codi c ORDER BY c.codiId DESC")
-    List<Codi> findAllCodisWithProducts();
+    List<Codi> findAllByOrderByCodiIdDesc();
 
 }
