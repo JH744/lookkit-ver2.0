@@ -1,8 +1,10 @@
 package synerjs.lookkit2nd.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Hibernate 프록시 무시
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
