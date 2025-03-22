@@ -1,19 +1,12 @@
 package synerjs.lookkit2nd.common.util;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import synerjs.lookkit2nd.user.CustomUser;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -39,7 +32,7 @@ public class JwtUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
-    public String createJwt(String username, String role, Long expiredMs) {
+    public  String createJwt(String username, String role, Long expiredMs) {
         return Jwts.builder()
             .claim("username", username)
             .claim("role", role)
