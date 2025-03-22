@@ -50,7 +50,6 @@ public class MainController {
             .body(products);
     }
 
-
     // 카테고리 별 상품 목록 표시
     @GetMapping("/category")
     public ResponseEntity<List<ProductDTO>> mainCategoryPage(
