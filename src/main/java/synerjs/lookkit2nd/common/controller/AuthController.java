@@ -1,5 +1,7 @@
 package synerjs.lookkit2nd.common.controller;
 
+import static synerjs.lookkit2nd.common.util.JwtUtil.createJwtCookie;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
@@ -38,15 +40,15 @@ public class AuthController {
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
         // 아이디와 비밀번호 가져오기
-        var authToken = new UsernamePasswordAuthenticationToken(
-                data.get("username"), data.get("password")
-        );
+        UsernamePasswordAuthenticationToken authToken
+            = new UsernamePasswordAuthenticationToken(data.get("username"), data.get("password"));
         // 인증 수행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 유저네임 추출
         CustomUser customUser =(CustomUser)authentication.getPrincipal();
+
+        // 유저네임 추출
         String username = customUser.getUsername();
 
         // 유저 ROLE 추출
@@ -55,17 +57,11 @@ public class AuthController {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-
         // JWT 생성
         String jwt = jwtUtil.createJwt(username, role, 60*60*60L);
 
-        // JWT를 쿠키에 저장
-        var cookie = new Cookie("Authorization", jwt);
-        cookie.setMaxAge(60 * 60 * 24); // 하루 유효
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        // 사용자 정보 가져오기(CustomUser 사용)
+        // 쿠키생성 후 jwt 저장 -> 응답에 쿠키 반영
+        response.addCookie(createJwtCookie(jwt));
         // 반환 데이터
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("Authorization", jwt); // JWT
@@ -76,11 +72,13 @@ public class AuthController {
     }
 
 
+
+
     /**
      * 회원가입
      */
-    @PostMapping("api/auth/signup")
-    public ResponseEntity signUp(@RequestBody UserDTO user) {
+    @PostMapping("/api/auth/signup")
+    public ResponseEntity<String> signUp(@RequestBody UserDTO user) {
         log.info("회원가입 요청 : {}",user);
         boolean result = userService.insertUser(user);
         log.info("회원가입 결과 : {}",result);

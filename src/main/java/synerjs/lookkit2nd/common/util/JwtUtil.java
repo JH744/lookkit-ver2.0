@@ -1,6 +1,7 @@
 package synerjs.lookkit2nd.common.util;
 
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -41,5 +42,15 @@ public class JwtUtil {
             .signWith(secretKey)
             .compact();
     }
+
+    // jwt쿠키 생성하기
+    public static Cookie createJwtCookie(String jwt) {
+        var cookie = new Cookie("Authorization", jwt);
+        cookie.setMaxAge(60 * 60 * 24); // 하루 유효
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        return cookie;
+    }
+
 
 }
