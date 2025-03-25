@@ -1,7 +1,5 @@
 package synerjs.lookkit2nd.common.controller;
 
-import static synerjs.lookkit2nd.common.util.JwtUtil.createJwtCookie;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collection;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import synerjs.lookkit2nd.common.provider.CookieProvider;
 import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.user.CustomUser;
 import synerjs.lookkit2nd.user.UserDTO;
@@ -33,6 +32,7 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtUtil jwtUtil;
+    private final CookieProvider cookieProvider;
 
     /*
      * 로그인
@@ -61,7 +61,7 @@ public class AuthController {
         String jwt = jwtUtil.createJwt(username, role, 60*60*60L);
 
         // 쿠키생성 후 jwt 저장 -> 응답에 쿠키 반영
-        response.addCookie(createJwtCookie(jwt));
+        response.addCookie(cookieProvider.createJwtCookie("Authorization",jwt));
         // 반환 데이터
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("Authorization", jwt); // JWT
@@ -84,9 +84,9 @@ public class AuthController {
         log.info("회원가입 결과 : {}",result);
         if (result) {
             return ResponseEntity.status(200).body("회원가입 성공");
-        } else {
-            return ResponseEntity.status(500).body("회원가입 실패");
         }
+            return ResponseEntity.status(500).body("회원가입 실패");
+
     }
 
 
@@ -95,19 +95,14 @@ public class AuthController {
      */
     @PostMapping("/api/auth/logout")
     public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
-        // JWT 쿠키를 삭제하기 위한 쿠키 설정
         log.info("로그아웃 진행");
-        Cookie cookie = new Cookie("Authorization", null);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // 즉시 만료
-        cookie.setDomain("localhost"); // 기존 쿠키의 Domain 확인 (필요 시 설정)
-        cookie.setSecure(false); // HTTPS 환경이 아니라면 false로 설정
-        response.addCookie(cookie);
+        // JWT 쿠키 만료시키기
+        response.addCookie(cookieProvider.expireJwtCookie());
         // 반환 데이터 (로그아웃 성공 메시지)
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("message", "Logout successful");
+        responseBody.put("message", "로그아웃 성공");
         return ResponseEntity.ok(responseBody);
     }
+
 
 }

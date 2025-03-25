@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import synerjs.lookkit2nd.common.provider.CookieProvider;
 import synerjs.lookkit2nd.common.util.JwtUtil;
 import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
 
@@ -21,8 +22,9 @@ import synerjs.lookkit2nd.oauth2.dto.CustomOAuth2User;
 @Component
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-
     private final JwtUtil jwtUtil;
+    private final CookieProvider cookieProvider;
+
 
     @Value("${DOMAIN_URI}")
     private String domainUri;
@@ -53,17 +55,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 
         // 쿠키에 JWT토큰 저장 후 응답
-        response.addCookie(createCookie("Authorization", jwtToken));
+        response.addCookie(cookieProvider.createJwtCookie("Authorization", jwtToken));
         response.sendRedirect(domainUri); // 토큰 쿠키발급 후 메인페이지 redirect
     }
 
-    // 쿠키 생성
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*60*60);
-        //cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        return cookie;
-    }
 }
