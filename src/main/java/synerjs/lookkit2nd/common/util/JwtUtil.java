@@ -1,6 +1,7 @@
 package synerjs.lookkit2nd.common.util;
 
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -41,5 +42,7 @@ public class JwtUtil {
             .signWith(secretKey)
             .compact();
     }
+
+
 
 }
