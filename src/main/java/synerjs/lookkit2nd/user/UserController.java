@@ -1,5 +1,6 @@
 package synerjs.lookkit2nd.user;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,11 @@ public class UserController {
     //아이디 중복 체크
     @GetMapping("/check-id")
     public ResponseEntity<String> checkIdDuplication(@RequestParam String userUuid) {
-        User result = userService.findByUserUuid(userUuid);
-
-        if (result == null) {
-            return ResponseEntity.status(200).body("사용 가능한 아이디");
+        boolean isDuplicate = Optional.ofNullable(userService.findByUserUuid(userUuid)).isPresent();
+        if (isDuplicate) {
+            return ResponseEntity.status(409).body("중복 아이디");
         }
-
-        return ResponseEntity.status(409).body("중복 아이디");
+        return ResponseEntity.status(200).body("사용 가능한 아이디");
     }
 
 
@@ -30,7 +29,6 @@ public class UserController {
         User user = userService.getUserInfo(id);
         return ResponseEntity.ok(user);
     }
-
 
 
     // 아이디로 유저 찾기
@@ -50,13 +48,10 @@ public class UserController {
     @PostMapping("/update/password")
     public ResponseEntity<String> updatePassword(@RequestBody UserDTO userDTO) {
         String result = userService.updatePassword(userDTO);
-
         if ("실패".equals(result)) {
             return ResponseEntity.status(500).body("비밀번호 변경에 실패했습니다.");
         }
-
         return ResponseEntity.status(200).body(result);
-
     }
 
 
