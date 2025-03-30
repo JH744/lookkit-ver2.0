@@ -56,17 +56,29 @@ public class UserService {
        }
 
 
-       // 아이디 조회 후 비밀번호 수정하기
+       // 아이디 조회 후 비밀번호 수정하기 삭제예정
+//    public String updatePassword(UserDTO userDTO) {
+//     Optional<User> optionalUser =  userRepository.findByUserUuid(userDTO.getUserUuid());
+//        if(optionalUser.isPresent()){
+//           User user= optionalUser.get();
+//           user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+//            userRepository.save(user);
+//            return "성공";
+//        }else {
+//            return "실패";
+//        }
+//    }
+
+    // 아이디 조회 후 비밀번호 수정하기
     public String updatePassword(UserDTO userDTO) {
-     Optional<User> optionalUser =  userRepository.findByUserUuid(userDTO.getUserUuid());
-        if(optionalUser.isPresent()){
-           User user= optionalUser.get();
-           user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            userRepository.save(user);
-            return "성공";
-        }else {
-            return "실패";
-        }
+        return userRepository.findByUserUuid(userDTO.getUserUuid())
+            .map(user -> {
+                String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+                return "성공";
+            })
+            .orElse("실패");
     }
 
 
