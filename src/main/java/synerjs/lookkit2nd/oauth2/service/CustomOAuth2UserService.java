@@ -37,9 +37,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 공급자 확인 -> OAuth2Response 객체 생성
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); //ex) kakao
-        log.info("요청된 Provider : {} ",registrationId);
+        //log.info("요청된 Provider : {} ", registrationId);
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        OAuth2Response oAuth2Response = getoAuth2Response(registrationId, attributes);
+
+        //요청된 유저 DB 조회 하기
+        //log.info("검증할 아이디 : {}", oAuth2Response.getUserUuid());
+        Optional<User> optionalUser = userRepository.findByUserUuid(oAuth2Response.getUserUuid());
+
+        // 기존 회원여부에 따라 회원가입 or 업데이트 진행
+        CustomOAuth2User customOAuth2User
+            = optionalUser.isEmpty()
+            ? signUpOAuth2User(oAuth2Response)
+            : updateOAuth2User(oAuth2Response, optionalUser);
+        return customOAuth2User;
+    }
+
+    /**
+     * OAuth 공급자 선택
+     */
+    private static OAuth2Response getoAuth2Response(String registrationId,
+        Map<String, Object> attributes) {
         OAuth2Response oAuth2Response =
             switch (registrationId) {
                 case "naver" -> {
@@ -52,21 +71,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     yield new KakaoResponse(attributes);
                 }
                 default -> null;
-        };
-
-        //요청된 유저 DB 조회 하기
-        //log.info("검증할 아이디 : {}", oAuth2Response.getUserUuid());
-        Optional<User> optionalUser = userRepository.findByUserUuid(oAuth2Response.getUserUuid());
-
-        // 기존 회원여부에 따라 회원가입 or 업데이트 진행
-        CustomOAuth2User customOAuth2User
-        = optionalUser.isEmpty()
-            ? signUpOAuth2User(oAuth2Response)
-            : updateOAuth2User(oAuth2Response, optionalUser);
-        return customOAuth2User;
+            };
+        return oAuth2Response;
     }
 
-    // 신규유저 - 회원가입
+    /**
+     * 신규유저 - 회원가입
+      */
     private CustomOAuth2User signUpOAuth2User(OAuth2Response oAuth2Response) {
         log.info("회원가입 진행");
         User userEntity = User.builder()
@@ -84,7 +95,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new CustomOAuth2User(userDTO);
     }
 
-    // 기존 유저- 최신정보 동기화를 위해 업데이트 진행
+    /**
+     * 기존 유저- 최신정보 동기화를 위해 업데이트 진행
+      */
     private CustomOAuth2User updateOAuth2User(OAuth2Response oAuth2Response,
         Optional<User> existData) {
         log.info("업데이트 진행");
