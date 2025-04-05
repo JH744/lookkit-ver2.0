@@ -39,6 +39,12 @@ public class AuthController {
      */
     @PostMapping("/api/auth/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> data, HttpServletResponse response) {
+        Map<String, Object> responseBody = loginUser(data, response);
+        return ResponseEntity.ok(responseBody);
+    }
+
+    private Map<String, Object> loginUser(Map<String, String> data,
+        HttpServletResponse response) {
         // 아이디와 비밀번호 가져오기
         UsernamePasswordAuthenticationToken authToken
             = new UsernamePasswordAuthenticationToken(data.get("username"), data.get("password"));
@@ -68,10 +74,8 @@ public class AuthController {
         responseBody.put("userId", customUser.getUserId());     // 사용자 ID
         responseBody.put("username", customUser.getUsername()); // 사용자 이름
         responseBody.put("roles", customUser.getAuthorities()); // 권한 정보
-        return ResponseEntity.ok(responseBody);
+        return responseBody;
     }
-
-
 
 
     /**
